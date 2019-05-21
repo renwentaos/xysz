@@ -35,6 +35,17 @@ public class LoginController {
 //    /**
 //     * 管理员登录页
 //     */
+
+    @RequestMapping(value = "/", method = RequestMethod.GET)
+    public String aLogin() {
+        //已登录则直接跳转默认页面
+        Object session = request.getSession().getAttribute("adminInfo");
+        if (session != null) {
+            return "redirect:" + ((Manager) session).getDefaultPage();
+        }
+        return "adminLogin";
+    }
+
     @RequestMapping(value = "/alogin", method = RequestMethod.GET)
     public String adminLogin() {
         //已登录则直接跳转默认页面
