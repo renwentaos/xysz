@@ -1,0 +1,198 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:replace="fragments/header :: managePublic('黑名单客户列表 - 云水滴商户后台',~{::link})">
+    <link href="/js/myPages/myPages.css" rel="stylesheet" type="text/css"/>
+    <!-- Date Range Picker -->
+    <link rel="stylesheet" type="text/css" href="/cosmo/css/daterangepicker/daterangepicker.css"/>
+</head>
+<body>
+<th:block th:replace="fragments/top :: merchantPublic('黑名单客户列表','',~{::#content},~{::#filter})">
+    <div id="filter" class="col controls-wrapper mt-3 mt-md-0 d-none d-md-block">
+        <div class="controls d-flex justify-content-center justify-content-md-end">
+            <form method="get">
+                <div class="row">
+                    <div class="col-5 col-md-3  p-1">
+                        <input type="text" class="form-control d-inline-block" placeholder="手机号/姓名/UID"
+                               name="memberInfo" th:value="${param.memberInfo}">
+                    </div>
+                    <div class="col-7 col-md-5 p-1">
+                        <input type="text" class="form-control d-inline-block" id="dateRange" placeholder="点击选择加入时间范围"
+                               th:value="${#strings.isEmpty(param.startTime)}?'':${param.startTime}+' - '+${param.endTime}">
+                    </div>
+                    <div class="col-5 col-md-3 p-1">
+                        <select class="form-control" name="level">
+                            <option value="">分类</option>
+                            <option th:selected="${param.level!=null}?${param.level[0]} eq ${lv.value}"
+                                    th:each="lv : ${application.memberLevel}"
+                                    th:text="${lv.key}" th:value="${lv.value}"></option>
+                        </select>
+                    </div>
+                    <div class="col-2 col-md-1 p-1">
+                        <input type="hidden" name="startTime" id="startTime" th:value="${param.startTime}">
+                        <input type="hidden" name="endTime" id="endTime" th:value="${param.endTime}">
+                        <button type="submit" class="btn btn-info py-1 px-2" data-toggle="modal"
+                                data-target="#gridFilters"><span
+                                class="material-icons align-text-bottom">search</span>
+                        </button>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+    <div class="content" id="content">
+        <div class="row align-items-center">
+            <table class="table table-bordered-sm bg-white responsive-table table-hover table-striped text-md-center align-middle-table">
+                <thead class="thead-light2">
+                <tr>
+                    <th scope="col">分类</th>
+                    <th scope="col">客户信息</th>
+                    <th scope="col">实名认证</th>
+                    <th scope="col">银行卡绑定</th>
+                    <th scope="col">基本信息</th>
+                    <th scope="col">联系人</th>
+                    <th scope="col">拉黑时间</th>
+                    <th scope="col">操作</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr th:each="item : ${pageInfo.list}">
+                    <td data-label="分类" th:switch="${item.member.level}">
+                        <span class="user-initials bg-info-light25 text-info"
+                              th:case="${application.memberLevel['B类客户']}">B类</span>
+                        <span class="user-initials bg-primary-light25 text-primary"
+                              th:case="*">A类</span>
+                    </td>
+                    <td data-label="客户信息">
+                        <small class="text-muted" th:if="${item.memberIdCard != null}"
+                               th:text="${item.memberIdCard.name}"></small>
+                        <div class="text-primary" th:text="${item.member.mobile}"></div>
+                    </td>
+                    <td data-label="实名认证" th:switch="${item.member.idCardState}">
+                        <span class="badge badge-danger mr-1 text-white"
+                              th:case="${application.infoState['已驳回']}">已驳回</span>
+                        <span class="badge badge-secondary mr-1 text-white"
+                              th:case="${application.infoState['未提交']}">未提交</span>
+                        <span class="badge badge-warning mr-1 text-white"
+                              th:case="${application.infoState['审核中']}">审核中</span>
+                        <span class="badge badge-success mr-1 text-white"
+                              th:case="${application.infoState['已完成']}">已完成</span>
+                    </td>
+                    <td data-label="银行卡绑定" th:switch="${item.member.bankState}">
+                        <span class="badge badge-danger mr-1 text-white"
+                              th:case="${application.infoState['已驳回']}">已驳回</span>
+                        <span class="badge badge-secondary mr-1 text-white"
+                              th:case="${application.infoState['未提交']}">未提交</span>
+                        <span class="badge badge-warning mr-1 text-white"
+                              th:case="${application.infoState['审核中']}">审核中</span>
+                        <span class="badge badge-success mr-1 text-white"
+                              th:case="${application.infoState['已完成']}">已完成</span>
+                    </td>
+                    <td data-label="基本信息" th:switch="${item.member.infoState}">
+                        <span class="badge badge-danger mr-1 text-white"
+                              th:case="${application.infoState['已驳回']}">已驳回</span>
+                        <span class="badge badge-secondary mr-1 text-white"
+                              th:case="${application.infoState['未提交']}">未提交</span>
+                        <span class="badge badge-warning mr-1 text-white"
+                              th:case="${application.infoState['审核中']}">审核中</span>
+                        <span class="badge badge-success mr-1 text-white"
+                              th:case="${application.infoState['已完成']}">已完成</span>
+                    </td>
+                    <td data-label="联系人" th:switch="${item.member.contactsState}">
+                        <span class="badge badge-danger mr-1 text-white"
+                              th:case="${application.infoState['已驳回']}">已驳回</span>
+                        <span class="badge badge-secondary mr-1 text-white"
+                              th:case="${application.infoState['未提交']}">未提交</span>
+                        <span class="badge badge-warning mr-1 text-white"
+                              th:case="${application.infoState['审核中']}">审核中</span>
+                        <span class="badge badge-success mr-1 text-white"
+                              th:case="${application.infoState['已完成']}">已完成</span>
+                    </td>
+                    <td data-label="拉黑时间" th:text="${#dates.format(item.createDate, 'yyyy-MM-dd HH:mm:ss')}"></td>
+
+                    <td data-label="操作" class="dropdown dropleft">
+                        <a th:href="'javascript:moveOut('+${item.memberId}+')'"
+                           class="btn text-white btn-sm btn-success mr-1 mr-lg-0">移出</a>
+                        <a th:href="'javascript:memberDetail('+${item.memberId}+')'"
+                           class="btn text-white btn-sm btn-primary mr-1 mr-lg-0">查看详情</a>
+                        <a href="javascript:void(0)" class="btn btn-warning btn-sm text-white " id="actionDropdown" data-toggle="dropdown"
+                           aria-expanded="true">快速跳转</a>
+                        <div class="dropdown-menu dropdown-menu-right" aria-labelledby="actionDropdown"
+                             x-placement="left-start"
+                             style="position: absolute; transform: translate3d(-136px, 13px, 0px); top: 0px; left: 0px; will-change: transform;">
+                            <a class="dropdown-item" th:href="'/merchant/apply/1-10?memberId='+${item.memberId}">额度记录</a>
+                            <a class="dropdown-item" th:href="'/merchant/loan/1-10?memberId='+${item.memberId}">贷款记录</a>
+                            <a class="dropdown-item" th:href="'/merchant/repayment/1-10?memberId='+${item.memberId}">还款记录</a>
+                        </div>
+                    </td>
+
+                </tr>
+                </tbody>
+            </table>
+        </div>
+        <div class="row" th:if="${pageInfo.total > 0}">
+            <div class="col-12">
+                <div id="pages"></div>
+            </div>
+        </div>
+    </div>
+</th:block>
+<th:block th:replace="fragments/js :: managePublic(~{})"></th:block>
+<script src="/js/myPages/myPages.js" type="text/javascript"></script>
+<script src="/cosmo/js/lib/moment.min.js"></script>
+<script src="/cosmo/js/daterangepicker/daterangepicker.min.js"></script>
+<script src="/js/my-datarange.js"></script>
+
+<script>
+    function moveOut(memberId) {
+        layer.confirm('将该用户移出黑名单？', {
+            btn: ['确定','取消'] //按钮
+        }, function(){
+            $.post("/merchant/back/move", {
+                "memberId": memberId,
+            }, function (data) {
+                if (data == null || data.length == 0) {
+                    window.location.reload();
+                } else {
+                    layer.msg(data);
+                }
+            }, 'text')
+        });
+
+    }
+    function memberDetail(id) {
+        var width = $(window).width();
+        var height = $(window).height();
+        if (width > 940) {
+            width = 940;
+            height = 623;
+        } else if (width <= 940 && width > 700) {
+            width = 700;
+            height = 450;
+        }
+        layer.open({
+            type: 2,
+            title: '客户详情',
+            shadeClose: true,
+            shade: 0.8,
+            area: [width + 'px', height + 'px'],
+            content: '/merchant/member/detail?id=' + id
+        });
+    }
+
+    $(function () {
+        $("#pages").myPages({
+            pageNo: [[${pageInfo.pageNum}]],
+            pageSize: [[${pageInfo.pageSize}]],
+            lastPage: [[${pageInfo.pages}]],
+            preText: "上一页",
+            nextText: "下一页",
+            url: "/merchant/back/{pageNo}-{pageSize}",
+            showPageButton: 6
+        })
+
+        //时间范围选择器
+        myRange("#dateRange", "#startTime", "#endTime");
+    })
+</script>
+</body>
+</html>

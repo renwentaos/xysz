@@ -1,0 +1,414 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="zh">
+<head th:replace="fragments/header :: managePublic('发布产品 - 行游神州管理员后台',~{::link})">
+    <link href="/js/myPages/myPages.css" rel="stylesheet" type="text/css"/>
+
+</head>
+<body>
+<th:block th:replace="fragments/top :: adminPublic('发布产品','为商户发布产品',~{::#content},~{})">
+    <div class="content" id="content">
+        <div class="row">
+            <div class="card col-xl-10">
+                <div class="row no-gutters">
+                    <div class="loader-wrapper incomponent" id="loaderDiv">
+                        <div class="spinner">
+                            <svg viewBox="0 0 66 66" xmlns="http://www.w3.org/2000/svg">
+                                <circle class="length" fill="none" stroke-width="6" stroke-linecap="round" cx="33"
+                                        cy="33" r="28"></circle>
+                            </svg>
+                            <svg viewBox="0 0 66 66" xmlns="http://www.w3.org/2000/svg">
+                                <circle fill="none" stroke-width="6" stroke-linecap="round" cx="33" cy="33"
+                                        r="28"></circle>
+                            </svg>
+                            <svg viewBox="0 0 66 66" xmlns="http://www.w3.org/2000/svg">
+                                <circle fill="none" stroke-width="6" stroke-linecap="round" cx="33" cy="33"
+                                        r="28"></circle>
+                            </svg>
+                            <svg viewBox="0 0 66 66" xmlns="http://www.w3.org/2000/svg">
+                                <circle fill="none" stroke-width="6" stroke-linecap="round" cx="33" cy="33"
+                                        r="28"></circle>
+                            </svg>
+                        </div>
+                    </div>
+                    <div class="col-lg-4   d-block border-lg-right">
+                        <div class="loader-wrapper incomponent" id="merchantDivLoader">
+                            <div class="spinner">
+                                <svg viewBox="0 0 66 66" xmlns="http://www.w3.org/2000/svg">
+                                    <circle class="length" fill="none" stroke-width="6" stroke-linecap="round" cx="33"
+                                            cy="33" r="28"></circle>
+                                </svg>
+                                <svg viewBox="0 0 66 66" xmlns="http://www.w3.org/2000/svg">
+                                    <circle fill="none" stroke-width="6" stroke-linecap="round" cx="33" cy="33"
+                                            r="28"></circle>
+                                </svg>
+                                <svg viewBox="0 0 66 66" xmlns="http://www.w3.org/2000/svg">
+                                    <circle fill="none" stroke-width="6" stroke-linecap="round" cx="33" cy="33"
+                                            r="28"></circle>
+                                </svg>
+                                <svg viewBox="0 0 66 66" xmlns="http://www.w3.org/2000/svg">
+                                    <circle fill="none" stroke-width="6" stroke-linecap="round" cx="33" cy="33"
+                                            r="28"></circle>
+                                </svg>
+                            </div>
+                        </div>
+                        <div class="card-header" style="padding: 18.5px 1.25rem">
+                            <div class="input-group">
+                                <input type="search" id="merchantName" class="form-control bg-light rounded"
+                                       placeholder="商户名称/ID(回车直接搜索)">
+                                <div class="input-group-append">
+                                    <button type="button" id="btnMerchantSearch" class="btn btn-info py-1 px-2"
+                                            data-toggle="modal"
+                                            data-target="#gridFilters"><span
+                                            class="material-icons align-text-bottom">search</span>
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                        <div id="merchantDiv">
+
+                        </div>
+                    </div>
+                    <div class="col-lg-8">
+                        <div class="card-header py-3">
+                            <div class="media align-items-center mb-0">
+                                <div class="media-body">
+                                    <h6 class="m-0 weight-400">产品资料</h6>
+                                    <small class="text-muted">选择商户然后填写产品的资料信息</small>
+                                </div>
+
+                            </div>
+
+                        </div>
+
+                        <div class="card-body">
+                            <form id="form" method="post">
+                                <div class="alert alert-danger" th:if="${msg != null}">
+                                    <strong>提示:</strong><span th:text="${msg}"></span>
+                                </div>
+                                <div class="form-group">
+                                    <label for="name">产品名称</label>
+                                    <input type="text" class="form-control" id="name" name="name"
+                                           data-fieldname="产品名称"
+                                           placeholder="请输入产品的名称(必填)">
+                                </div>
+
+                                <div class="form-row">
+                                    <div class="form-group col-md-6">
+                                        <label for="minAmount">最小借款金额</label>
+                                        <input type="text" class="form-control" id="minAmount" name="minAmount"
+                                               data-fieldname="最小借款金额"
+                                               placeholder="请输入最小的借款金额(必填)">
+                                    </div>
+                                    <div class="form-group col-md-6">
+                                        <label for="maxAmount">最大借款金额</label>
+                                        <input type="text" class="form-control" id="maxAmount" name="maxAmount"
+                                               data-fieldname="最大借款金额"
+                                               placeholder="请输入最大的借款金额(必填)">
+                                    </div>
+                                </div>
+                                <div class="form-row">
+                                    <div class="form-group col-md-4">
+                                        <label for="loanTime">借款时间</label>
+                                        <div class="input-group">
+                                            <input type="text" class="form-control" id="loanTime" name="loanTime"
+                                                   data-fieldname="借款时间"
+                                                   placeholder="请输入借款的天数(必填)">
+                                            <div class="input-group-append">
+                                                <span class="input-group-text">天</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="form-group col-md-4">
+                                        <label for="repaymentIntervalTime">还款间隔</label>
+                                        <div class="input-group">
+
+                                            <select class="form-control" id="repaymentIntervalTime" name="repaymentIntervalTime">
+                                            </select>
+                                        </div>
+
+                                    </div>
+                                    <div class="form-group col-md-4">
+                                        <label>风控数据(可选)</label>
+                                        <div class="input-group">
+                                            <div class="form-check form-check-inline">
+                                                <input class="form-check-input" type="checkbox" id="jd" name="jd" value="1">
+                                                <label class="form-check-label" for="jd">京东数据</label>
+                                            </div>
+                                            <div class="form-check form-check-inline">
+                                                <input class="form-check-input" type="checkbox" id="tb" name="tb" value="1">
+                                                <label class="form-check-label" for="tb">淘宝数据</label>
+                                            </div>
+                                        </div>
+
+                                    </div>
+                                </div>
+                                <div class="form-row">
+                                    <div class="form-group col-md-4">
+                                        <label for="dayRates">日息</label>
+                                        <div class="input-group">
+                                            <div class="input-group-prepend">
+                                                <span class="input-group-text">万分之</span>
+                                            </div>
+                                            <input type="text" class="form-control" id="dayRates" name="dayRates"
+                                                   data-fieldname="日息"
+                                                   placeholder="请输入正常日息(必填)">
+                                        </div>
+                                    </div>
+                                    <div class="form-group col-md-4">
+                                        <label for="overdueDayRates">逾期日息</label>
+                                        <div class="input-group">
+                                            <div class="input-group-prepend">
+                                                <span class="input-group-text">千分之</span>
+                                            </div>
+                                            <input type="text" class="form-control" id="overdueDayRates"
+                                                   name="overdueDayRates"
+                                                   data-fieldname="逾期日息"
+                                                   placeholder="请输入逾期日息(必填)">
+                                        </div>
+                                    </div>
+                                    <div class="form-group col-md-4">
+                                        <label for="cutInterestPercent">代金券比例</label>
+                                        <div class="input-group">
+                                            <div class="input-group-prepend">
+                                                <span class="input-group-text">百分之</span>
+                                            </div>
+                                            <input type="text" class="form-control" id="cutInterestPercent"
+                                                   name="cutInterestPercent"
+                                                   data-fieldname="砍头息"
+                                                   placeholder="代金券面额与砍头息相等(必填)">
+                                        </div>
+
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <label for="description">项目描述</label>
+                                    <textarea class="form-control" id="description" name="description"
+                                              rows="6" placeholder="请输入对项目的描述"></textarea>
+                                </div>
+                                <input type="hidden" name="token" th:value="${token}">
+                                <input type="hidden" id="merchantId" name="merchantId"/>
+                                <button type="submit" class="btn btn-block btn-primary btn-lg">发布项目</button>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+
+    </div>
+</th:block>
+<th:block th:replace="fragments/js :: managePublic(~{})"></th:block>
+<script type="text/javascript" src="/js/validate/jquery.validate.js"></script>
+<script type="text/javascript" src="/js/validate/localization/messages_zh_layer.js"></script>
+<script src="/js/jquery.animate-colors-min.js"></script>
+<script src="/js/myPages/myPages.js" type="text/javascript"></script>
+<script>
+    var merchantLevel = $.parseJSON("[[${application.merchantLevel}]]".replaceAll("=", ":")
+        .replace(/(?:\s*['"]*)?([\u4e00-\u9fa5_a-zA-Z0-9]+)(?:['"]*\s*)?:/g, "\"$1\":"));
+    var imgSite = "[[${application.imgSite}]]";
+
+    var nowMerchantId = 0;
+
+    function loadMerchants(pageNo) {
+        nowMerchantId = 0;
+        $("#merchantId").val("");
+        if (!pageNo || pageNo < 1) {
+            pageNo = 1;
+        }
+        var element = $("#merchantDiv");
+        timeLoader($("#loaderDiv"), element, 100, 300, $("#merchantName"))
+        $.post("/admin/merchant/member/merlists", {
+            "info": $("#merchantName").val(),
+            "number": pageNo,
+            "size": 6
+        }, function (data) {
+            loaderData = data;
+            buildMerchantHtml(data, element);
+        });
+    }
+
+    function buildMerchantHtml(data, element) {
+        element.children().remove();
+        $(data.list).each(function (number, item) {
+            var merchantDiv = $("<div name='merchantDiv'></div>");
+            merchantDiv.addClass("media border-bottom px-3 py-4");
+            merchantDiv.css("cursor", "pointer");
+            merchantDiv.hover(function () {
+                if ($(this).attr("data-select") != "true")
+                    $(this).toggleClass("bg-light");
+            });
+            merchantDiv.data("merchantId", item.id);
+            merchantDiv.click(function () {
+                var merchantId = $(this).data("merchantId");
+                if (merchantId != nowMerchantId) {
+                    nowMerchantId = merchantId;
+                    $("#merchantId").val(merchantId);
+                    $("div[data-select]").css({"background-color": '', "color": ""});
+                    $("div[data-select]").removeAttr("data-select");
+                    $(this).attr("data-select", "true");
+                    $(this).removeClass("bg-light");
+                    $(this).animate({backgroundColor: '#343a40', color: "white"}, 200);
+                }
+            })
+
+            var logImg = $("<img />");
+            logImg.appendTo(merchantDiv);
+            logImg.addClass("mr-3 rounded");
+            logImg.width(30);
+            logImg.attr("src", imgSite+item.logo);
+
+            var content = $("<div></div>");
+            content.appendTo(merchantDiv);
+            content.addClass("media-body");
+
+            var title = $("<h6></h6>");
+            title.appendTo(content);
+            title.addClass("m-0 weight-400");
+            title.text(item.name);
+
+            var level = $("<span></span>");
+            level.appendTo(title);
+            level.addClass("badge mr-1 text-white ml-2");
+
+            if (item.level == merchantLevel["普通商户"]) {
+                level.text("普通商户");
+                level.addClass("badge-info");
+            } else if (item.level == merchantLevel["VIP商户"]) {
+                level.text("VIP商户");
+                level.addClass("badge-success");
+            } else if (item.level == merchantLevel["全国VIP商户"]) {
+                level.text("全国VIP商户");
+                level.addClass("badge-warning");
+            } else if (item.level == merchantLevel["超级VIP商户"]) {
+                level.text("超级VIP商户");
+                level.addClass("badge-primary");
+            }
+
+
+            var desc = $("<small></small>");
+            desc.appendTo(content);
+            desc.addClass("text-muted");
+            desc.text("地区:" + item.province + " - " + item.city);
+            element.append(merchantDiv);
+
+        })
+
+        var merchantPages = $("<div id='merchantPages' class='mt-3 float-right'></div>");
+        // var merchantPages = merchantPagesDiv.find("#merchantPages");
+        merchantPages.appendTo(element);
+        merchantPages.myPages({
+            pageNo: data.pageNum,
+            pageSize: data.pageSize,
+            lastPage: data.pages,
+            preText: "上一页",
+            nextText: "下一页",
+            url: "javascript:loadMerchants({pageNo})"
+        })
+    }
+
+    $(function () {
+        loadMerchants()
+        $("#btnReset").click(function () {
+            var con = layer.confirm('确认重置吗？', {
+                btn: ['确认', '取消'] //按钮
+            }, function () {
+                $("#form")[0].reset();
+                layer.close(con);
+            });
+        })
+
+        $("#form").validate({
+            ignore: [],
+            rules: {
+                merchantId: {
+                    required: true
+                },
+                name: {
+                    required: true,
+                    minlength: 2
+                },
+                minAmount: {
+                    required: true,
+                    min: 100,
+                    digits:true
+                },
+                maxAmount: {
+                    required: true,
+                    min: 100,
+                    digits:true,
+                    gt: ["#minAmount", "最小借款金额"]
+                },
+                loanTime: {
+                    required: true,
+                    digits:true,
+                    min: 1
+                },
+                repaymentIntervalTime: {
+                    required: true,
+                    digits:true,
+                    min: 1
+                },
+                dayRates: {
+                    required: true,
+                    min: 0.01
+                },
+                overdueDayRates: {
+                    required: true,
+                    min: 0.01
+                },
+                cutInterestPercent: {
+                    required: true,
+                    min: 1
+                }
+            },
+            messages: {
+                merchantId: {
+                    required: "您还没有选择商户"
+                },
+                dayRates: {
+                    min: "日息最低为万分之0.01"
+                },
+                overdueDayRates: {
+                    min: "逾期日息最低为千分之0.01"
+                },
+                cutInterestPercent: {
+                    min: "砍头息最低为百分之1"
+                }
+            },
+            submitHandler: function (form) {
+                layer.confirm('确认发布产品？', {
+                    btn: ['确认', '取消'] //按钮
+                }, function () {
+                    form.submit();
+                });
+            }
+        });
+        
+        $("#loanTime").blur(function () {
+            if($("#form").validate().element($("#loanTime"))){
+                var day = $("#loanTime").val();
+                var html = "";
+                for(var i = 1;i<=day;i++){
+                    if(day%i == 0){
+                        html+="<option value='"+i+"' ";
+                        if(i == 7){
+                            html += " selected ";
+                        }
+                        html+=">"+i+"天</option>"
+                    }
+                }
+                $("#repaymentIntervalTime").html(html)
+            }
+        })
+
+        $("#merchantName").keyup(function (event) {
+            if (event.keyCode == 13) {
+                loadMerchants()
+            }
+        })
+    })
+</script>
+</body>
+</html>

@@ -1,0 +1,137 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.xws.xysz.dao.ManagerDao">
+    <resultMap id="BaseResultMap" type="com.xws.xysz.model.Manager">
+
+        <!-- id -->
+        <id column="id" jdbcType="INTEGER" property="id"/>
+
+        <!-- 用户名 -->
+        <result column="user_name" jdbcType="VARCHAR" property="userName"/>
+
+        <!-- 密码 -->
+        <result column="password" jdbcType="VARCHAR" property="password"/>
+
+        <!-- 扰码 -->
+        <result column="p_key" jdbcType="VARCHAR" property="pKey"/>
+
+        <!-- 管理员姓名 -->
+        <result column="name" jdbcType="VARCHAR" property="name"/>
+
+        <!-- 状态，-1冻结/删除，0正常 -->
+        <result column="state" jdbcType="INTEGER" property="state"/>
+
+        <!-- 拥有的角色，多个逗号隔开 -->
+        <result column="roles" jdbcType="VARCHAR" property="roles"/>
+
+
+        <collection property="roleList" ofType="com.xws.xysz.model.Role">
+            <id property="id" column="roleId"/>
+            <result property="name" column="roleName"/>
+            <result property="rightIds" column="right_ids"/>
+        </collection>
+        <collection property="rightsList" ofType="com.xws.xysz.model.Rights">
+            <id property="id" column="rightId"/>
+            <result property="rightName" column="right_name"/>
+            <result property="right" column="right"/>
+            <result property="fatherId" column="father_id"/>
+            <result property="isView" column="is_view"/>
+        </collection>
+    </resultMap>
+    <insert id="insert" keyColumn="id" keyProperty="id" useGeneratedKeys="true">
+        insert into manager
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="userName != null">
+                user_name,
+            </if>
+            <if test="password != null">
+                `password`,
+            </if>
+            <if test="pKey != null">
+                p_key,
+            </if>
+            <if test="name != null">
+                `name`,
+            </if>
+            <if test="state != null">
+                `state`,
+            </if>
+            <if test="roles != null">
+                roles,
+            </if>
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="userName != null">
+                #{userName,jdbcType=VARCHAR},
+            </if>
+            <if test="password != null">
+                #{password,jdbcType=VARCHAR},
+            </if>
+            <if test="pKey != null">
+                #{pKey,jdbcType=VARCHAR},
+            </if>
+            <if test="name != null">
+                #{name,jdbcType=VARCHAR},
+            </if>
+            <if test="state != null">
+                #{state,jdbcType=INTEGER},
+            </if>
+            <if test="roles != null">
+                #{roles,jdbcType=VARCHAR},
+            </if>
+        </trim>
+    </insert>
+    <update id="updateById">
+        update manager
+        <set>
+            <if test="userName != null">
+                user_name = #{userName,jdbcType=VARCHAR},
+            </if>
+            <if test="password != null">
+                `password` = #{password,jdbcType=VARCHAR},
+            </if>
+            <if test="pKey != null">
+                p_key = #{pKey,jdbcType=VARCHAR},
+            </if>
+            <if test="name != null">
+                `name` = #{name,jdbcType=VARCHAR},
+            </if>
+            <if test="state != null">
+                `state` = #{state,jdbcType=INTEGER},
+            </if>
+            <if test="roles != null">
+                roles = #{roles,jdbcType=VARCHAR},
+            </if>
+        </set>
+        where id = #{id,jdbcType=INTEGER}
+    </update>
+    <select id="selectById" parameterType="java.lang.Integer" resultMap="BaseResultMap">
+        select * from manager
+        where id=#{id}
+    </select>
+    <select id="selectAll" resultMap="BaseResultMap">
+        select m.*,r.id as roleId,r.`name` as roleName,r.right_ids from manager m
+        left join role r on ( find_in_set(r.id,m.roles))
+        <if test="state !=null">
+            where state=#{state}
+        </if>
+        order by state desc
+  </select>
+
+    <!-- Your codes goes here!!! -->
+
+    <!--根据id获得管理员和权限信息-->
+    <select id="selectManagerAndRightsById" parameterType="java.lang.Integer" resultMap="BaseResultMap">
+        select m.*,r.id as roleId,r.`name` as roleName,r.right_ids,rt.id as rightId,rt.`right`,rt.right_name
+        ,rt.father_id,rt.is_view
+        from manager m
+        left join role r on(find_in_set(r.id,m.roles))
+        left join rights rt on (FIND_IN_SET(rt.id,r.right_ids))
+        where m.id=#{id} order by state,rt.`order` desc
+    </select>
+
+    <!--根据用户名获取Manager信息-->
+    <select id="selectByUsername" resultMap="BaseResultMap">
+        select * from manager where user_name=#{username}
+    </select>
+</mapper>

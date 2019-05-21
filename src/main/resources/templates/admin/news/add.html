@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="zh">
+<head th:replace="fragments/header :: managePublic('发布公告 - 加佰加管理员后台',~{::link})">
+</head>
+<body>
+<th:block th:replace="fragments/top :: adminPublic('发布公告','公告详情',~{::#content},~{})">
+    <div class="content" id="content">
+        <div class="row">
+            <div class="col-lg-5 col-xl-11">
+                <div class="card">
+                    <div class="loader-wrapper incomponent" id="loaderDiv">
+                        <div class="spinner">
+                            <svg viewBox="0 0 66 66" xmlns="http://www.w3.org/2000/svg">
+                                <circle class="length" fill="none" stroke-width="6" stroke-linecap="round" cx="33"
+                                        cy="33" r="28"></circle>
+                            </svg>
+                            <svg viewBox="0 0 66 66" xmlns="http://www.w3.org/2000/svg">
+                                <circle fill="none" stroke-width="6" stroke-linecap="round" cx="33" cy="33"
+                                        r="28"></circle>
+                            </svg>
+                            <svg viewBox="0 0 66 66" xmlns="http://www.w3.org/2000/svg">
+                                <circle fill="none" stroke-width="6" stroke-linecap="round" cx="33" cy="33"
+                                        r="28"></circle>
+                            </svg>
+                            <svg viewBox="0 0 66 66" xmlns="http://www.w3.org/2000/svg">
+                                <circle fill="none" stroke-width="6" stroke-linecap="round" cx="33" cy="33"
+                                        r="28"></circle>
+                            </svg>
+                        </div>
+                    </div>
+                    <div class="card-header py-3">
+                        <div class="media align-items-center mb-0">
+                            <div class="media-body">
+                                <h6 class="m-0 weight-400">公告资料</h6>
+                            </div>
+
+                        </div>
+                    </div>
+                    <div class="card-body">
+                        <form id="form" method="post" enctype="multipart/form-data">
+                            <div class="alert alert-danger" th:if="${msg != null}">
+                                <strong>提示:</strong><span th:text="${msg}"></span>
+                            </div>
+                            <div class="form-group">
+                                <label th:for="type">公告类别</label>
+                                <select class="form-control" name="type" id="type">
+                                    <option value="">公告类别</option>
+                                    <option  th:each="codes : ${application.newsCode}"
+                                             th:text="${codes.key}" th:value="${codes.value}"></option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label for="title">标题</label>
+                                <input type="text" class="form-control" id="title" name="title"
+                                       data-fieldname="公告标题"
+                                       placeholder="请输入公告标题(必填)">
+                            </div>
+                            <div class="form-group">
+                                <label for="title">关键字</label>
+                                <textarea rows="3" class="form-control" id="keys" name="keys"
+                                       data-fieldname="公告描述"
+                                       placeholder="请输入公告描述(必填)"></textarea>
+                            </div>
+                            <div class="form-group">
+                                <label th:for="contents">公告内容</label>
+                                <p style="overflow:auto;overflow-x: hidden;">
+                                    <script id="contents" name="contents"  data-fieldname="公告内容" type="text/plain"></script>
+                                </p>
+                            </div>
+                            <input type="hidden" name="token" th:value="${token}">
+                            <input type="submit" id="sub" style="margin-top: 30px;"
+                                   class="btn btn-block btn-primary btn-lg" value="发布公告">
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</th:block>
+</body>
+<th:block th:replace="fragments/js :: managePublic(~{})"></th:block>
+<link rel="stylesheet" href="/js/umeditor/themes/default/css/umeditor.css">
+<script type="text/javascript" src="/js/umeditor/umeditor.config.js"></script>
+<script type="text/javascript" src="/js/umeditor/umeditor.js"></script>
+<script type="text/javascript" src="/js/umeditor/lang/zh-cn/zh-cn.js"></script>
+<script type="text/javascript" src="/js/layer/layer.js"></script>
+<script type="text/javascript" src="/js/validate/jquery.validate.min.js"></script>
+<script type="text/javascript" src="/js/validate/localization/messages_zh_layer.js"></script>
+<style>
+    label {
+        position: relative;
+    }
+
+    #file {
+        position: absolute;
+        left: 0;
+        top: 0;
+        opacity: 0;
+    }
+
+    #btn {
+        margin-right: 5px;
+    }
+</style>
+<script type="text/javascript">
+    $(document).ready(function () {
+        $("#form").validate({
+            rules: {
+                title: {
+                    required: true
+                }
+            },
+            submitHandler: function (form) {
+                var typeV= $('#type option:selected') .val();//选中的值
+                if(typeV == null || typeV ==''){
+                    layer.msg("请选择类别");
+                    return;
+                }
+                var keysV = $("#keys").val();
+                if(keysV == null || keysV ==''){
+                    layer.msg("请输入描述信息");
+                    return;
+                }
+                layer.confirm('确认添加？', {
+                    btn: ['确认', '取消'] //按钮
+                }, function () {
+                    form.submit();
+                });
+            }
+        });
+    })
+
+    function changePic() {
+        var reads = new FileReader();
+        var f = document.getElementById('file').files[0];
+        reads.readAsDataURL(f);
+        reads.onload = function (e) {
+            document.getElementById('logoPic').src = this.result;
+        };
+        $("#logoPic").show();
+        $("#logoPic").attr('style', 'width: 300px;height: 200px;');
+        $("#removes").show();
+    }
+
+    $(function () {
+        window.um = UM.getEditor('contents');
+        $('#moves').on('mouseleave', '.content-img-list-item', function () {
+            $(this).children('a').addClass('hide');
+        });
+    })
+
+    function remove() {
+        $("#file").val('');
+        $("#removes").hide();
+        $("#logoPic").hide();
+    }
+</script>
+</html>

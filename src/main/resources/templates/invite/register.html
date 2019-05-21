@@ -1,0 +1,169 @@
+﻿<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="zh">
+<html>
+	<head>
+		<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, minimum-scale=1.0, maximum-scale=5.0" charset="UTF-8">
+		<meta name="apple-mobile-web-app-capable" content="yes">
+		<meta name="apple-mobile-web-app-status-bar-style" content="black">
+		<meta name="format-detection" content="telephone=no">
+		<title>用户注册</title>
+		<link rel="stylesheet" href="/invite/css/iconfont.css" />
+		<link rel="stylesheet" href="/invite/css/common.css" />
+		<link rel="stylesheet" href="/invite/css/ModularForm.css" />
+		<link rel="stylesheet" href="/invite/css/LoginRegister.css" />
+		<!--<script type="text/javascript" src="/invite/js/Libs/jquery.min.js" ></script>-->
+		<script type="text/javascript" src="/js/jquery-3.3.1.min.js" ></script>
+	</head>
+	<body>
+		<div class="wrapper">
+			<!--页头-->
+			<header class="header">
+				<img src="/invite/images/applogo.png">
+			</header>
+			<form method="post" id="form" action="/invite/registers">
+			<section class="main" id="groupForm">
+				<div class="DeInfo_Inpet DeInfo_Inpet2">
+					<div class="DeInfoInput LoginInput">
+						<label class="iconfont icon-zhanghu1 floatL" ></label>
+						<input type="text" id="account" placeholder="请输入手机号" name="mobile" class="DeInfo_text" data-regtest="^1[3|4|5|7|8]\d{9}$ ">
+					</div>
+					<div class="DeInfoInput LoginInput">
+						<label class="iconfont icon-verification floatL" ></label>
+						<input type="number" id="code" name="code" placeholder="请输入验证码" class="DeInfo_text" data-regtest="\d">
+						<a class="sent" id="sendCode" href="javascript:void(0);" onclick="javascript:verify();" >获取验证码</a>
+
+					</div>
+					<div class="DeInfoInput LoginInput">
+						<label class="iconfont icon-mima floatL" ></label>
+						<input type="password" id="password" name="password" placeholder="8-20字母数字组合" class="DeInfo_text" data-regtest="\d">
+					</div>
+					<p class="errorShow">不能为空</p>
+					<div class="optCont">
+						<div class="floatL OptContInfo OptContInfo2" >
+							<div class="floatL OptInfoL">
+								<input type="checkbox" checked data-style="checkeds" class="checkedNum" />
+								<label class="iconfont"></label>
+							</div>
+							<div class="floatL OptInfoR">已阅读并同意<a href="zcxy.html" target="_blank">《用户注册协议》</a></div>
+						</div>
+					</div>
+				</div>
+				<!--按钮-->
+				<div class="BtnCont">
+					<input type="hidden" name="token" id="token" th:value="${token}">
+					<input type="hidden" name="merchantId" id="merchantId" th:value="${merchantId}">
+					<input type="hidden" name="channelId" id="channelId" th:value="${channelId}">
+					<button type="submit" class="BigBtn" id="register" >立即注册</button>
+				</div>
+			</section>
+			</form>
+			
+		</div>
+		<script type="text/javascript" src="/invite/js/Libs/swiper-3.3.1.jquery.min.js" ></script>
+		<script type="text/javascript" src="/js/validate/jquery.validate.min.js"></script>
+		<script type="text/javascript" src="/js/layer/layer.js"></script>
+		<script type="text/javascript" src="/js/validate/localization/messages_zh_layer.js"></script>
+		<!--<script type="text/javascript" src="http://api.map.baidu.com/api?v=1.4&ak=ZWUUkyZvPGxkTapaaQXbq6EL2yEhZLWD"></script>-->
+		<!--<script type="text/javascript" src="http://api.map.baidu.com/getscript?v=1.4&amp;ak=ZWUUkyZvPGxkTapaaQXbq6EL2yEhZLWD&amp;services=&amp;t=20150522093217"></script>-->
+		<!--<div id="allmap"></div>-->
+	</body>
+	<script type="text/javascript">
+		function verify() {
+			if(document.getElementById('sendCode').innerText != '获取验证码'){
+				layer.msg("请稍后。。");
+				return;
+			}
+			var account = $("#account").val();
+			var msg='';
+			// var reg = /^(?![0-9]+$)(?![a-zA-Z]+$)[0-9A-Za-z`~!@#$%^&*()+=|{}':;',\[\].<>/?~！@#￥%……&*（）——+|{}【】‘；：”“’。，、？]{8,20}$/;
+			if(account == null || account == ''){
+				msg = '请输入手机号码';
+			}else{
+				if(!/^(13[0-9]|14[5-9]|15[012356789]|166|17[0-8]|18[0-9]|19[8-9])[0-9]{8}$/.test(account)){
+					msg = '手机号码错误';
+				}
+				$.ajax({
+					type: 'POST',
+					url: '/invite/validate/mobile',
+					dataType: "json",
+					data: 'mobile=' + account,
+					async: false,
+					success: function (data) {
+						if (data == true) {
+							msg = '手机号已被注册';
+						}
+					}
+				});
+			}
+			if(msg != null && msg != ''){
+				layer.msg(msg);
+				return ;
+			}else{
+			document.getElementById("sendCode").innerHTML="发送中...";
+				// $("#sendCode").css("background-color", "#ccc");
+				$("#sendCode").attr('disabled', "true");
+			$.ajax({
+				type: "POST",
+				url: "/invite/sms",
+				data: {
+					codeType: 1001,
+					mobile: account
+				},
+				dataType: "json",
+				success: function (data) {
+					if (isNaN(data)) { //发送失败
+						layer.msg( data);
+						document.getElementById("sendCode").innerHTML=='获取验证码';
+						$("#sendCode").removeAttr("disabled");
+						// $("#sendCode").css("background-color", "#8dcd53");
+					} else {
+						sendIntervalTime(data);
+						// $("#sendCode").css("background-color", "#ccc");
+						$("#sendCode").attr('disabled', "true");
+					}
+				}
+			});
+			}
+		}
+
+		function sendIntervalTime(interval) {
+			if (interval > 1) {
+				interval--;
+				document.getElementById("sendCode").innerHTML=interval + "s后重试";
+				setTimeout("sendIntervalTime("+interval+")", 1000);
+			} else {
+				document.getElementById("sendCode").innerHTML='获取验证码';
+				$("#sendCode").removeAttr("disabled");
+			}
+		};
+
+		$(function () {
+			var msg = "[[${msg}]]";
+			if(msg != null && msg != ''){
+				layer.msg(msg);
+			}
+			$("#form").validate({
+				submitHandler: function (form) {
+					var mobile = $("#account").val();
+					var code = $("#code").val();
+					var password = $("#password").val();
+					if(mobile.length != 11){
+						layer.msg("手机号错误");
+						return;
+					}
+					if(code.length != 6 ){
+						layer.msg("验证码错误");
+						return;
+					}
+					if(password.length<8 || password.length>20){
+						layer.msg("密码不符合规则");
+						return;
+					}
+					layer.load(2, {shade: [0.8, '#fff']});
+						form.submit();
+				}
+			});
+		})
+
+	</script>
+</html>

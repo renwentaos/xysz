@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:replace="fragments/header :: managePublic('网站提示 - 云水滴',~{})"></head>
+<body>
+<div class="container">
+        <div class="card  text-center" style="margin-top:20%">
+            <div class="card-header bg-light">
+                网站提示
+            </div>
+            <div class="card-body">
+                <h1 class=" weight-400 mt-5 card-title" th:text="${msg}"></h1>
+                <br/>
+                <p class="card-text"><strong class="text-warning" id="jumpTo">5</strong> 秒后系统自动跳转，也可点击下方按钮跳转</p>
+                <br/>
+                <a th:href="${url}" class="btn btn-primary">点击跳转</a>
+            </div>
+        </div>
+</div>
+<script type="text/javascript">
+    function countDown(secs,surl){
+        var jumpTo = document.getElementById('jumpTo');
+        jumpTo.innerHTML=secs;
+        if(--secs>0){
+            setTimeout("countDown("+secs+",'"+surl+"')",1000);
+        }
+        else{
+            location.href=surl;
+        }
+    }
+
+    var url ="[[${url}]]";
+    url = url==""?"/":url;
+    countDown(5,url);
+</script>
+</body>
+</html>

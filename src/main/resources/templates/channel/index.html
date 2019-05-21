@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:replace="fragments/header :: managePublic('首页 - 云水滴渠道商后台',~{})"></head>
+<body>
+<th:block th:replace="fragments/top :: channelPublic('首页','云水滴渠道商后台',~{::#content},~{})">
+    <div class="content" id="content">
+        <div class="row">
+            <div class="col-lg-6">
+                <div class="card">
+                    <div class="card-header">
+                        渠道商信息
+                    </div>
+                    <div class="card-body">
+                        <label class="weight-400">推广链接</label>
+                        <div class="input-group">
+                            <input type="text" id="tgUrl" class="form-control" readonly>
+                            <div class="input-group-append">
+                                <button id="copyUrl" data-clipboard-target="#tgUrl" class="btn btn-primary" type="button">
+                                    复制链接
+                                </button>
+                            </div>
+                        </div>
+                        <label class="mt-4 weight-400">推广二维码</label>
+                        <div id="tgQRCode" class="text-center"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</th:block>
+<th:block th:replace="fragments/js :: managePublic(~{})"></th:block>
+<script src="/js/jquery-qrcode-0.14.0.min.js"></script>
+<script src="/js/clipboard.min.js" type="text/javascript"></script>
+
+<script>
+    $(function () {
+        var url = URlHandle("/invite/index?channelId=[[${session.channelInfo.id}]]");
+        var labelTxt = "[[${session.channelInfo.userName}]]";
+        $("#tgUrl").val(url);
+        $("#tgQRCode").qrcode({
+            text: url,
+            ecLevel: "H",
+            size:200,
+            mode:2,
+            fontcolor:"#0064D2",
+            label:labelTxt
+        });
+        var clipboard = new ClipboardJS('#copyUrl');
+        clipboard.on('success', function (e) {
+            layer.msg("复制推广链接成功");
+        });
+    })
+</script>
+</body>
+</html>

@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:replace="fragments/header :: managePublic('添加管理员 - 行游神州管理员后台',~{})"></head>
+<body>
+<th:block th:replace="fragments/top :: adminPublic('添加管理员','',~{::#content},~{})">
+    <div class="content" id="content">
+        <div class="row">
+            <div class=" col-lg-4 col-12 ">
+                <form method="post" id="form">
+                    <div class="form-group">
+                        <label for="userName">用户名</label>
+                        <input type="text" class="form-control" id="userName" name="userName"
+                               data-fieldname="用户名"
+                               placeholder="请输入用户名">
+                    </div>
+                    <div class="form-group">
+                        <label for="password">密码</label>
+                        <input type="password" class="form-control" id="password" name="password"
+                               data-fieldname="密码"
+                               placeholder="请输入想要设定的密码">
+                    </div>
+                    <div class="form-group">
+                        <label for="password2">确认密码</label>
+                        <input type="password" class="form-control" id="password2" name="password2"
+                               data-fieldname="确认密码"
+                               placeholder="请再次输入想要设定的密码">
+                    </div>
+                    <div class="form-group">
+                        <label for="name">真实姓名</label>
+                        <input type="text" class="form-control" id="name" name="name"
+                               data-fieldname="真实姓名"
+                               placeholder="请输入新增管理员的真实姓名">
+                    </div>
+                    <div class="alert alert-danger" th:if="${msg != null}">
+                        <strong>提示:</strong><span th:text="${msg}"></span>
+                    </div>
+                    <input type="hidden" name="token" th:value="${token}">
+                    <button type="submit" class="btn btn-primary">确认添加</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</th:block>
+<th:block th:replace="fragments/js :: managePublic(~{})"></th:block>
+<script type="text/javascript" src="/js/validate/jquery.validate.min.js"></script>
+<script type="text/javascript" src="/js/validate/localization/messages_zh_layer.js"></script>
+<script>
+    $(document).ready(function () {
+        $("#form").validate({
+            rules: {
+                userName: {
+                    required: true,
+                    minlength: 4
+                },
+                password: {
+                    required: true,
+                    rangelength: [5, 20]
+                },
+                password2: {
+                    required: true,
+                    equalTo: "#password"
+                },
+                name: {
+                    required: true
+                }
+            },
+            submitHandler: function (form) {
+                layer.confirm('确认添加新管理员？', {
+                    btn: ['确认', '取消'] //按钮
+                }, function () {
+                    form.submit();
+                });
+            }
+        });
+    })
+</script>
+</body>
+</html>

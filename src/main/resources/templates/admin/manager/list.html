@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:replace="fragments/header :: managePublic('管理员列表 - 行游神州管理员后台',~{::link})">
+    <link href="/js/myPages/myPages.css" rel="stylesheet" type="text/css"/>
+</head>
+<body>
+<th:block th:replace="fragments/top :: adminPublic('管理员列表','',~{::#content},~{})">
+    <div class="content" id="content">
+        <div class="row align-items-center">
+            <table class="table table-bordered-sm bg-white responsive-table table-hover table-striped text-md-center">
+                <thead class="thead-light2">
+                <tr>
+                    <th scope="col" width="1">#</th>
+                    <th scope="col">用户名</th>
+                    <th scope="col">真实姓名</th>
+                    <th scope="col">角色</th>
+                    <th scope="col">状态</th>
+                    <th scope="col">操作</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr th:each="item,sta : ${pageInfo.list}">
+                    <td data-label="序号" scope="row" th:text="${sta.count}"></td>
+                    <td data-label="用户名" th:text="${item.userName}"></td>
+                    <td data-label="真实姓名" th:text="${item.name}"></td>
+                    <td data-label="角色">
+                        <span class="badge badge-info mr-1"
+                              th:each="role : ${item.roleList}" th:text="${role.name}"></span>
+                    </td>
+                    <td data-label="状态" th:switch="${item.state}">
+                        <strong class="text-danger" th:case="-1">禁用</strong>
+                        <strong class="text-success" th:case="*">正常</strong>
+                    </td>
+                    <td data-label="操作">
+                        <a th:href="'/admin/manager/role/allot?id='+${item.id}"
+                           class="btn text-white btn-sm btn-primary">分配角色</a>
+                    </td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+        <div class="row" th:if="${pageInfo.total > 0}">
+            <div class="col-12">
+                <div id="pages"></div>
+            </div>
+        </div>
+    </div>
+</th:block>
+<th:block th:replace="fragments/js :: managePublic(~{})"></th:block>
+<script src="/js/myPages/myPages.js" type="text/javascript"></script>
+<script>
+    $(function () {
+        $("#pages").myPages({
+            pageNo:[[${pageInfo.pageNum}]],
+            pageSize:[[${pageInfo.pageSize}]],
+            lastPage:[[${pageInfo.pages}]],
+            preText:"上一页",
+            nextText:"下一页",
+            url: "/admin/manager/{pageNo}-{pageSize}",
+            showPageButton: 6
+        })
+    })
+</script>
+</body>
+</html>

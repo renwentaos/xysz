@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:replace="fragments/header :: managePublic('钱包财务记录 - 云水滴商户后台',~{::link})">
+    <link href="/js/myPages/myPages.css" rel="stylesheet" type="text/css"/>
+    <!-- Date Range Picker -->
+    <link rel="stylesheet" type="text/css" href="/cosmo/css/daterangepicker/daterangepicker.css"/>
+</head>
+<body>
+<th:block th:replace="fragments/top :: merchantPublic('钱包财务记录','',~{::#content},~{::#filter})">
+    <div id="filter" class="col controls-wrapper mt-3 mt-md-0 d-none d-md-block">
+        <div class="controls d-flex justify-content-center justify-content-md-end">
+            <form method="get">
+                <div class="row">
+                    <div class="col-md-4 col-xl-3 p-1">
+                        <input type="text" class="form-control d-inline-block" placeholder="交易订单号"
+                               name="orderId" th:value="${param.orderId}">
+                    </div>
+                    <div class="col-7 col-md-8 col-xl-4 p-1">
+                        <input type="text" class="form-control d-inline-block" id="dateRange" placeholder="点击选择交易时间范围"
+                               th:value="${#strings.isEmpty(param.startTime)}?'':${param.startTime}+' - '+${param.endTime}">
+                    </div>
+                    <div class="col-6 col-md-4 col-xl-2 p-1">
+                            <select class="form-control" name="typeCode">
+                                <option value="">交易类型</option>
+                                <option th:selected="${param.typeCode!=null}?${param.typeCode[0]} eq ${walletType.value}"
+                                        th:each="walletType : ${application.merchantWalletType}"
+                                        th:text="${walletType.key}" th:value="${walletType.value}"></option>
+                            </select>
+                    </div>
+                    <div class="col-3 col-md-3 col-xl-2 p-1">
+                        <select class="form-control" name="state">
+                            <option value="">状态</option>
+                            <option th:selected="${param.state!=null}?${param.state[0]} eq ${sta.value}"
+                                    th:each="sta : ${application.merchantWalletState}"
+                                    th:text="${sta.key}" th:value="${sta.value}"></option>
+                        </select>
+                    </div>
+                    <div class="col-2 col-md-1 p-1">
+                        <input type="hidden" name="startTime" id="startTime" th:value="${param.startTime}">
+                        <input type="hidden" name="endTime" id="endTime" th:value="${param.endTime}">
+                        <button type="submit" class="btn btn-info py-1 px-2" data-toggle="modal"
+                                data-target="#gridFilters"><span
+                                class="material-icons align-text-bottom">search</span>
+                        </button>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+    <div class="content" id="content">
+        <div class="row align-items-center">
+
+            <table class="table table-bordered-sm bg-white responsive-table table-hover table-striped text-md-center align-middle-table">
+                <thead class="thead-light2">
+                <tr>
+                    <th scope="col">订单号</th>
+                    <th scope="col">交易类型</th>
+                    <th scope="col">交易金额</th>
+                    <th scope="col">手续费</th>
+                    <th scope="col">操作时间</th>
+                    <th scope="col">状态</th>
+                    <th scope="col">操作</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr th:each="item : ${pageInfo.list}">
+                    <td data-label="订单号">
+                        <span th:text="${item.orderId}"></span>
+                    </td>
+                    <td data-label="类型" th:switch="${item.typeCode}">
+                        <span class="badge badge-info mr-1 text-white"
+                                  th:case="${application.merchantWalletType['充值']}">钱包充值</span>
+                        <span class="badge badge-warning mr-1 text-white"
+                              th:case="${application.merchantWalletType['提现']}">钱包提现</span>
+                        <span class="badge badge-info mr-1 text-white"
+                              th:case="${application.merchantWalletType['回款']}">回款</span>
+                        <span class="badge badge-warning mr-1 text-white"
+                              th:case="${application.merchantWalletType['放款']}">放款</span>
+
+                    </td>
+                    <td data-label="交易金额">
+                                    <span class="text-success"
+                                          th:text="${#numbers.formatCurrency(item.amount)}"></span>
+                    </td>
+                    <td data-label="手续费">
+                        <span class="text-primary" th:text="${#numbers.formatCurrency(item.fyFee+item.platformFee)}"></span>
+                    </td>
+                    <td data-label="交易时间">
+                        <span th:text="${#dates.format(item.createDate, 'yyyy-MM-dd HH:mm:ss')}"></span>
+                    </td>
+                    <td data-label="状态" th:switch="${item.state}">
+                        <strong class="text-danger" th:case="-1">失败</strong>
+                        <strong class="text-warning" th:case="0">处理中</strong>
+                        <strong class="text-success" th:case="1">成功</strong>
+                    </td>
+                    <td data-label="操作" class="dropdown dropleft">
+                        <a th:href="'/merchant/repayment/1-10?orderId='+${item.orderId}" class="btn btn-sm btn-outline-primary" th:if="${item.typeCode == application.merchantWalletType['回款']} ">查看详情</a>
+                    </td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+        <div class="row" th:if="${pageInfo.total > 0}">
+            <div class="col-12">
+                <div id="pages"></div>
+            </div>
+        </div>
+    </div>
+</th:block>
+<th:block th:replace="fragments/js :: managePublic(~{})"></th:block>
+<script src="/js/myPages/myPages.js" type="text/javascript"></script>
+<script src="/cosmo/js/lib/moment.min.js"></script>
+<script src="/cosmo/js/daterangepicker/daterangepicker.min.js"></script>
+<script src="/js/my-datarange.js"></script>
+
+<script>
+
+    $(function () {
+
+        $("#pages").myPages({
+            pageNo: [[${pageInfo.pageNum}]],
+            pageSize: [[${pageInfo.pageSize}]],
+            lastPage: [[${pageInfo.pages}]],
+            preText: "上一页",
+            nextText: "下一页",
+            url: "/merchant/wallet/{pageNo}-{pageSize}",
+            showPageButton: 6
+        })
+        //时间范围选择器
+        myRange("#dateRange", "#startTime", "#endTime");
+    })
+</script>
+</body>
+</html>

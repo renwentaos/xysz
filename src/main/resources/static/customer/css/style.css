@@ -1,0 +1,100 @@
+* {
+	margin: 0;
+	padding: 0
+}
+
+html {
+	font-size: 16px;
+	background: #fff;
+}
+
+
+header {
+	height: 4rem;
+	background-color: #e93038;
+	text-align: center;
+	color: #fff;
+	line-height: 4rem
+}
+
+footer {
+	height: 4rem;
+	background-color: #e93038;
+	text-align: center;
+	color: #fff;
+	line-height: 4rem;
+	position: absolute;
+	bottom: 0;
+	width: 100%
+}
+
+#wrapper {
+	width: 100%;
+	overflow: hidden;
+	z-index: 1;
+	text-align: center;
+	background: #fff;
+}
+
+.pull_icon {
+	width: 25px;
+	height: 25px;
+	background-image: url(../images/pull.png);
+	background-repeat: no-repeat;
+	background-position: center;
+	background-size: 25px;
+	transition: all .5s
+}
+
+.tab_cont {
+	padding-top: 80px;
+	text-align: center;
+}
+
+.tab_cont img{
+	width: 50%;
+}
+
+.tab_cont p{
+	margin-top: 10px;
+}
+
+
+.scroller {
+	background-color: #fff
+}
+
+.more .flip {
+	transform: rotate(180deg)
+}
+
+.loading {
+	background-image: url(../images/loading.png);
+	background-repeat: no-repeat;
+	background-position: center;
+	background-size: 25px
+}
+
+.phone{
+	margin: 0 15px;
+	height: 50px;
+	line-height: 50px;
+	background: #f5f5f5;
+	margin-top: 50px;
+	text-align: center
+}
+
+.phone span a{
+	text-decoration: none;
+	color: #1b9dff;
+}
+
+@-webkit-keyframes loading {
+	from {
+		-webkit-transform: rotate(0deg) translateZ(0)
+	}
+
+	to {
+		-webkit-transform: rotate(360deg) translateZ(0)
+	}
+}

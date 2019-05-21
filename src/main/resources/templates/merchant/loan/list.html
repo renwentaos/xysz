@@ -1,0 +1,334 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:replace="fragments/header :: managePublic('贷款申请列表 - 云水滴商户后台',~{::link})">
+    <link href="/js/myPages/myPages.css" rel="stylesheet" type="text/css"/>
+    <!-- Date Range Picker -->
+    <link rel="stylesheet" type="text/css" href="/cosmo/css/daterangepicker/daterangepicker.css"/>
+</head>
+<body>
+<div class="modal fade" id="opinionModel" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel"
+     aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="opinion">审批意见</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <input type="hidden" class="form-control" id="loanId" name="loanId"/>
+                <div class="form-group">
+                    <label for="reason">理由：</label>
+                    <textarea class="form-control" id="reason" name="reason"
+                              rows="4" placeholder="请输入拒贷理由"></textarea>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">关闭</button>
+                <button type="button" id="btnRefuse" class="btn btn-primary">拒绝</button>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="modal fade" id="loanModel" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel"
+     aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="exampleModalLabel">放款</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <input type="hidden" class="form-control" id="loanIds" name="loanIds"/>
+                <div class="form-group">
+                    <label for="amount">银行名称</label>
+                    <input class="form-control" id="bankName" type="text"
+                           readonly="ture"/>
+                </div>
+                <div class="form-group">
+                    <label for="amount">银行卡号</label>
+                    <input class="form-control" id="bankNumber" type="text"
+                           readonly="ture"/>
+                </div>
+                <div class="form-group">
+                    <label for="amount">借款用途</label>
+                    <input class="form-control" id="loanUse" type="text"
+                           readonly="ture"/>
+                </div>
+                <div class="form-group">
+                    <label for="amount">金额</label>
+                    <input class="form-control" id="amount" name="amount" type="number"
+                           placeholder="请输入放款金额" readonly="ture"/>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">关闭</button>
+                <button type="button" id="btnLoan" class="btn btn-primary">放款</button>
+            </div>
+        </div>
+    </div>
+</div>
+<input type="hidden" name="tokens" id="tokens" th:value="${token}">
+<th:block th:replace="fragments/top :: merchantPublic('贷款申请列表','',~{::#content},~{::#filter})">
+    <div id="filter" class="col controls-wrapper mt-3 mt-md-0 d-none d-md-block">
+        <div class="controls d-flex justify-content-center justify-content-md-end">
+            <form method="get">
+                <div class="row">
+                    <div class="col-md-4 col-xl-3 p-1">
+                        <input type="text" class="form-control d-inline-block" placeholder="贷款申请订单号"
+                               name="orderId" th:value="${param.orderId}">
+                    </div>
+                    <div class="col-6 col-md-4 col-xl-2 p-1">
+                        <input type="text" class="form-control d-inline-block" placeholder="产品名称"
+                               name="projectName" th:value="${param.projectName}">
+                    </div>
+                    <div class="col-6 col-md-4 col-xl-2 p-1">
+                        <input type="text" class="form-control d-inline-block" placeholder="客户手机号/姓名/ID"
+                               name="memberInfo" th:value="${param.memberInfo}">
+                    </div>
+                    <div class="col-7 col-md-8 col-xl-3 p-1">
+                        <input type="text" class="form-control d-inline-block" id="dateRange" placeholder="点击选择申请时间范围"
+                               th:value="${#strings.isEmpty(param.startTime)}?'':${param.startTime}+' - '+${param.endTime}">
+                    </div>
+                    <div class="col-3 col-md-3 col-xl-1 p-1" th:if="${session.fake == null}">
+                        <select class="form-control" name="state">
+                            <option value="">状态</option>
+                            <option th:selected="${param.state!=null}?${param.state[0]} eq ${sta.value}"
+                                    th:each="sta : ${application.loanState}"
+                                    th:text="${sta.key}" th:value="${sta.value}"></option>
+                        </select>
+                    </div>
+                    <div class="col-2 col-md-1 p-1">
+                        <input type="hidden" name="startTime" id="startTime" th:value="${param.startTime}">
+                        <input type="hidden" name="endTime" id="endTime" th:value="${param.endTime}">
+                        <button type="submit" class="btn btn-info py-1 px-2" data-toggle="modal"
+                                data-target="#gridFilters"><span
+                                class="material-icons align-text-bottom">search</span>
+                        </button>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+    <div class="content" id="content">
+        <div class="row align-items-center">
+            <table class="table table-bordered-sm bg-white responsive-table table-hover table-striped text-md-center align-middle-table">
+                <thead class="thead-light2">
+                <tr>
+                    <th scope="col">贷款订单号</th>
+                    <th scope="col">贷款客户</th>
+                    <th scope="col">产品名称</th>
+                    <th scope="col">申请额度/审批额度</th>
+                    <th scope="col">申请时间</th>
+                    <th scope="col">放款时间</th>
+                    <th scope="col" th:if="${session.fake == null}">状态</th>
+                    <th scope="col">操作</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr th:each="item : ${pageInfo.list}" data-toggle="tooltip"
+                    th:id="'tr'+${item.id}"
+                    th:title="'审批意见:'+${item.opinion==null||item.opinion.length() == 0?'无':item.opinion}">
+                    <td data-label="贷款订单号" th:text="${item.orderId}"></td>
+                    <td data-label="贷款客户">
+                        <small class="text-muted" th:if="${item.memberIdCard != null}"
+                               th:text="${item.memberIdCard.name}"></small>
+                        <div class="text-primary" th:text="${item.member.mobile}"></div>
+                    </td>
+                    <td data-label="产品名称" th:text="${item.project.name}"></td>
+                    <td data-label="申请额度/审批额度">
+                        <span class="text-info" th:text="${#numbers.formatCurrency(item.applyAmount)}"></span>
+                        /
+                        <span class="text-success font-weight-bold"
+                              th:text="${#numbers.formatCurrency(item.amount)}"></span>
+                    </td>
+                    <td data-label="申请时间" th:text="${#dates.format(item.createDate, 'yyyy-MM-dd HH:mm:ss')}"></td>
+                    <td data-label="放款时间" th:text="${item.loanDate!=null?#dates.format(item.loanDate, 'yyyy-MM-dd HH:mm:ss'):'未放款'}"></td>
+                    <td data-label="状态" th:switch="${item.state}"  th:if="${session.fake == null}">
+                        <strong th:id="state+${item.id}" class="text-danger" th:case="-1">已拒绝</strong>
+                        <strong th:id="state+${item.id}" class="text-warning" th:case="0">待处理</strong>
+                        <strong th:id="state+${item.id}" class="text-success" th:case="1">还款中</strong>
+                        <strong th:id="state+${item.id}" class="text-primary" th:case="2">已结清</strong>
+                    </td>
+                    <td data-label="操作">
+                        <th:block th:if="${item.remark}">
+                            <a th:href="'javascript:ht(\''+${item.remark}+'\')'"
+                               class="btn btn-info btn-sm text-white" name="refuse">合同</a>
+                        </th:block>
+                        <a th:href="'javascript:audit('+${item.applyId}+','+${item.member.id}+')'"
+                           class="btn text-white btn-sm btn-primary mr-1 mr-lg-0">认证详情</a>
+                        <th:block th:if="${item.state == 0}">
+                            <!--<th:block th:if="${item.lendingStatus == 0}">-->
+                            <a class="btn text-white btn-sm btn-success" name="loan" th:id="loan+${item.id}"
+                               th:href="'javascript:loan('+${item.id}+','+${#numbers.formatDecimal(item.applyAmount,1,2)}+',\''+${item.memberBankCard.bankName}+'\',\''+${item.memberBankCard.bankCardNumber}+'\',\''+${item.use}+'\')'">
+                                放款</a>
+                            <!--</th:block>-->
+                            <!--<th:block th:if="${item.lendingStatus == 1}">-->
+                            <!--<a class="btn text-white btn-sm btn-success" name="lending"-->
+                            <!--href="javascript:void(0)">-->
+                            <!--放款中...</a>-->
+                            <!--</th:block>-->
+                            <!--<th:block th:if="${item.lendingStatus == -1}">-->
+                            <!--<a class="btn btn-danger btn-sm text-white" name="lending"-->
+                            <!--th:href="'javascript:getMsg(\''+${item.msg}+'\')'">-->
+                            <!--放款失败</a>-->
+                            <!--</th:block>-->
+
+                            <a th:href="'javascript:refuseLoan('+${item.id}+')'"
+                            class="btn btn-warning btn-sm text-white" th:id="refuseLoan+${item.id}" name="refuseLoan">拒批</a>
+                        </th:block>
+                        <th:block th:if="${item.state == 1 || item.state == 2 }">
+                            <a th:href="${item.state}>0?'javascript:repaymentList('+${item.id}+')':'javascript:repaymentList(null)'"
+                               class="btn text-white btn-sm btn-primary" name="btnRepayment">查看还款计划</a>
+                        </th:block>
+                        <th:block th:if="${item.state == -1 }">
+                            <a href="javascript:void(0)"
+                               class="btn btn-danger btn-sm text-white" name="refuse">已拒批</a>
+                        </th:block>
+
+                    </td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+        <div class="row" th:if="${pageInfo.total > 0}">
+            <div class="col-12">
+                <div id="pages"></div>
+            </div>
+        </div>
+    </div>
+</th:block>
+<th:block th:replace="fragments/js :: managePublic(~{})"></th:block>
+<script src="/js/myPages/myPages.js" type="text/javascript"></script>
+<script src="/cosmo/js/lib/moment.min.js"></script>
+<script src="/cosmo/js/daterangepicker/daterangepicker.min.js"></script>
+<script src="/js/my-datarange.js"></script>
+<script src="/js/merchantPublic.js"></script>
+
+<script>
+    function repaymentList(loanId) {
+        if (loanId) {
+            var width = $(window).width();
+            var height = $(window).height();
+            if (width > 940) {
+                width = 940;
+                height = 550;
+            } else if (width <= 940 && width > 700) {
+                width = 700;
+                height = 500;
+            }
+            layer.open({
+                type: 2,
+                title: '还款计划',
+                shadeClose: true,
+                shade: 0.8,
+                area: [width + 'px', height + 'px'],
+                content: '/merchant/repayment/plan?loanId=' + loanId
+            });
+        } else {
+            layer.msg("该贷款申请尚未通过审核")
+        }
+    }
+
+    //拒绝批复
+    function refuseLoan(loanId) {
+        $("#loanId").val(loanId);
+        $("#opinionModel").modal();
+    }
+
+    function getMsg(msg) {
+        layer.alert(msg, {
+            icon: 5,
+            title: "失败原因"
+        });
+    }
+
+    function loan(loanId, applyAmount, bankName, bankNumber, loanUse) {
+        $("#loanIds").val(loanId);
+        $("#amount").val(applyAmount);
+        $("#bankName").val(bankName);
+        $("#bankNumber").val(bankNumber);
+        $("#loanUse").val(loanUse);
+        $("#loanModel").modal();
+    }
+
+    function ht(id) {
+        var index = layer.open({
+            type: 2,
+            title: "电子合同详情",
+            skin: 'layui-layer-lan',
+            area: ['95%', '95%'],
+            content: '[[${application.acSite}]]' + 'searchResult?r=' + id
+        });
+    }
+
+    $(function () {
+        $("#pages").myPages({
+            pageNo: [[${pageInfo.pageNum}]],
+            pageSize: [[${pageInfo.pageSize}]],
+            lastPage: [[${pageInfo.pages}]],
+            preText: "上一页",
+            nextText: "下一页",
+            url: "/merchant/loan/{pageNo}-{pageSize}",
+            showPageButton: 6
+        })
+//时间范围选择器
+        myRange("#dateRange", "#startTime", "#endTime");
+
+
+        $("#btnRefuse").click(function () {
+            var loanId = $("#loanId").val();
+            var opinion = $("#reason").val();
+            if(opinion.trim().length<=0){
+                layer.msg("请输入拒批原因");                return false;
+            }
+            layer.confirm('确认拒绝该用户的贷款申请？', {
+                btn: ['确认', '取消'] //按钮
+            }, function () {
+                $.post("/merchant/loan/refuseLoan", {loanId: loanId, opinion: opinion}, function (result) {
+                    //         // 请求处理
+                    if (result != "success") {
+                        layer.msg(result);
+                    } else {
+                        var rId = "#refuseLoan"+loanId;
+                        var lId = "#loan"+loanId;
+                        var sId = "#state"+loanId;
+                        $(lId).hide();
+                        $(rId).html("已拒批").removeClass("btn-warning").addClass("btn-danger");
+                        $(sId).html("已拒绝").removeClass("text-warning").addClass("text-danger");
+                        $("#opinionModel").modal('hide');
+                        $("#tr"+loanId).attr("data-original-title","审批意见："+opinion);
+                        layer.closeAll();
+                    }
+                }, "text");
+            });
+
+        })
+
+        $("#btnLoan").click(function () {
+            var loanId = $("#loanIds").val();
+            var amount = $("#amount").val();
+            if (amount == null || amount <= 0) {
+                layer.msg("请输入金额");
+                return;
+            }
+            var token = $("#tokens").val();
+            layer.load(2, {shade: [0.8, '#fff']});
+            $.post("/merchant/loan/credit", {loanId: loanId, amount: amount,token:token}, function (result) {
+                //         // 请求处理
+                if (result != "success") {
+                    layer.msg(result);
+                } else {
+                    window.location.reload();
+                }
+            }, "text");
+        })
+
+
+    })
+</script>
+</body>
+</html>

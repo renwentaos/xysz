@@ -1,0 +1,229 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<Configuration status="warn" monitorInterval="1800">
+    <properties>
+        <property name="LOG_HOME">logs/</property>
+        <property name="PATTERN">%d{yyyy-MM-dd HH:mm:ss a} [Thread: %t][ Method: %l ]%n%p:%m%n%n</property>
+    </properties>
+
+    <Appenders>
+        <Console name="Console" target="SYSTEM_OUT">
+            <PatternLayout pattern="[%d{HH:mm:ss:SSS}] [%p] - %l - %m%n"/>
+
+        </Console>
+
+        <RollingFile
+                name="WarnLog"
+                fileName="${LOG_HOME}/warn.log"
+                filePattern="${LOG_HOME}/$${date:yyyy-MM}/warn-%d{yyyy-MM-dd}-%i.log">
+            <Filters>
+                <ThresholdFilter level="WARN"/>
+                <ThresholdFilter level="ERROR" onMatch="DENY" onMismatch="NEUTRAL"/>
+            </Filters>
+            <PatternLayout charset="UTF-8" pattern="${PATTERN}"/>
+            <Policies>
+                <TimeBasedTriggeringPolicy/>
+                <SizeBasedTriggeringPolicy size="100MB"/>
+            </Policies>
+            <DefaultRolloverStrategy max="20"/>
+        </RollingFile>
+
+
+        <RollingFile
+                name="ErrorLog"
+                fileName="${LOG_HOME}/error.log"
+                filePattern="${LOG_HOME}/$${date:yyyy-MM}/error-%d{yyyy-MM-dd}-%i.log">
+            <ThresholdFilter level="ERROR"/>
+            <PatternLayout charset="UTF-8" pattern="${PATTERN}"/>
+            <Policies>
+                <TimeBasedTriggeringPolicy/>
+                <SizeBasedTriggeringPolicy size="100MB"/>
+            </Policies>
+            <DefaultRolloverStrategy max="20"/>
+        </RollingFile>
+
+        <RollingFile
+                name="loanPre"
+                fileName="${LOG_HOME}/loan-pre.log"
+                filePattern="${LOG_HOME}/$${date:yyyy-MM}/loan-pre-%d{yyyy-MM-dd}-%i.log">
+            <PatternLayout charset="UTF-8" pattern="${PATTERN}"/>
+            <Policies>
+                <TimeBasedTriggeringPolicy/>
+                <SizeBasedTriggeringPolicy size="100MB"/>
+            </Policies>
+            <DefaultRolloverStrategy max="20"/>
+        </RollingFile>
+
+        <RollingFile
+                name="yys"
+                fileName="${LOG_HOME}/yys.log"
+                filePattern="${LOG_HOME}/$${date:yyyy-MM}/yys-%d{yyyy-MM-dd}-%i.log">
+            <PatternLayout charset="UTF-8" pattern="${PATTERN}"/>
+            <Policies>
+                <TimeBasedTriggeringPolicy/>
+                <SizeBasedTriggeringPolicy size="100MB"/>
+            </Policies>
+            <DefaultRolloverStrategy max="20"/>
+        </RollingFile>
+        <RollingFile
+                name="jd"
+                fileName="${LOG_HOME}/jd.log"
+                filePattern="${LOG_HOME}/$${date:yyyy-MM}/jd-%d{yyyy-MM-dd}-%i.log">
+            <PatternLayout charset="UTF-8" pattern="${PATTERN}"/>
+            <Policies>
+                <TimeBasedTriggeringPolicy/>
+                <SizeBasedTriggeringPolicy size="100MB"/>
+            </Policies>
+            <DefaultRolloverStrategy max="20"/>
+        </RollingFile>
+        <RollingFile
+                name="tb"
+                fileName="${LOG_HOME}/tb.log"
+                filePattern="${LOG_HOME}/$${date:yyyy-MM}/tb-%d{yyyy-MM-dd}-%i.log">
+            <PatternLayout charset="UTF-8" pattern="${PATTERN}"/>
+            <Policies>
+                <TimeBasedTriggeringPolicy/>
+                <SizeBasedTriggeringPolicy size="100MB"/>
+            </Policies>
+            <DefaultRolloverStrategy max="20"/>
+        </RollingFile>
+        <RollingFile
+                name="wy"
+                fileName="${LOG_HOME}/wy.log"
+                filePattern="${LOG_HOME}/$${date:yyyy-MM}/wy-%d{yyyy-MM-dd}-%i.log">
+            <PatternLayout charset="UTF-8" pattern="${PATTERN}"/>
+            <Policies>
+                <TimeBasedTriggeringPolicy/>
+                <SizeBasedTriggeringPolicy size="100MB"/>
+            </Policies>
+            <DefaultRolloverStrategy max="20"/>
+        </RollingFile>
+        <RollingFile
+                name="fyRepayBack"
+                fileName="${LOG_HOME}/fyRepayBack.log"
+                filePattern="${LOG_HOME}/$${date:yyyy-MM}/fyRepayBack-%d{yyyy-MM-dd}-%i.log">
+            <PatternLayout charset="UTF-8" pattern="${PATTERN}"/>
+            <Policies>
+                <TimeBasedTriggeringPolicy/>
+                <SizeBasedTriggeringPolicy size="100MB"/>
+            </Policies>
+            <DefaultRolloverStrategy max="20"/>
+        </RollingFile>
+        <RollingFile
+                name="withholdInfo"
+                fileName="${LOG_HOME}/withholdInfo.log"
+                filePattern="${LOG_HOME}/$${date:yyyy-MM}/withholdInfo-%d{yyyy-MM-dd}-%i.log">
+            <PatternLayout charset="UTF-8" pattern="${PATTERN}"/>
+            <Policies>
+                <TimeBasedTriggeringPolicy/>
+                <SizeBasedTriggeringPolicy size="100MB"/>
+            </Policies>
+            <DefaultRolloverStrategy max="20"/>
+        </RollingFile>
+        <RollingFile
+                name="updateApplyState"
+                fileName="${LOG_HOME}/updateApplyState.log"
+                filePattern="${LOG_HOME}/$${date:yyyy-MM}/updateApplyState-%d{yyyy-MM-dd}-%i.log">
+            <PatternLayout charset="UTF-8" pattern="${PATTERN}"/>
+            <Policies>
+                <TimeBasedTriggeringPolicy/>
+                <SizeBasedTriggeringPolicy size="100MB"/>
+            </Policies>
+            <DefaultRolloverStrategy max="20"/>
+        </RollingFile>
+
+        <RollingFile
+                name="app"
+                fileName="${LOG_HOME}/app.log"
+                filePattern="${LOG_HOME}/$${date:yyyy-MM}/app-%d{yyyy-MM-dd}-%i.log">
+            <PatternLayout charset="UTF-8" pattern="${PATTERN}"/>
+            <Policies>
+                <TimeBasedTriggeringPolicy/>
+                <SizeBasedTriggeringPolicy size="100MB"/>
+            </Policies>
+            <DefaultRolloverStrategy max="20"/>
+        </RollingFile>
+
+        <RollingFile
+                name="fy"
+                fileName="${LOG_HOME}/fy.log"
+                filePattern="${LOG_HOME}/$${date:yyyy-MM}/fy-%d{yyyy-MM-dd}-%i.log">
+            <PatternLayout charset="UTF-8" pattern="${PATTERN}"/>
+            <Policies>
+                <TimeBasedTriggeringPolicy/>
+                <SizeBasedTriggeringPolicy size="100MB"/>
+            </Policies>
+            <DefaultRolloverStrategy max="20"/>
+        </RollingFile>
+
+        <RollingFile
+                name="withDraw"
+                fileName="${LOG_HOME}/withDraw.log"
+                filePattern="${LOG_HOME}/$${date:yyyy-MM}/withDraw-%d{yyyy-MM-dd}-%i.log">
+            <PatternLayout charset="UTF-8" pattern="${PATTERN}"/>
+            <Policies>
+                <TimeBasedTriggeringPolicy/>
+                <SizeBasedTriggeringPolicy size="100MB"/>
+            </Policies>
+            <DefaultRolloverStrategy max="20"/>
+        </RollingFile>
+
+
+    </Appenders>
+
+    <Loggers>
+        <!--过滤掉spring和mybatis的一些无用的DEBUG信息-->
+        <logger name="org.springframework" level="warn"/>
+        <logger name="org.mybatis" level="WARN" />
+        <Logger name="org.hibernate.validator" level="warn" />
+        <Logger name="io.netty.util" level="warn" />
+        <Logger name="org.apache.ibatis" level="WARN" />
+        <Logger name="org.apache.juli" level="warn" />
+        <logger name="org.thymeleaf" level="WARN"/>
+
+
+        <Logger name="loanPreLogger" additivity="TRUE" level="ALL">
+            <AppenderRef ref="loanPre" level="ALL" />
+        </Logger>
+
+        <Logger name="yysLogger" additivity="TRUE" level="ALL">
+            <AppenderRef ref="yys" level="ALL" />
+        </Logger>
+        <Logger name="jdLogger" additivity="TRUE" level="ALL">
+            <AppenderRef ref="jd" level="ALL" />
+        </Logger>
+        <Logger name="tbLogger" additivity="TRUE" level="ALL">
+            <AppenderRef ref="tb" level="ALL" />
+        </Logger>
+        <Logger name="wyLogger" additivity="TRUE" level="ALL">
+            <AppenderRef ref="wy" level="ALL" />
+        </Logger>
+        <Logger name="fyRepayBackLogger" additivity="TRUE" level="ALL">
+            <AppenderRef ref="fyRepayBack" level="ALL" />
+        </Logger>
+        <Logger name="withholdInfoLogger" additivity="TRUE" level="ALL">
+            <AppenderRef ref="withholdInfo" level="ALL" />
+        </Logger>
+        <Logger name="updateApplyStateLogger" additivity="TRUE" level="ALL">
+            <AppenderRef ref="updateApplyState" level="ALL" />
+        </Logger>
+
+        <Logger name="appLogger" additivity="false" level="ALL">
+            <AppenderRef ref="app" level="ALL" />
+        </Logger>
+        <Logger name="fyLogger" additivity="false" level="ALL">
+            <AppenderRef ref="fy" level="ALL" />
+        </Logger>
+        <Logger name="withDrawLogger" additivity="false" level="ALL">
+            <AppenderRef ref="withDraw" level="ALL" />
+        </Logger>
+
+        <!--<logger name="com.tkq.yunshuidi.dao" level="DEBUG" additivity="false">-->
+            <!--<AppenderRef ref="Console" />-->
+        <!--</logger>-->
+        <root level="WARN">
+            <appender-ref ref="Console"/>
+            <appender-ref ref="ErrorLog"/>
+            <appender-ref ref="WarnLog"/>
+        </root>
+    </Loggers>
+</Configuration>

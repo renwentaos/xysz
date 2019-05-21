@@ -1,0 +1,16 @@
+spring:
+  application:
+    name: xysz
+  profiles:
+    active: dev
+  http:
+    encoding:
+      force: true
+      charset: UTF-8
+      enabled: true
+server:
+  tomcat:
+    uri-encoding: UTF-8
+  servlet:
+    session:
+      timeout: PT6H

@@ -1,0 +1,236 @@
+<!DOCTYPE html>
+<html lang="en"><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    <title>行游神州</title>
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0, user-scalable=no minimal-ui">
+    <link rel="stylesheet" href="css/header_include.min.css">
+    <link rel="stylesheet" href="css/appView.css">
+    <style type="text/css">
+        tml,body,div,span,applet,object,iframe,h1,h2,h3,h4,h5,h6,p,blockquote,pre,a,abbr,acronym,address,big,cite,code,del,dfn,em,img,ins,kbd,q,s,samp,small,strike,strong,sub,sup,tt,var,b,u,i,center,dl,dt,dd,ol,ul,li,fieldset,form,label,legend,table,caption,tbody,tfoot,thead,tr,th,td,article,aside,canvas,details,embed,figure,figcaption,footer,header,hgroup,menu,nav,output,ruby,section,summary,time,mark,audio,video{margin:0;padding:0;border:0;font-size:100%;font:inherit;vertical-align:baseline}
+        article,aside,details,figcaption,figure,footer,header,hgroup,menu,nav,section{display:block}
+        html{font-family:sans-serif;-ms-text-size-adjust:100%;-webkit-text-size-adjust:100%}
+        html,body{width:100%}
+        body{font-family:Arial,Helvetica,sans-serif;line-height:1.6;background:#fff;color:#333;-webkit-font-smoothing:antialiased;-webkit-text-size-adjust:100%;text-rendering:optimizeLegibility}
+        img,a img,img:focus{border:0;outline:0}
+        img{max-width:100%;height: auto;}
+        textarea,input,a,textarea:focus,input:focus,a:focus{outline:none}
+        h1,h2,h3,h4,h5,h6{font-weight:normal;margin-bottom:15px;line-height:1.4}
+        h1 a,h2 a,h3 a,h4 a,h5 a,h6 a{font-weight:inherit;color:#444444}
+        body{font-size: 62.5%; font-family: 'Microsoft Yahei','\5FAE\8F6F\96C5\9ED1',Arial,'Hiragino Sans GB','\5B8B\4F53'; line-height: 1.6}
+        li{list-style: none;}
+        #header {
+            background: url(img/top_bg.png) no-repeat scroll top center;
+            background-size: 100%;
+            height: 200px;
+        }
+        @media (max-width: 770px) {
+            #header {
+                background:url(img/top_bg_m.png) no-repeat scroll top center;
+                background-size:100% auto;
+                height:100px;
+                width: 100%;
+            }
+
+        }
+        #weixin-tip{display:none; position: fixed; left:0; top:0; background: rgba(0,0,0,0.8); filter:alpha(opacity=80); width: 100%; height:100%; z-index: 100;}
+        #weixin-tip p{text-align: center; margin-top: 10%; padding:0 5%; position: relative;}
+        #weixin-tip .close{
+            color: #fff;
+            padding: 5px;
+            font: bold 20px/20px simsun;
+            text-shadow: 0 1px 0 #ddd;
+            position: absolute;
+            top: 0; left: 5%;
+        }</style>
+</head>
+
+<body style="font-size:14px">
+<div class="row-fluid" style="z-index:-2;">
+    <div id="header"></div>
+</div>
+<div class="row-fluid breadcrumbs">
+    <div class="container">
+        <div class="view row">
+            <div class="span12" style="text-align:center;">
+                <a href=""><img src="img/logo.png" class="appicon"></a>
+            </div>
+        </div>
+        <div class="span12" style="text-align:center;padding-top:20px;">
+            <h2 style="color:#333;font-size:24px;margin-bottom: -5px;">
+                行游神州
+            </h2>
+        </div>
+        <div class="span12 gray-text " style="text-align:center;">
+            <ul class="breadcrumb " style="margin-top:20px;margin-bottom:0px;">
+                <li>版本：1.0.3                            (build 7)
+                </li>
+                <li>大小：12 MB</li>
+
+                <li class="hide">更新时间                        ：2019-03-14</li>
+            </ul>
+            <ul class="breadcrumb">
+                <li class="" style="margin-bottom: 15px">更新时间                                ：2019-03-14</li>
+            </ul>
+        </div>
+    </div><!--/container-->
+</div><!--/breadcrumbs-->
+<!--=== End Breadcrumbs ===-->
+
+
+<!--=== Content Part ===-->
+<div class="container content">
+    <div id="" class="view row">
+        <div class="span12 margin-bottom-30" style="text-align:center;" id="J_weixinb">
+            <div class="spinner">
+                <a href="javascript:test();" class="btn-u btn-u-lg" style="width: 220px" id="J_weixin">点击安装</a>
+            </div>
+        </div>
+
+        <div class="span12" style="text-align:center;">
+            <span id="believe"></span>
+        </div>
+    </div>
+    <hr class="devider devider-dotted">
+    <div id="" class="view row margin-bottom-30">
+        <div class="span12" style="text-align:center;">
+            扫描下方二维码关注我们的官方微信号            <br>
+            <br>
+            <img src="img/ewm.png" style="width:156px; height:156px;">
+        </div>
+    </div>
+
+    <div id="weixin-tip"><p><img src="img/live_weixin.png" alt="微信打开"><span id="close" title="关闭" class="close">×</span></p></div>
+
+    <script type="text/javascript">
+
+        var is_weixin = (function() {
+
+            var ua = navigator.userAgent.toLowerCase();
+
+            if (ua.match(/MicroMessenger/i) == "micromessenger") {
+
+                return true;
+
+            } else {
+
+                return false;
+
+            }
+
+        })();
+
+        window.onload = function(){
+
+            var winHeight = typeof window.innerHeight != 'undefined' ? window.innerHeight : document.documentElement.clientHeight;
+
+            var btn = document.getElementById('J_weixin');
+            var btn = document.getElementById('J_weixinb');
+            var tip = document.getElementById('weixin-tip');
+            var close = document.getElementById('close');
+
+            if(is_weixin){
+
+                btn.onclick = function(e){
+
+                    tip.style.height = winHeight + 'px';
+
+                    tip.style.display = 'block';
+
+                    return false;
+
+                }
+
+                close.onclick = function(){
+
+                    tip.style.display = 'none';
+
+                }
+
+            }
+
+        }
+    </script>
+
+    <script>
+        function test()
+        {
+            // 获取终端的相关信息
+            var Terminal = {
+                // 辨别移动终端类型
+                platform : function(){
+                    var u = navigator.userAgent, app = navigator.appVersion;
+                    return {
+                        // android终端
+                        android: u.indexOf('Android') > -1 || u.indexOf('Linux') > -1,
+                        // 是否为iPhone
+                        iPhone: u.indexOf('iPhone') > -1 ,
+                        // 是否iPad
+                        iPad: u.indexOf('iPad') > -1
+                    };
+                }(),
+
+            }
+
+            // 根据不同的终端，跳转到不同的地址
+            if(Terminal.platform.android){
+                theUrl = 'https://www.yunshuidi.cn/download/app/android/yunshuidi.apk';
+            }else if(Terminal.platform.iPhone||Terminal.platform.iPad){
+                document.getElementById("believe").innerHTML="<a href=\"https://www.yunshuidi.cn/download/app/ios/embedded.mobileprovision\" class=\"btn-u btn-u-lg\" style=\"background: #2ecc71;border:1px solid #2ecc71;width: 220px;\" id=\"believe\">信任开发者</a>";
+                theUrl = 'itms-services://?action=download-manifest&url=https://www.yunshuidi.cn/download/app/ios/yunshuidi.plist';
+// <!-- theUrl = 'https://www.pgyer.com/knYd';-->
+
+            }
+
+            location.href = theUrl;
+        }
+
+    </script>
+    <script>
+        // 获取终端的相关信息
+        var Terminal = {
+                // 辨别移动终端类型
+                platform : function(){
+                    var u = navigator.userAgent, app = navigator.appVersion;
+                    return {
+                        // android终端
+                        android: u.indexOf('Android') > -1 || u.indexOf('Linux') > -1,
+                        // 是否为iPhone
+                        iPhone: u.indexOf('iPhone') > -1 ,
+                        // 是否iPad
+                        iPad: u.indexOf('iPad') > -1
+                    };
+                }(),
+
+            }
+
+
+
+
+
+
+
+            </div><!--/container-->
+            <!--=== End Content Part ===-->
+
+
+            <!--=== Copyright ===-->
+            <link rel="stylesheet" href="css/custom-sky-forms.css">
+            <link href="css/fineuploader.css" rel="stylesheet" type="text/css">
+            <div class="copyright">
+            <div class="container" style="z-index:-1;">
+            <div class="row">
+            <div class="col-lg-12 col-xs-12 col-md-6 col-sm-6 text-left" style="z-index:0;text-align: center;">
+            <a href="http://yunshuidi.cn">行游神州</a>
+            </div>
+            </div><!--/row-fluid-->
+            </div><!--/container-->
+            </div>
+            <div id="reportAppModal"></div>
+            <div id="loginTelModalDiv"></div>
+
+            <!--=== End Copyright ===-->
+            <!-- JS Global Compulsory -->
+
+            </body>
+            </html>

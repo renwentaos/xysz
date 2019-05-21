@@ -1,0 +1,206 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:replace="fragments/header :: managePublic('流量财务记录 - 云水滴商户后台',~{::link})">
+    <link href="/js/myPages/myPages.css" rel="stylesheet" type="text/css"/>
+    <!-- Date Range Picker -->
+    <link rel="stylesheet" type="text/css" href="/cosmo/css/daterangepicker/daterangepicker.css"/>
+</head>
+<body>
+<th:block th:replace="fragments/top :: merchantPublic('流量财务消费充值记录','',~{::#content},~{::#filter})">
+    <div id="filter" class="col controls-wrapper mt-3 mt-md-0 d-none d-md-block">
+        <div class="controls d-flex justify-content-center justify-content-md-end">
+            <form method="get">
+                <div class="row">
+                    <div class="col-10 col-md-10 p-1">
+                        <input type="text" class="form-control d-inline-block" id="dateRange" placeholder="点击选择时间范围"
+                               th:value="${#strings.isEmpty(param.startTime)}?'':${param.startTime}+' - '+${param.endTime}">
+                    </div>
+                    <div class="col-2 col-md-1 p-1">
+                        <input type="hidden" name="startTime" id="startTime" th:value="${param.startTime}">
+                        <input type="hidden" name="endTime" id="endTime" th:value="${param.endTime}">
+                        <button type="submit" class="btn btn-info py-1 px-2" data-toggle="modal"
+                                data-target="#gridFilters"><span
+                                class="material-icons align-text-bottom">search</span>
+                        </button>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+    <div class="content" id="content">
+        <div class="row align-items-center">
+            <div class="col-12">
+                <div class="card mb-4">
+                    <div class="card-body">
+                        <h6 class="weight-400 mb-3 border-left border-warning pl-2 border-width-medium">消费总费用
+                            <small class="text-muted">汇总统计</small>
+                        </h6>
+                        <div class="row">
+                            <div class="col">
+                                <small class="badge badge-primary weight-300 text-white">三方风控</small>
+                                <div class="weight-400"
+                                     th:text="${#numbers.formatCurrency(consumeSum.get('贷前'))}"></div>
+                            </div>
+                            <div class="col">
+                                <small class="weight-300 badge badge-warning">淘宝数据</small>
+                                <div class="weight-400"
+                                     th:text="${#numbers.formatCurrency(consumeSum.get('淘宝'))}"></div>
+                            </div>
+                            <div class="col">
+                                <small class="weight-300 badge badge-danger">京东数据</small>
+                                <div class="weight-400"
+                                     th:text="${#numbers.formatCurrency(consumeSum.get('京东'))}"></div>
+                            </div>
+                            <div class="col">
+                                <small class="weight-300 badge badge-info">电子合同</small>
+                                <div class="weight-400"
+                                     th:text="${#numbers.formatCurrency(consumeSum.get('电子合同'))}"></div>
+                            </div>
+                            <div class="col">
+                                <small class="weight-300 badge badge-success text-white">短信</small>
+                                <div class="weight-400"
+                                     th:text="${#numbers.formatCurrency(consumeSum.get('额度批复')+consumeSum.get('放款')+consumeSum.get('还款提醒'))}"></div>
+                            </div>
+                            <div class="col">
+                                <small class="weight-300 badge bg-primary-light25">A类流量</small>
+                                <div class="weight-400"
+                                     th:text="${#numbers.formatCurrency(consumeSum.get('A类流量'))}"></div>
+                            </div>
+                            <div class="col">
+                                <small class="weight-300 badge bg-info-light25">B类流量</small>
+                                <div class="weight-400"
+                                     th:text="${#numbers.formatCurrency(consumeSum.get('B类流量'))}"></div>
+                            </div>
+                            <div class="col">
+                                <small class="weight-300 badge badge-secondary">合计</small>
+                                <div class="weight-400"
+                                     th:text="${#numbers.formatCurrency(consumeSum.get('合计'))}"></div>
+                            </div>
+                        </div>
+                        <div class="progress mt-3" style="height: 6px;">
+                            <th:block th:if="${consumeSum.get('合计')>0}">
+                                <div class="progress-bar" role="progressbar"
+                                     th:title="'三方风控:'+${#numbers.formatCurrency(consumeSum.get('贷前'))}" data-toggle="tooltip"
+                                     th:with="percent=${#format.formatDecimal(consumeSum.get('贷前')/consumeSum.get('合计')*100,'#.##')}"
+                                     th:style="'width:'+${percent}+'%'" th:attr="aria-valuenow=${percent}"
+                                     aria-valuemin="0" aria-valuemax="100"></div>
+                                <div class="progress-bar bg-warning" role="progressbar"
+                                     th:title="'淘宝:'+${#numbers.formatCurrency(consumeSum.get('淘宝'))}" data-toggle="tooltip"
+                                     th:with="percent=${#format.formatDecimal(consumeSum.get('淘宝')/consumeSum.get('合计')*100,'#.##')}"
+                                     th:style="'width:'+${percent}+'%'" th:attr="aria-valuenow=${percent}"
+                                     aria-valuemin="0" aria-valuemax="100"></div>
+                                <div class="progress-bar bg-danger" role="progressbar"
+                                     th:title="'京东:'+${#numbers.formatCurrency(consumeSum.get('京东'))}" data-toggle="tooltip"
+                                     th:with="percent=${#format.formatDecimal(consumeSum.get('京东')/consumeSum.get('合计')*100,'#.##')}"
+                                     th:style="'width:'+${percent}+'%'" th:attr="aria-valuenow=${percent}"
+                                     aria-valuemin="0" aria-valuemax="100"></div>
+                                <div class="progress-bar bg-info" role="progressbar"
+                                     th:title="'电子合同:'+${#numbers.formatCurrency(consumeSum.get('电子合同'))}" data-toggle="tooltip"
+                                     th:with="percent=${#format.formatDecimal(consumeSum.get('电子合同')/consumeSum.get('合计')*100,'#.##')}"
+                                     th:style="'width:'+${percent}+'%'" th:attr="aria-valuenow=${percent}"
+                                     aria-valuemin="0" aria-valuemax="100"></div>
+                                <div class="progress-bar bg-success" role="progressbar"
+                                     th:title="'短信:'+${#numbers.formatCurrency(consumeSum.get('额度批复')+consumeSum.get('放款')+consumeSum.get('还款提醒'))}" data-toggle="tooltip"
+                                     th:with="percent=${#format.formatDecimal((consumeSum.get('额度批复')+consumeSum.get('放款')+consumeSum.get('还款提醒'))/consumeSum.get('合计')*100,'#.##')}"
+                                     th:style="'width:'+${percent}+'%'" th:attr="aria-valuenow=${percent}"
+                                     aria-valuemin="0" aria-valuemax="100"></div>
+                                <div class="progress-bar bg-primary-light25" role="progressbar"
+                                     th:title="'A类流量:'+${#numbers.formatCurrency(consumeSum.get('A类流量'))}" data-toggle="tooltip"
+                                     th:with="percent=${#format.formatDecimal(consumeSum.get('A类流量')/consumeSum.get('合计')*100,'#.##')}"
+                                     th:style="'width:'+${percent}+'%'" th:attr="aria-valuenow=${percent}"
+                                     aria-valuemin="0" aria-valuemax="100"></div>
+                                <div class="progress-bar bg-info-light25" role="progressbar"
+                                     th:title="'B类流量:'+${#numbers.formatCurrency(consumeSum.get('B类流量'))}" data-toggle="tooltip"
+                                     th:with="percent=${#format.formatDecimal(consumeSum.get('B类流量')/consumeSum.get('合计')*100,'#.##')}"
+                                     th:style="'width:'+${percent}+'%'" th:attr="aria-valuenow=${percent}"
+                                     aria-valuemin="0" aria-valuemax="100"></div>
+                            </th:block>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-12">
+                <div class="card mb-4">
+                    <div class="card-body">
+                        <h6 class="weight-400 mb-3 border-left border-warning pl-2 border-width-medium">充值记录
+                        </h6>
+                        <table class="table table-bordered-sm bg-white responsive-table table-hover table-striped text-md-center align-middle-table">
+                            <thead class="thead-light2">
+                            <tr>
+                                <th scope="col">类型</th>
+                                <th scope="col">充值金额</th>
+                                <th scope="col">赠送金额</th>
+                                <th scope="col">续期天数</th>
+                                <th scope="col">充值时间</th>
+                                <th scope="col">操作</th>
+                            </tr>
+                            </thead>
+                            <tbody>
+                            <tr th:each="item : ${pageInfo.list}">
+                                <td data-label="类型" th:switch="${item.type}">
+                            <span class="badge badge-info mr-1 text-white"
+                                  th:case="${application.rechargeType['流量充值']}">流量充值</span>
+                                    <span class="badge badge-warning mr-1 text-white"
+                                          th:case="${application.rechargeType['平台费充值']}">平台费充值</span>
+
+                                </td>
+                                <td data-label="充值金额">
+                                    <span class="text-primary" th:text="${#numbers.formatCurrency(item.amount)}"></span>
+                                </td>
+                                <td data-label="赠送金额">
+                                    <span class="text-success"
+                                          th:text="${#numbers.formatCurrency(item.addAmount)}"></span>
+                                </td>
+                                <td data-label="续期天数">
+                                    <span class="text-info" th:text="${item.duration}+'天'"></span>
+                                </td>
+                                <td data-label="充值时间">
+                                    <span th:text="${#dates.format(item.createDate, 'yyyy-MM-dd HH:mm:ss')}"></span>
+                                </td>
+                                <td data-label="操作" class="dropdown dropleft">
+                                    <a name="btnUpdateState" href="javascript:void(0)"
+                                       th:attr="data-img=${application.imgSite}+'/'+${item.pic}"
+                                       class="btn text-white btn-sm btn-primary">
+                                        查看凭证图片
+                                    </a>
+                                </td>
+                            </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+        <div class="row" th:if="${pageInfo.total > 0}">
+            <div class="col-12">
+                <div id="pages"></div>
+            </div>
+        </div>
+    </div>
+</th:block>
+<th:block th:replace="fragments/js :: managePublic(~{})"></th:block>
+<script src="/js/myPages/myPages.js" type="text/javascript"></script>
+<script src="/cosmo/js/lib/moment.min.js"></script>
+<script src="/cosmo/js/daterangepicker/daterangepicker.min.js"></script>
+<script src="/js/my-datarange.js"></script>
+
+<script>
+
+    $(function () {
+
+        $("#pages").myPages({
+            pageNo: [[${pageInfo.pageNum}]],
+            pageSize: [[${pageInfo.pageSize}]],
+            lastPage: [[${pageInfo.pages}]],
+            preText: "上一页",
+            nextText: "下一页",
+            url: "/merchant/money/{pageNo}-{pageSize}",
+            showPageButton: 6
+        })
+        //时间范围选择器
+        myRange("#dateRange", "#startTime", "#endTime");
+    })
+</script>
+</body>
+</html>

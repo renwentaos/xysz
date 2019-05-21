@@ -1,0 +1,429 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:replace="fragments/header :: managePublic('商户列表 - 行游神州管理员后台',~{::link})">
+    <link href="/js/myPages/myPages.css" rel="stylesheet" type="text/css"/>
+    <!-- Date Range Picker -->
+    <link rel="stylesheet" type="text/css" href="/cosmo/css/daterangepicker/daterangepicker.css"/>
+</head>
+<body>
+<div class="modal fade" id="remarkModel" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel"
+     aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="exampleModalLabel">添加备注</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <input type="hidden" class="form-control" id="merchantId" name="merchantId"/>
+                <div class="form-group">
+                    <label for="remark">备注信息</label>
+                    <textarea class="form-control" id="remark" name="remark"
+                              rows="4" placeholder="请输入备注信息"></textarea>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">关闭</button>
+                <button type="button" id="btnSaveRemark" class="btn btn-primary">保存</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="rechargeModel" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel"
+     aria-hidden="true">
+    <form method="post" id="rechargeForm" action="/admin/money/recharge">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">商户充值</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <input type="hidden" class="form-control" id="rechargeMerchantId" name="merchantId"/>
+                    <input type="hidden" class="form-control" id="rechargeImg" name="rechargeImg"/>
+                    <div class="form-group">
+                        <label for="amount">充值类型</label>
+                        <select class="form-control" id="rechargeType" name="type">
+                            <option value="1001">流量充值</option>
+                            <option value="1002">平台费充值</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="amount">充值金额</label>
+                        <div class="input-group">
+                            <input class="form-control" id="amount" name="amount"
+                                   data-fieldname="充值金额"
+                                   placeholder="请输入要充值的金额金额"/>
+                            <div class="input-group-append">
+                                <span class="input-group-text">元</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="form-group" id="rechargeAddAmount">
+                        <label for="addAmount">额外赠送金额</label>
+                        <div class="input-group">
+                            <input class="form-control" id="addAmount" name="addAmount"
+                                   data-fieldname="额外赠送金额" value="0"
+                                   placeholder="请输入要额外赠送的金额"/>
+                            <div class="input-group-append">
+                                <span class="input-group-text">元</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="form-group" id="rechargeDuration" style="display: none">
+                        <label for="amount">续费天数</label>
+                        <div class="input-group">
+                            <input class="form-control" id="duration" name="duration"
+                                   data-fieldname="续费天数"
+                                   placeholder="请输入要续费的天数"/>
+                            <div class="input-group-append">
+                                <span class="input-group-text">天</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="amount">凭证图片</label>
+                        <div class="custom-file">
+                            <input type="file" class="custom-file-input" id="validatedCustomFile" lang="zh">
+                            <label class="custom-file-label" id="picLabel" for="validatedCustomFile">选择凭证图片</label>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="amount">备注</label>
+                        <input class="form-control" id="rechargeRemark" name="remark"
+                               placeholder="请输入备注内容(可选)"/>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">关闭</button>
+                    <button type="submit" id="btnRecharge" class="btn btn-primary">充值</button>
+                </div>
+            </div>
+        </div>
+    </form>
+</div>
+<th:block th:replace="fragments/top :: adminPublic('商户列表','',~{::#content},~{::#filter})">
+    <div id="filter" class="col controls-wrapper mt-3 mt-md-0 d-none d-md-block">
+        <div class="controls d-flex justify-content-center justify-content-md-end">
+            <form method="get">
+                <div class="row">
+                    <div class="col-5 col-md-3  p-1">
+                        <input type="text" class="form-control d-inline-block" placeholder="商户名称/ID"
+                               name="info" th:value="${param.info}">
+                    </div>
+                    <div class="col-7 col-md-3 p-1">
+                        <input type="text" class="form-control d-inline-block" id="dateRange" placeholder="点击选择开户时间范围"
+                               th:value="${#strings.isEmpty(param.startTime)}?'':${param.startTime}+' - '+${param.endTime}">
+                    </div>
+                    <div class="col-4 col-md-2 p-1">
+                        <select class="form-control" name="level">
+                            <option value="">等级</option>
+                            <option th:selected="${param.level!=null}?${param.level[0]} eq ${lv.value}"
+                                    th:each="lv : ${application.merchantLevel}"
+                                    th:text="${lv.key}" th:value="${lv.value}"></option>
+                        </select>
+                    </div>
+                    <div class="col-6 col-md-3">
+                        <div class="row">
+                            <div class="col-7 p-1">
+                                <select class="form-control" name="state">
+                                    <option value="">状态</option>
+                                    <option th:selected="${param.state!=null}?${param.state[0]} eq ${sta.value}"
+                                            th:each="sta : ${application.basicState}"
+                                            th:text="${sta.key}" th:value="${sta.value}"></option>
+                                </select>
+                            </div>
+                            <div class="col-5  px-0 pt-1 small">
+                                <div class="form-check form-check-inline">
+                                    <input class="form-check-input" type="checkbox" id="yebz" name="yebz" value="1" th:checked="${param.yebz!=null}">
+                                    <label class="form-check-label" for="yebz">余额不足</label>
+                                </div>
+                                <div class="form-check form-check-inline">
+                                    <input class="form-check-input" type="checkbox" id="ydq" name="ydq" value="1" th:checked="${param.ydq!=null}">
+                                    <label class="form-check-label" for="ydq">已到期</label>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-2 col-md-1 p-1">
+                        <input type="hidden" name="startTime" id="startTime" th:value="${param.startTime}">
+                        <input type="hidden" name="endTime" id="endTime" th:value="${param.endTime}">
+                        <button type="submit" class="btn btn-info py-1 px-2" data-toggle="modal"
+                                data-target="#gridFilters"><span
+                                class="material-icons align-text-bottom">search</span>
+                        </button>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+    <div class="content" id="content">
+        <div class="row align-items-center" th:with="now=${new java.util.Date()}">
+            <table class="table table-bordered-sm bg-white responsive-table table-hover table-striped text-md-center align-middle-table">
+                <thead class="thead-light2">
+                <tr>
+                    <th scope="col">LOGO</th>
+                    <th scope="col">商户名称</th>
+                    <th scope="col">联系人</th>
+                    <th scope="col">联系电话</th>
+                    <th scope="col">地区</th>
+                    <th scope="col">流量余额</th>
+                    <th scope="col">开户时间</th>
+                    <th scope="col">到期时间</th>
+                    <th scope="col">状态</th>
+                    <th scope="col">操作</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr th:each="item : ${pageInfo.list}">
+                    <td><img th:src="${application.imgSite}+'/'+${item.logo}" class="border" style="width: 30px;"></td>
+                    <td data-label="商户名称">
+                        [[${item.name}]]
+                        <div th:switch="${item.level}">
+                            <span class="badge badge-info mr-1 text-white"
+                                  th:case="${application.merchantLevel['普通商户']}">普通商户</span>
+                            <span class="badge badge-success mr-1 text-white"
+                                  th:case="${application.merchantLevel['VIP商户']}">VIP商户</span>
+                            <span class="badge badge-warning mr-1 text-white"
+                                  th:case="${application.merchantLevel['全国VIP商户']}">全国VIP商户</span>
+                            <span class="badge badge-primary mr-1 text-white"
+                                  th:case="${application.merchantLevel['超级VIP商户']}">超级VIP商户</span>
+                        </div>
+                    </td>
+                    <td data-label="联系人" th:text="${item.contactName}"></td>
+                    <td data-label="联系电话" th:text="${item.contactMobile}"></td>
+                    <td data-label="地区" th:text="${item.province}+' - '+${item.city}"></td>
+                    <td data-label="流量余额">
+                        <div class="text-primary" th:text="${#numbers.formatCurrency(item.availableBalance)}"></div>
+                        <span class="badge text-white badge-danger" th:if="${item.availableBalance<500}">余额不足</span>
+                    </td>
+                    <td data-label="开户时间" th:text="${#dates.format(item.createDate, 'yyyy-MM-dd HH:mm:ss')}"></td>
+                    <td data-label="到期时间">
+                        <div>
+                        [[${#dates.format(item.expiryDate, 'yyyy-MM-dd HH:mm:ss')}]]
+                        </div>
+                        <span class="badge text-white badge-danger" th:if="${item.expiryDate<now}">已到期</span>
+                    </td>
+                    <td data-label="状态" th:switch="${item.state}">
+                        <strong class="text-danger" th:case="-1">冻结</strong>
+                        <strong class="text-success" th:case="*">正常</strong>
+                    </td>
+                    <td data-label="操作" class="dropdown dropleft">
+                        <a th:href="'javascript:merchantDetail('+${item.id}+')'"
+                           class="btn text-white btn-sm btn-primary  mr-1 mr-lg-0">详情</a>
+                        <a th:href="'javascript:merchantRecharge('+${item.id}+')'"
+                           class="btn text-white btn-sm btn-success  mr-1 mr-lg-0">充值</a>
+                        <a href="javascript:void(0)" class="btn btn-warning btn-sm text-white  mr-1 mr-lg-0"
+                           id="actionDropdown"
+                           data-toggle="dropdown"
+                           aria-expanded="true">跳转</a>
+                        <div class="dropdown-menu dropdown-menu-right" aria-labelledby="actionDropdown"
+                             x-placement="left-start"
+                             style="position: absolute; transform: translate3d(-136px, 13px, 0px); top: 0px; left: 0px; will-change: transform;">
+                            <a class="dropdown-item"
+                               th:href="'/admin/money/recharge/1-10?merchantId='+${item.id}">充值记录</a>
+                            <a class="dropdown-item"
+                               th:href="'/admin/money/consume/1-10?merchantId='+${item.id}">消费记录</a>
+                            <a class="dropdown-item" th:href="'/admin/member/1-10?merchantId='+${item.id}">拥有客户</a>
+                            <a class="dropdown-item" th:href="'/admin/project/1-10?merchantId='+${item.id}">旗下产品</a>
+                            <a class="dropdown-item"
+                               th:href="'/admin/project/apply/1-10?merchantId='+${item.id}">额度记录</a>
+                            <a class="dropdown-item"
+                               th:href="'/admin/project/loan/1-10?merchantId='+${item.id}">贷款记录</a>
+                            <a class="dropdown-item" th:href="'/admin/project/repayment/1-10?merchantId='+${item.id}">还款记录</a>
+                        </div>
+                        <a name="btnUpdateState" href="javascript:void(0)"
+                           th:attr="data-id=${item.id}"
+                           class="btn text-white btn-sm btn-danger mr-1 mr-lg-0">
+                            <span th:if="${item.state == 0}">冻结</span>
+                            <span th:if="${item.state == -1}">解冻</span>
+                        </a>
+                        <a name="btnRemark" data-toggle="tooltip" data-placement="top" href="javascript:void(0)"
+                           th:title="${item.remark}" th:attr="data-id=${item.id}"
+                           class="btn text-white btn-sm btn-info">备注</a>
+
+                    </td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+        <div class="row" th:if="${pageInfo.total > 0}">
+            <div class="col-12">
+                <div id="pages"></div>
+            </div>
+        </div>
+    </div>
+</th:block>
+<th:block th:replace="fragments/js :: managePublic(~{})"></th:block>
+<script src="/js/myPages/myPages.js" type="text/javascript"></script>
+<script src="/cosmo/js/lib/moment.min.js"></script>
+<script src="/cosmo/js/daterangepicker/daterangepicker.min.js"></script>
+<script src="/js/my-datarange.js"></script>
+<script type="text/javascript" src="/js/validate/jquery.validate.js"></script>
+<script type="text/javascript" src="/js/validate/localization/messages_zh_layer.js"></script>
+<script>
+
+    function merchantDetail(id) {
+        var width = $(window).width();
+        var height = $(window).height();
+        if (width > 940) {
+            width = 940;
+            height = 640;
+        } else if (width <= 940 && width > 700) {
+            width = 700;
+            height = 450;
+        }
+        layer.open({
+            type: 2,
+            title: '商户详情',
+            shadeClose: true,
+            shade: 0.8,
+            area: [width + 'px', height + 'px'],
+            content: '/admin/merchant/detail?id=' + id
+
+        });
+    }
+
+    function merchantRecharge(id) {
+        $("#rechargeMerchantId").val(id);
+        $("#rechargeModel").modal();
+    }
+
+
+    $(function () {
+        $("#pages").myPages({
+            pageNo: [[${pageInfo.pageNum}]],
+            pageSize: [[${pageInfo.pageSize}]],
+            lastPage: [[${pageInfo.pages}]],
+            preText: "上一页",
+            nextText: "下一页",
+            url: "/admin/merchant/{pageNo}-{pageSize}",
+            showPageButton: 6
+        })
+
+        //时间范围选择器
+        myRange("#dateRange", "#startTime", "#endTime");
+
+        $("a[name='btnUpdateState']").click(function () {
+            var txt = $(this).text();
+            var id = $(this).data("id");
+            layer.confirm('确认' + txt + '该商户？', {
+                btn: ['确认', '取消'] //按钮
+            }, function () {
+                $.get("/admin/merchant/state?id=" + id, function (data) {
+                    window.location.reload();
+                })
+            });
+
+        })
+
+        $("a[name='btnRemark']").click(function () {
+            var id = $(this).data("id");
+            var remark = $(this).data("original-title");
+            $("#merchantId").val(id);
+            $("#remark").val(remark);
+            $("#remarkModel").modal();
+        })
+
+        $("#btnSaveRemark").click(function () {
+            var merchantId = $("#merchantId").val();
+            var remark = $("#remark").val();
+            $.get("/admin/merchant/remark?merchantId=" + merchantId + "&remark=" + remark, function (data) {
+                if (data == "") {
+                    window.location.reload();
+                } else {
+                    layer.msg(data);
+                }
+            }, 'text')
+        })
+
+        $("#rechargeType").change(function () {
+            var val = $(this).val();
+            var speed = 200;
+            if (val == "1002") {
+                $("#rechargeAddAmount").fadeOut(speed, function () {
+                    $("#rechargeDuration").fadeIn(speed);
+                });
+            } else {
+                $("#rechargeDuration").fadeOut(speed, function () {
+                    $("#rechargeAddAmount").fadeIn(speed);
+                });
+            }
+        })
+
+        $("#validatedCustomFile").change(function () {
+            var file = this.files[0];
+            //判断是否是图片类型
+            if (!/image\/\w+/.test(file.type)) {
+                layer.msg("只能选择图片");
+                return false;
+            }
+            var reader = new FileReader();
+            reader.readAsDataURL(file);
+            reader.onload = function (e) {
+                dealImage(this.result, 1000, 100, function (base64) {
+                    $("#rechargeImg").val(base64);
+                })
+            }
+
+            var val = $(this).val();
+            $("#picLabel").text(val);
+
+        })
+
+
+        $("#rechargeForm").validate({
+            rules: {
+                amount: {
+                    required: true,
+                    digits: true
+                },
+                duration: {
+                    digits: true
+                },
+                addAmount: {
+                    digits: true
+                }
+            },
+            submitHandler: function (form) {
+                var msg = null;
+                var img = $("#rechargeImg").val();
+                if (img == null || img.length == 0) {
+                    msg = "凭证图片不能为空，请上传凭证图片";
+                } else {
+                    var amount = $("#amount").val();
+                    if ($("#rechargeType").val() == "1002") {
+                        var dur = $("#duration").val();
+                        if (dur == null || dur.length == 0) {
+                            msg = "平台续期时间不能为空";
+                        } else if (dur < 1) {
+                            msg = "平台续期时间最少为1天";
+                        }
+                    } else {
+                        if (amount <= 1) {
+                            msg = "流量充值金额不能低于1元";
+                        }
+                    }
+                }
+
+                if (msg != null) {
+                    layer.msg(msg)
+                    return;
+                }
+
+                layer.confirm('确认充值？', {
+                    btn: ['确认', '取消'] //按钮
+                }, function () {
+                    form.submit();
+                });
+            }
+        })
+    })
+</script>
+</body>
+</html>

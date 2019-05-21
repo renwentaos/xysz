@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:replace="fragments/header :: managePublic('产品列表 - 云水滴商户后台',~{::link})">
+    <link href="/js/myPages/myPages.css" rel="stylesheet" type="text/css"/>
+    <!-- Date Range Picker -->
+</head>
+<body>
+<th:block th:replace="fragments/top :: merchantPublic('产品列表','',~{::#content},~{::#filter})">
+    <div id="filter" class="col controls-wrapper mt-3 mt-md-0 d-none d-md-block">
+        <div class="controls d-flex justify-content-center justify-content-md-end">
+            <form method="get">
+                <div class="row">
+                    <div class="col-6 col-md-7 p-1">
+                        <input type="text" class="form-control d-inline-block" placeholder="产品名称"
+                               name="name" th:value="${param.name}">
+                    </div>
+                    <div class="col-4 col-md-3 p-1">
+                        <select class="form-control" name="state">
+                            <option value="">状态</option>
+                            <option th:selected="${param.state!=null}?${param.state[0]} eq ${sta.value}"
+                                    th:each="sta : ${application.basicState}"
+                                    th:text="${sta.key}" th:value="${sta.value}"></option>
+                        </select>
+                    </div>
+                    <div class="col-2 col-md-2 p-1">
+                        <button type="submit" class="btn btn-info py-1 px-2" data-toggle="modal"
+                                data-target="#gridFilters"><span
+                                class="material-icons align-text-bottom">search</span>
+                        </button>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+    <div class="content" id="content">
+        <div class="row align-items-center">
+            <table class="table table-bordered-sm bg-white responsive-table table-hover table-striped text-md-center align-middle-table">
+                <thead class="thead-light2">
+                <tr>
+                    <th scope="col">产品名称</th>
+                    <th scope="col">借款金额</th>
+                    <th scope="col">借款时间/还款周期</th>
+                    <th scope="col">日息/逾期</th>
+                    <th scope="col">代金券</th>
+                    <th scope="col">风控数据</th>
+                    <th scope="col">状态</th>
+                    <th scope="col">操作</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr th:each="item : ${pageInfo.list}">
+                    <td data-label="产品名称" th:text="${item.name}"></td>
+                    <td data-label="借款金额">
+                        <span class="text-info" th:text="${#numbers.formatCurrency(item.minAmount)}"></span>
+                        ~
+                        <span class="text-primary" th:text="${#numbers.formatCurrency(item.maxAmount)}"></span>
+                    </td>
+                    <td data-label="借款时间">
+                        <span th:text="${item.loanTime}+'天'"></span>
+                        /
+                        <small th:text="${item.repaymentIntervalTime}+'天'"></small>
+                    </td>
+                    <td data-label="日息/逾期">
+                        <span class="text-success"
+                              th:text="${#format.formatDecimal(item.dayRates*100,'#.#######')}+'%'"></span>
+                        /
+                        <small class="text-danger"
+                               th:text="${#format.formatDecimal(item.overdueDayRates*100,'#.#######')}+'%'"></small>
+                    </td>
+                    <td data-label="代金券" th:text="${#format.formatDecimal(item.cutInterestPercent*100,'#.######')+'%'}">
+                    </td>
+                    <td data-label="风控数据">
+                        <span class="badge badge-danger mr-1" th:if="${item.jd > 0}">京东</span>
+                        <span class="badge badge-warning" th:if="${item.tb > 0}">淘宝</span>
+                        <span class="badge badge-secondary" th:if="${item.tb == 0 && item.jd==0}">无</span>
+                    </td>
+                    <td data-label="状态" th:switch="${item.state}">
+                        <strong class="text-danger" th:case="-1">已下架</strong>
+                        <strong class="text-success" th:case="*">正常</strong>
+                    </td>
+                    <td data-label="操作" class="dropdown dropleft">
+                        <a href="javascript:void(0)" class="btn btn-warning btn-sm text-white " id="actionDropdown" data-toggle="dropdown"
+                           aria-expanded="true">快速跳转</a>
+                        <div class="dropdown-menu dropdown-menu-right" aria-labelledby="actionDropdown"
+                             x-placement="left-start"
+                             style="position: absolute; transform: translate3d(-136px, 13px, 0px); top: 0px; left: 0px; will-change: transform;">
+                            <a class="dropdown-item" th:href="'/merchant/apply/1-10?projectId='+${item.id}">额度记录</a>
+                            <a class="dropdown-item" th:href="'/merchant/loan/1-10?projectId='+${item.id}">贷款记录</a>
+                            <a class="dropdown-item" th:href="'/merchant/repayment/1-10?projectId='+${item.id}">还款记录</a>
+                        </div>
+                    </td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+        <div class="row" th:if="${pageInfo.total > 0}">
+            <div class="col-12">
+                <div id="pages"></div>
+            </div>
+        </div>
+    </div>
+</th:block>
+<th:block th:replace="fragments/js :: managePublic(~{})"></th:block>
+<script src="/js/myPages/myPages.js" type="text/javascript"></script>
+
+<script>
+    $(function () {
+        $("#pages").myPages({
+            pageNo: [[${pageInfo.pageNum}]],
+            pageSize: [[${pageInfo.pageSize}]],
+            lastPage: [[${pageInfo.pages}]],
+            preText: "上一页",
+            nextText: "下一页",
+            url: "/merchant/project/{pageNo}-{pageSize}",
+            showPageButton: 6
+        })
+
+    })
+
+</script>
+</body>
+</html>

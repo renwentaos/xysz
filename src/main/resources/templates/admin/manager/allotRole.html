@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:replace="fragments/header :: managePublic('修改管理员信息 - 行游神州管理员后台',~{})"></head>
+<body>
+<th:block th:replace="fragments/top :: adminPublic('修改管理员信息','修改管理员信息及为管理员分配角色',~{::#content},~{})">
+    <div class="content" id="content">
+        <div class="row">
+            <div class=" col-lg-4 col-12 ">
+                <form method="post" id="form">
+                    <div class="form-group">
+                        <label for="userName">用户名</label>
+                        <input type="text" class="form-control" id="userName" name="userName"
+                               data-fieldname="用户名"
+                               placeholder="请输入用户名" th:value="${manager.userName}">
+                    </div>
+                    <div class="form-group">
+                        <label for="name">真实姓名</label>
+                        <input type="text" class="form-control" id="name" name="name"
+                               data-fieldname="真实姓名"
+                               placeholder="请输入管理员的真实姓名" th:value="${manager.name}">
+                    </div>
+                    <div class="form-group">
+                        <label>状态</label>
+                        <div class="form-control" style="background: none;border:none;">
+                            <div class="custom-control custom-radio custom-control-inline">
+                                <input type="radio" id="state1" name="state" value="3"
+                                       class="custom-control-input" th:checked="${manager.state!=-1}">
+                                <label class="custom-control-label" for="state1">正常</label>
+                            </div>
+                            <div class="custom-control custom-radio custom-control-inline">
+                                <input type="radio" id="state2" name="state" value="-1"
+                                       class="custom-control-input" th:checked="${manager.state==-1}">
+                                <label class="custom-control-label" for="state2">冻结</label>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label>
+                            角色
+                        </label>
+                        <div class="form-control" style="background: none;border:none;">
+                            <div class="custom-control custom-checkbox custom-control-inline"
+                                 th:each="role,roleSta : ${list}">
+                                <input type="checkbox" class="custom-control-input"
+                                       name="roles" th:id="'roles'+${roleSta.index}"
+                                       th:value="${role.id}"
+                                       th:checked="${manager.rolesIds.containsKey(role.id.toString())}">
+                                <label class="custom-control-label" th:text="${role.name}"
+                                       th:for="'roles'+${roleSta.index}"></label>
+                            </div>
+
+                        </div>
+                    </div>
+                    <div class="alert alert-danger" th:if="${msg != null}">
+                        <strong>提示:</strong><span th:text="${msg}"></span>
+                    </div>
+                    <input type="hidden" th:value="${manager.id}" name="id">
+                    <input type="hidden" name="token" th:value="${token}">
+                    <button type="submit" class="btn btn-primary">保存修改</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</th:block>
+<th:block th:replace="fragments/js :: managePublic(~{})"></th:block>
+<script type="text/javascript" src="/js/validate/jquery.validate.min.js"></script>
+<script type="text/javascript" src="/js/validate/localization/messages_zh_layer.js"></script>
+<script>
+    $(document).ready(function () {
+
+        $("#form").validate({
+            rules: {
+                userName: {
+                    required: true
+                },
+                name: {
+                    required: true
+                }
+            },
+            submitHandler: function (form) {
+                layer.confirm('确认修改管理员信息？', {
+                    btn: ['确认', '取消'] //按钮
+                }, function () {
+                    form.submit();
+                });
+            }
+        });
+    })
+</script>
+</body>
+</html>

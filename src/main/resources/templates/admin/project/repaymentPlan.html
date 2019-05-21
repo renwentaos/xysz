@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:replace="fragments/header :: managePublic('还款计划 - 云水滴',~{})">
+    </head>
+<body>
+<div class="container-fluid">
+    <div class="row mt-4">
+        <div class="col-sm-6" th:each="item : ${pageInfo.list}">
+            <div name="repaymentDiv" class="card mb-4"
+                 th:attr="data-day=${item.state==0}?${item.countDownDay}:'false'">
+                <div class="card-body position-relative">
+                    <div class="position-absolute" style="top:-20px;right:5px;" th:switch="${item.state}">
+                        <img th:case="0" src="/img/repayState1.png">
+                        <img th:case="4" src="/img/repayState3.png">
+                        <img th:case="*" src="/img/repayState2.png">
+                    </div>
+                    <h5 class="weight-400">
+                        <span class="text-primary">第 [[${item.stage}]] 期</span>
+                        /
+                        <span class="text-dark">总 [[${item.totalStage}]] 期</span>
+                    </h5>
+                    <div class="bg-light px-2 py-3 text-center">
+                        <div class="row">
+                            <span class="col-4 text-muted">
+                                已还
+                            </span>
+                            <span class="col-4 text-muted">
+                                本金
+                            </span>
+                            <span class="col-4 text-muted">
+                                利息
+                            </span>
+                        </div>
+                        <div class="row mt-2">
+                            <h5 class="weight-400 col-4 text-success" th:text="${#numbers.formatCurrency(item.realAmount)}"></h5>
+                            <h5 class="weight-400 col-4" th:text="${#numbers.formatCurrency(item.principal)}"></h5>
+                            <h5 class="weight-400 col-4" th:text="${#numbers.formatCurrency(item.interest)}"></h5>
+                        </div>
+                    </div>
+                    <div class="mt-2">
+                        <small class="text-muted">
+                            订单号：
+                            <span style="color:#4E565A;" th:text="${item.orderId}"></span>
+                        </small>
+                        <br>
+                        <!--<small class="text-muted">-->
+                            <!--借款人：-->
+                            <!--<span style="color:#4E565A;"-->
+                                  <!--th:text="${item.memberIdCard ==null?item.member.mobile:item.memberIdCard.name}"></span>-->
+                        <!--</small>-->
+                        <!--<br>-->
+                        <small class="text-muted">
+                            应还时间：
+                            <span style="color:#4E565A;"
+                                  th:text="${#dates.format(item.expectRepayTime,'yyyy-MM-dd HH:mm:ss')}"></span>
+                        </small>
+                        <span class="badge badge-primary float-right" th:if="${item.state != 0 and item.state != 4}">
+                                [[${#dates.format(item.repayTime, 'yyyy-MM-dd HH:mm:ss')}]]已还
+                            </span>
+                        <span class="badge badge-warning text-light float-right" th:if="${item.state == 0}">
+                                还有
+                                <span th:if="${item.countDownDay > 0}"
+                                      th:text="${item.countDownDay}+'天'"></span>
+                                <span th:if="${item.countDownHour > 0}"
+                                      th:text="${item.countDownHour}+'小时'"></span>
+                                到期
+                            </span>
+                        <span class="badge badge-danger float-right" th:if="${item.state == 4}">
+                                已逾期
+                                <span th:if="${item.countDownDay > 0}"
+                                      th:text="${item.countDownDay}+'天'"></span>
+                                <span th:if="${item.countDownHour > 0}"
+                                      th:text="${item.countDownHour}+'小时'"></span>
+                            </span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<th:block th:replace="fragments/js :: managePublic(~{})"></th:block>
+<script>
+</script>
+</body>
+</html>

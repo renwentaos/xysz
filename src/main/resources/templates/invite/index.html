@@ -1,0 +1,63 @@
+﻿<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="zh">
+	<head>
+		<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, minimum-scale=1.0, maximum-scale=5.0" charset="UTF-8">
+		<meta name="apple-mobile-web-app-capable" content="yes">
+		<meta name="apple-mobile-web-app-status-bar-style" content="black">
+		<meta name="format-detection" content="telephone=no">
+		<title>云水滴</title>
+		<link rel="stylesheet" href="/invite/css/iconfont.css" />
+		<link rel="stylesheet" href="/invite/css/common.css" />
+		<link rel="stylesheet" href="/invite/css/ModularForm.css" />
+		<link rel="stylesheet" href="/invite/css/LoginRegister.css" />
+		<script type="text/javascript" src="/invite/js/Libs/jquery.min.js" ></script>
+	</head>
+	<body>
+		<div class="content">
+			<img src="/invite/images/ysd_01.jpg">
+			<img src="/invite/images/ysd_02.jpg">
+			<img src="/invite/images/ysd_03.jpg">
+			<img src="/invite/images/ysd_04.jpg">
+			<img src="/invite/images/ysd_05.jpg">
+		</div>
+		<div class="support-buy-box">
+			<ul class="support-financial-ul" id="xjkAccountProList">
+				<tr th:each="item : ${list}">
+				<li class="support-financial-list">
+					<div class="product-box">
+						<h3><span th:text="${item.name}"></span><a href="javascript:void(0)" onclick="register()" class="go" target="_blank">去申请</a></h3>
+						<div class="financial-data-limit clearfix">
+							<div class="limit-box"><p>额度(元)</p><div class="edu"><span th:text="${item.maxAmount}"></span></div></div>
+							<div class="limit-box" style="text-align: center"><p><span>借款期限</span><span th:text="${item.loanTime}"></span><span>天</span></p><div><span>共</span><span th:text="${item.loanTime/item.repaymentIntervalTime}"></span><span>期</span></div></div>
+							<div class="limit-box" style="text-align: right"><p>日利率</p><div><span th:text="${#numbers.formatDecimal(item.dayRates*100,1,4)}"></span><em>%</em></div></div>
+						</div>
+					</div>
+				</li>
+				</tr>
+			</ul>
+		</div>
+
+		<script type="text/javascript" src="/invite/js/Libs/swiper-3.3.1.jquery.min.js" ></script>
+		<script type="text/javascript" src="/invite/js/common.js" ></script>
+		<script type="text/javascript" src="/invite/js/yanzheng.js" ></script>
+		<script type="text/javascript" src="/js/layer/layer.js"></script>
+	</body>
+	<script type="text/javascript">
+	$(function () {
+		var msg = "[[${msg}]]";
+		if(msg != null && msg != ''){
+			layer.msg(msg);
+		}
+
+	})
+		function register() {
+			var url = location.search;
+			if(url != null && url !=''){
+				window.location.href= '/invite/registers'+url;
+				// window.location.href= 'register.html'+url;
+			}else{
+				window.location.href= '/invite/registers'
+			}
+		}
+	</script>
+</html>

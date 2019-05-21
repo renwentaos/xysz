@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<body>
+
+<th:block th:fragment="priv(js)">
+    <script type="text/javascript" th:src="@{/js/jquery-3.3.1.min.js}"></script>
+    <script type="text/javascript" th:src="@{/js/public.js}"></script>
+    <script type="text/javascript" th:src="@{/js/layer/layer.js}"></script>
+    <th:block th:replace="${js}"/>
+</th:block>
+
+<!--公用js-->
+<th:block th:fragment="public(js)">
+    <th:block th:replace="fragments/js :: priv(${js})"></th:block>
+</th:block>
+
+
+<!--管理员、商户公用js-->
+<th:block th:fragment="managePublic(js)">
+    <th:block th:replace="fragments/js :: priv(${js})"></th:block>
+    <script type="text/javascript" th:src="@{/cosmo/js/lib/popper.min.js}"></script>
+    <script type="text/javascript" th:src="@{/cosmo/js/bootstrap/bootstrap.min.js}"></script>
+    <script type="text/javascript" th:src="@{/cosmo/js/chosen-js/chosen.jquery.js}"></script>
+    <script type="text/javascript" th:src="@{/cosmo/js/custom.js}"></script>
+    <script type="text/javascript" th:src="@{/cosmo/top.js}"></script>
+</th:block>
+</body>
+</html>

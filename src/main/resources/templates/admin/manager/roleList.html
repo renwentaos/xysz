@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:replace="fragments/header :: managePublic('角色列表 - 行游神州管理员后台',~{})"></head>
+<body>
+<th:block th:replace="fragments/top :: adminPublic('角色列表','管理角色列表',~{::#content},~{})">
+    <div class="content" id="content">
+        <div class="row align-items-center">
+                    <table class="table table-bordered-sm bg-white responsive-table table-hover table-striped">
+                        <thead class="thead-light2">
+                        <tr>
+                            <th scope="col" width="1">#</th>
+                            <th scope="col" class="text-md-center">角色名称</th>
+                            <th scope="col" class="text-md-center">操作</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        <tr th:each="item,sta : ${list}">
+                            <td data-label="序号" scope="row" th:text="${sta.count}"></td>
+                            <td data-label="角色名称" class="text-md-center" th:text="${item.name}"></td>
+                            <td data-label="操作" class="text-md-center">
+                                <a th:href="'/admin/manager/role/rights?id='+${item.id}" class="btn text-white btn-sm btn-primary">分配权限</a>
+                            </td>
+                        </tr>
+                        </tbody>
+                    </table>
+        </div>
+    </div>
+</th:block>
+<th:block th:replace="fragments/js :: managePublic(~{})"></th:block>
+</body>
+</html>

@@ -1,0 +1,21 @@
+package com.xws.xysz.config;
+
+/**
+ * App接口相关设置
+ * JokerYG
+ * Date: 2018-11-19
+ * Time: 10:35
+ */
+public class APPConfig {
+    //APP-TOKEN设置
+    public final static String TOKEN_PREFIX = "atk-";//APPTOKEN存储redis前缀
+    public final static int TOKEN_EXPIRE = 14 * 24 * 60 * 60;//APP_TOKEN生命周期-秒
+    public final static int REQUEST_TIME_EXPIRE = 1 * 60 ;//app请求超时时间-秒
+    public final static String RSA_PUB_KEY = "MIGfMA0GCSqGSIb3DQEBAQUAA4GNADCBiQKBgQCva5zyrSyeg4pedBK9t7UpHgY40++3LXsu7xm0V9o7PsgbtiCkqGVCy/nE9TiMSNscOClliZIRmVpI/Dha2fZsB13bebYmjP1a41q+LVhTOBJSWztdet5ftXklQp0FqUTq3CAMWZKUQTTHNNfRcm5S7dzpdrfyrqO3xh88Mal4qQIDAQAB";
+    public final static String RSA_PRI_KEY = "MIICdgIBADANBgkqhkiG9w0BAQEFAASCAmAwggJcAgEAAoGBAK9rnPKtLJ6Dil50Er23tSkeBjjT77ctey7vGbRX2js+yBu2IKSoZULL+cT1OIxI2xw4KWWJkhGZWkj8OFrZ9mwHXdt5tiaM/VrjWr4tWFM4ElJbO1163l+1eSVCnQWpROrcIAxZkpRBNMc019FyblLt3Ol2t/Kuo7fGHzwxqXipAgMBAAECgYB/WPdKcY+Xz9Sut0M3uVrp66MGtE0tRPZNX0Tg2HpUUkKBY5mVD67bbCr54i/YH7f5Z4gd7148KoERxRDAW8V49ubbhcuFCihXR0Bw+sj4Z0GQqFKs5YrtJB5dXaSQiXANmsMVAjaTt5Au8mElzZhCOUQD1UFSObBNsghoqOMogQJBAPKzKgPCgXiZcPY1N8LSZPjamOfIVQ8midGIKVwvkw9wuZMG0E31lreIcG2BEZOQtQPfEju6tL2w+psBQSHlS/ECQQC5CJXElJbhr3fKw9z5m75Cm5NS1bb13U2qabsWw2CWDGTs9HP15hU3vFPsgNITNZUU1lLwFTzOSbYaCFzNJJA5AkEAwOnS4qwv96mX1cyVZyGPqxMu6UYe/mz2rXuazLDwJxzGFW0cFGu7AmXMX+5xByfGCq68soeE9ScA/Eax+/xkMQJAVieELLMPCeh8u6G1G1gEH9l2oGQ4O4SerBFs9m1kZJlCyP4NnFpUWM5MuVtF9YHGd5xPo9APrvGtY7OvGinDKQJAUDt4gGpSHNlz0/u+8VomWYGYV3sci/MqOLajj3tAVyFZmvM3TtKzlm700/TnN0c2JsOW7h1iZyTmTbPMaTxIOg==";
+    public final static String SIGN_KEY = "32D070407EDD19245B204E0615675A44";
+
+
+
+
+}

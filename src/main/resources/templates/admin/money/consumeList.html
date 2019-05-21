@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:replace="fragments/header :: managePublic('商户消费记录 - 行游神州管理员后台',~{::link})">
+    <link href="/js/myPages/myPages.css" rel="stylesheet" type="text/css"/>
+    <!-- Date Range Picker -->
+    <link rel="stylesheet" type="text/css" href="/cosmo/css/daterangepicker/daterangepicker.css"/>
+
+</head>
+<body style="height:100%">
+<th:block th:replace="fragments/top :: adminPublic('商户消费记录列表','',~{::#content},~{::#filter})">
+    <div id="filter" class="col controls-wrapper mt-3 mt-md-0 d-none d-md-block">
+        <div class="controls d-flex justify-content-center justify-content-md-end">
+            <form method="get">
+                <div class="row">
+                    <div class="col-5 col-md-4 p-1">
+                        <input type="text" class="form-control d-inline-block" placeholder="商户名称/ID"
+                               name="merchantInfo" th:value="${param.merchantInfo}">
+                    </div>
+                    <div class="col-7 col-md-4 p-1">
+                        <input type="text" class="form-control d-inline-block" id="dateRange" placeholder="点击选择消费时间范围"
+                               th:value="${#strings.isEmpty(param.startTime)}?'':${param.startTime}+' - '+${param.endTime}">
+                    </div>
+                    <div class="col-9 col-md-3 p-1">
+                        <select class="form-control" name="type">
+                            <option value="">消费类型</option>
+                            <option th:selected="${param.type!=null}?${param.type[0]} eq ${tt.value}"
+                                    th:each="tt : ${application.consumeType}"
+                                    th:text="${tt.key}" th:value="${tt.value}"></option>
+                        </select>
+                    </div>
+                    <div class="col-2 col-md-1 p-1">
+                        <input type="hidden" name="startTime" id="startTime" th:value="${param.startTime}">
+                        <input type="hidden" name="endTime" id="endTime" th:value="${param.endTime}">
+                        <button type="submit" class="btn btn-info py-1 px-2" data-toggle="modal"
+                                data-target="#gridFilters"><span
+                                class="material-icons align-text-bottom">search</span>
+                        </button>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+    <div class="content" id="content">
+        <div class="row align-items-center">
+            <table class="table table-bordered-sm bg-white responsive-table table-hover table-striped text-md-center align-middle-table">
+                <thead class="thead-light2">
+                <tr>
+                    <th scope="col">商户信息</th>
+                    <th scope="col">消费类型</th>
+                    <th scope="col">消费金额</th>
+                    <th scope="col">消费时间</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr th:each="item : ${pageInfo.list}">
+                    <td data-label="商户信息">
+                        <img th:src="${application.imgSite}+'/'+${item.merchant.logo}" class="pb-1 pr-1" style="width: 20px;">
+                        <div th:text="${item.merchant.name}"></div>
+                    </td>
+                    <td data-label="消费类型"  th:text="${application.consumeTypeCode.get(item.type)}">
+
+                    </td>
+                    <td data-label="消费金额">
+                        <span class="text-primary" th:text="${#numbers.formatCurrency(item.amount)}"></span>
+                    </td>
+                    <td data-label="消费时间">
+                        <span th:text="${#dates.format(item.createDate, 'yyyy-MM-dd HH:mm:ss')}"></span>
+                    </td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+        <div class="row" th:if="${pageInfo.total > 0}">
+            <div class="col-12">
+                <div id="pages"></div>
+            </div>
+        </div>
+    </div>
+</th:block>
+<th:block th:replace="fragments/js :: managePublic(~{})"></th:block>
+<script src="/js/myPages/myPages.js" type="text/javascript"></script>
+<script src="/cosmo/js/lib/moment.min.js"></script>
+<script src="/cosmo/js/daterangepicker/daterangepicker.min.js"></script>
+<script src="/js/my-datarange.js"></script>
+<script>
+    $(function () {
+        $("#pages").myPages({
+            pageNo: [[${pageInfo.pageNum}]],
+            pageSize: [[${pageInfo.pageSize}]],
+            lastPage: [[${pageInfo.pages}]],
+            preText: "上一页",
+            nextText: "下一页",
+            url: "/admin/money/consume/{pageNo}-{pageSize}",
+            showPageButton: 6
+        })
+        //时间范围选择器
+        myRange("#dateRange", "#startTime", "#endTime");
+    })
+
+</script>
+</body>
+</html>

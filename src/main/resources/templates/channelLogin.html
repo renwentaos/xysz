@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:replace="fragments/header :: managePublic('渠道商登录 - 云水滴',~{})"></head>
+<body>
+<div class="container-fluid">
+
+<section class="wrapper" style="margin-top:6%;">
+    <div class="login row">
+        <div class="col-md-4 offset-md-4 col-xl-2 offset-xl-5">
+            <div class="form">
+                <div class="text-center mb-4">
+                    <img src="/img/merchant/logo2.png"/>
+                </div>
+                <h3 class="h4 mb-5 text-center">云水滴渠道商登录</h3>
+                <form style="padding-left:10px;padding-right:10px;" id="form" method="post">
+                    <div class="form-group">
+                        <label for="userName">用户名</label>
+                        <input type="text" class="form-control" data-fieldname="用户名" id="userName" name="userName" placeholder="请输入用户名">
+                    </div>
+                    <div class="form-group">
+                        <label for="password">密码</label>
+                        <input type="password" class="form-control" data-fieldname="密码" id="password" name="password" placeholder="请输入密码">
+                    </div>
+                    <div class="form-group" th:if="${session.merchantCount>=3}">
+                        <label for="code">验证码</label>
+                        <div class="row">
+                            <div class="col-7">
+                                <input class="form-control" type="text" id="code" name="code">
+                            </div>
+                            <a href="javascript:void(0)" class="col-5" name="refreshImgCode"
+                               title="点击更换验证码">
+                                <img id="imgCodeImg" class="img-fluid" style="border:1px solid #bbb;border-radius: 4px;" src="/imgcode?w=180&h=60">
+                            </a>
+                        </div>
+                    </div>
+                    <div class="form-group" th:if="${msg != null}">
+                        <div class="col-xs-12 text-danger">
+                            <strong>登录出错:</strong><span th:text="${msg}"></span>
+                        </div>
+                    </div>
+                    <input type="submit" id="btnLogin" class="btn mt-4 btn-primary btn-block" value="商 户 登 录">
+                </form>
+            </div>
+        </div>
+    </div>
+</section>
+</div>
+<th:block th:replace="fragments/js :: managePublic(~{})"></th:block>
+<script type="text/javascript" src="/js/validate/jquery.validate.min.js"></script>
+<script type="text/javascript" src="/js/validate/localization/messages_zh_layer.js"></script>
+<script>
+    $(document).ready(function () {
+        $("a[name='refreshImgCode']").click(function () {
+            $("#imgCodeImg").attr("src", $("#imgCodeImg").attr("src")+"&m=" + Math.random());
+        });
+
+        $("#form").validate({
+            rules: {
+                userName: {
+                    required: true,
+                    rangelength: [2, 20]
+                },
+                password: {
+                    required: true,
+                    rangelength: [5, 20]
+                }
+            }
+        });
+    })
+</script>
+</body>
+</html>

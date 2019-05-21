@@ -1,0 +1,307 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:replace="fragments/header :: managePublic('首页 - 云水滴商户后台',~{})"></head>
+<body>
+<div class="modal fade" id="cashModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel"
+     aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="opinion">提现</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div class="form-group">
+                    <label>结算银行：</label>
+                    <input readonly="readonly" class="form-control text-muted" th:value="${mInfo.bankName}">
+                </div>
+                <div class="form-group">
+                    <label>结算卡号：</label>
+                    <input readonly="readonly" class="form-control text-muted" th:value="${mInfo.bankCard}">
+                </div>
+                <div class="form-group">
+                    <label>结算卡预留手机号：</label>
+                    <input readonly="readonly" class="form-control text-muted" th:value="${mInfo.bankCardMobile}">
+                </div>
+                <div class="form-group">
+                    <label>结算卡持有人姓名：</label>
+                    <input readonly="readonly" class="form-control text-muted" th:value="${mInfo.bankCardOwnerName}">
+                </div>
+                <div class="form-group">
+                    <label>钱包可用余额:</label>
+                    <input readonly="readonly" class="form-control text-muted" th:value="${mInfo.walletBalance}">
+                </div>
+                <div class="form-group">
+                    <label>提现金额:</label>
+                    <form id="cashForm" method="post" action="/merchant/wallet/cash">
+                        <input class="form-control" id="cashMoney" name="money">
+                    </form>
+                    <div class="text-right">
+                        <small>
+                            手续费:<span id="cashFee">0</span> 总支出:<span id="cashSum">0</span>
+                        </small>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">关闭</button>
+                <button type="button" id="btnCash" class="btn btn-primary">确认提现</button>
+            </div>
+        </div>
+    </div>
+</div>
+<th:block th:replace="fragments/top :: merchantPublic('首页','云水滴商户后台',~{::#content},~{})">
+    <div class="content" id="content">
+        <div th:if="${news !=null && news !=''}">
+        <a href="/merchant/news/list/1001-1-10">
+        <div class="alert alert-success" style="width: 100%;float: left;line-height: 1" title="查看更多"><p style="float: left;margin: 0"><img src="/img/gonggao.png" style="width: 20px; margin-right: 10px">公告：<span th:text="${news.title}"></span></p>
+            <!--<marquee class="col-11" scrolldelay="800" scrollamount="100" th:utext="${news.title}"></marquee>--><!--behavior="slide"-->
+            <span style="float: right" th:text="${#dates.format(news.createDate,'yyyy-MM-dd')}"></span>
+        </div>
+        </a>
+        </div>
+        <div class="alert alert-danger" role="alert" th:if="${mInfo.availableBalance < 700}">
+            提示:您的流量余额不足700元，余额低于500元时不能正常登陆使用，避免耽误您的正常使用，请及时充值！ 
+        </div>
+        <div class="card mb-4">
+            <div class="card-body  p-lg-4">
+                <div class="row">
+                    <div class="col-md-6 col-lg-3  mb-4 mb-md-0 ">
+                        <div class="media align-items-center">
+                            <span class="material-icons text-success mr-3 circle p-3 border border-success bg-success-light25">group</span>
+                            <div class="media-body">
+                                <h4 class="weight-400 m-0" th:text="${memberCount}+' 位'"></h4>
+                                <small class="text-muted">拥有客户数量</small>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-6 col-lg-3  mb-4 mb-lg-0">
+                        <div class="media align-items-center">
+                            <span class="material-icons text-info mr-3 circle p-3 border border-info bg-info-light25">credit_card</span>
+                            <div class="media-body">
+                                <h4 class="weight-400 m-0" th:text="${applyCount}+' 笔'"></h4>
+                                <small class="text-muted">待处理的额度申请数量</small>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-6 col-lg-3 mb-4 mb-md-0">
+                        <div class="media align-items-center">
+                            <span class="material-icons text-warning mr-3 circle p-3 border border-warning bg-warning-light25">pages</span>
+                            <div class="media-body">
+                                <h4 class="weight-400 m-0" th:text="${loanCount}+' 笔'"></h4>
+                                <small class="text-muted">待处理的借款申请数量</small>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-6 col-lg-3  mb-4 mb-lg-0">
+                        <div class="media align-items-center">
+                            <span class="material-icons text-danger mr-3 circle p-3 border border-danger bg-danger-light25">monetization_on</span>
+                            <div class="media-body">
+                                <h4 class="weight-400 m-0" th:text="${repaymentAmount}+' 元'"></h4>
+                                <small class="text-muted">总待收款金额</small>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-12 col-lg-8">
+                <div class="card mb-4">
+                    <div class="card-header">
+                        近半年放款金额/回款金额趋势图
+                    </div>
+                    <div class="card-body  p-lg-4">
+                        <canvas id="chart"></canvas>
+                    </div>
+                </div>
+            </div>
+            <div class="col-12 col-lg-4">
+                <div class="card mb-4">
+                    <div class="card-header">
+                        商户信息
+                    </div>
+                    <div class="card-body p-lg-4 ">
+                        <div class="row">
+                            <div class="col-4 weight-400 text-dark ">商户名称</div>
+                            <div class="col-8" th:switch="${session.merchantInfo.level}">
+                                [[${session.merchantInfo.name}]]
+                                <span class="badge badge-info mr-1 text-white"
+                                      th:case="${application.merchantLevel['普通商户']}">普通商户</span>
+                                <span class="badge badge-success mr-1 text-white"
+                                      th:case="${application.merchantLevel['VIP商户']}">VIP商户</span>
+                                <span class="badge badge-warning mr-1 text-white"
+                                      th:case="${application.merchantLevel['全国VIP商户']}">全国VIP商户</span>
+                                <span class="badge badge-primary mr-1 text-white"
+                                      th:case="${application.merchantLevel['超级VIP商户']}">超级VIP商户</span>
+                                <span class="badge badge-dark"
+                                      th:text="${session.merchantInfo.province}+'-'+${session.merchantInfo.city}">
+                                </span>
+                            </div>
+                            <div class="col-4 weight-400 mt-3 text-dark ">钱包余额
+                                (
+                                <small class="text-success">可用</small>
+                                /
+                                <small class="text-primary">冻结</small>
+                                )
+                            </div>
+                            <div class="col-8 mt-3">
+                                <span class="text-success weight-400">[[${#numbers.formatCurrency(mInfo.walletBalance)}]]</span>
+                                /
+                                <small class="text-primary">[[${#numbers.formatCurrency(mInfo.walletLockBalance)}]]
+                                </small>
+                                <button data-toggle="modal" data-target="#cashModal" class="btn btn-sm btn-primary">提现
+                                </button>
+                                <a href="/merchant/wallet/1-10" class="btn btn-sm btn-info">明细</a>
+
+                            </div>
+                            <div class="col-4 weight-400 mt-3 text-dark ">流量余额</div>
+                            <div class="col-8 mt-3" th:text="${#numbers.formatCurrency(mInfo.availableBalance)}"></div>
+                            <div class="col-4 weight-400 mt-3 text-dark ">到期时间</div>
+                            <div class="col-8 mt-3"
+                                 th:text="${#dates.format(mInfo.expiryDate,'yyyy-MM-dd HH:mm:ss')}"></div>
+                            <div class="col-4 weight-400 mt-3 text-dark ">推送流量</div>
+                            <div class="col-8  mt-3">
+                                <div>
+                                    <span class="user-initials bg-primary-light25 text-primary">A类</span>
+                                    每天[[${mInfo.aPushCount}]]个,今日已推送[[${mInfo.aPushedCount}]]个
+                                </div>
+                                <div class="mt-1">
+                                    <span class="user-initials bg-info-light25 text-info">B类</span>
+                                    每天[[${mInfo.bPushCount}]]个,今日已推送[[${mInfo.bPushedCount}]]个
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="card mb-4">
+                            <div class="card-header">
+                                推广二维码
+                            </div>
+                            <div class="card-body text-center" id="tgQRCode">
+
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-6 ">
+                        <div class="card mb-4">
+                            <div class="card-header">
+                                APP下载
+                            </div>
+                            <div class="card-body text-center">
+                                <img src="/img/download-ewm.png" width="169" height="169">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+</th:block>
+<th:block th:replace="fragments/js :: managePublic(~{})"></th:block>
+<script src="/js/chart/Chart.min.js"></script>
+<script src="/js/chart/utils.js"></script>
+<script src="/js/jquery-qrcode-0.14.0.min.js"></script>
+
+<script>
+    $(function () {
+        loadLoanAndRepayChart();
+        var text = "/invite/index?merchantId=" + "[[${session.merchantInfo.id}]]";
+        if ("[[${session.merchantInfo.level}]]" == 2) {
+            text = "/invite/index";
+        }
+        text = URlHandle(text);
+        $("#tgQRCode").qrcode({
+            text: text,
+            mode: 4,
+            mSize: 0.2,
+            ecLevel: "H",
+            size: 163,
+            image: $("#merchantLogo")[0]
+        });
+
+        $("#cashMoney").keyup(function () {
+            textNum(this);
+            var val = parseFloat($(this).val());
+            var cashFee = [[${cashFee}]];
+            var walletBalance = [[${mInfo.walletBalance}]];
+            if (val < 0 || isNaN(val)) {
+                val = 0;
+            } else if (val > walletBalance) {
+                val = walletBalance;
+            }
+            $(this).val(val);
+            $("#cashFee").text(cashFee);
+            $("#cashSum").text(val + cashFee);
+        }).blur(function () {
+            $(this).val(parseFloat($(this).val()))
+        }).bind("paste", function () {  //CTR+V事件处理
+            textNum(this);
+        }).css("ime-mode", "disabled");
+
+        $("#btnCash").click(function () {
+            if ($("#cashMoney") == 0) {
+                layer.msg("提现金额不能为0元")
+                return;
+            }
+
+            $("#cashForm").submit();
+        })
+
+    })
+
+    function loadLoanAndRepayChart() {
+        $.post("/merchant/report/month/loanAndRepay", {
+            "monthCount": 6
+        }, function (data) {
+            var labels = [];
+            var loans = [];
+            var repays = [];
+            for (var i = 0; i < 6; i++) {
+                labels[i] = data["loanMoney"][i].date;
+                loans[i] = data["loanMoney"][i].money;
+                repays[i] = data["repayMoney"][i].money;
+            }
+
+            var ctx = document.getElementById("chart").getContext('2d');
+            var contactBlackListChart = new Chart(ctx, {
+                type: 'line',
+                data: {
+                    datasets: [{
+                        data: loans,
+                        borderColor: window.chartColors.red,
+                        borderWidth: 2,
+                        backgroundColor: Samples.utils.transparentize(window.chartColors.red),
+                        lineTension: 0,
+                        fill: "start",
+                        label: "放款金额(元)"
+                    },
+                        {
+                            data: repays,
+                            borderColor: window.chartColors.blue,
+                            borderWidth: 2,
+                            backgroundColor: Samples.utils.transparentize(window.chartColors.blue),
+                            lineTension: 0,
+                            fill: "start",
+                            label: "回款金额(元)"
+                        }],
+                    labels: labels
+                },
+                options: {
+                    tooltips: {
+                        mode: 'index',
+                        intersect: false,
+                    }
+                }
+            });
+
+        });
+    }
+</script>
+</body>
+</html>

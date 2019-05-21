@@ -1,0 +1,344 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:replace="fragments/header :: managePublic('客户详情 - 云水滴',~{})"></head>
+<body>
+<div class="container-fluid">
+    <ul class="nav nav-tabs mt-2" id="myTab" role="tablist">
+        <li class="nav-item">
+            <a class="nav-link px-4  active " id="home-tab" data-toggle="tab" href="#home5" role="tab"
+               aria-controls="home" aria-selected="true">账号信息</a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link px-4  " id="profile-tab" data-toggle="tab" href="#profile5" role="tab"
+               aria-controls="profile" aria-selected="false">实名信息</a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link px-4 " id="contact-tab" data-toggle="tab" href="#contact5" role="tab"
+               aria-controls="contact" aria-selected="false">基础信息</a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link px-4 " id="voucher-tab" data-toggle="tab" href="#voucher5" role="tab"
+               aria-controls="voucher" aria-selected="false">代金券</a>
+        </li>
+    </ul>
+    <div class="card border-top-0 mb-4">
+        <div class="card-body ">
+
+            <div class="tab-content" id="myTabContent">
+                <div class="tab-pane fade show active" id="home5" role="tabpanel" aria-labelledby="home-tab">
+                    <div class="row text-center border-top border-right  ">
+                        <div class="col-4 col-md-3  bg-light  py-2 text-primary border-left border-bottom"><b>手机号</b></div>
+                        <div class="col-8 col-md-3  border-left border-bottom py-2 "><span th:text="${member.mobile}"/></div>
+                        <div class="col-4 col-md-3 bg-light  py-2 text-primary border-left border-bottom"><b>姓名</b></div>
+                        <div class="col-8 col-md-3   border-left border-bottom py-2 ">
+                            <th:block th:if="${member.memberIdCard == null}"><span>未实名</span></th:block>
+                            <th:block th:unless="${member.memberIdCard == null}"><span th:text="${member.memberIdCard.name}"/></th:block>
+                        </div>
+                        <div class="col-4 col-md-3 bg-light  py-2 text-primary border-left border-bottom"><b>状态</b></div>
+                        <th:block th:if="${member.state == 0}">
+                        <div class="col-8 col-md-3   border-left border-bottom py-2 "> 正常</div>
+                        </th:block>
+                        <th:block th:if="${member.state != 0}">
+                            <div class="col-8 col-md-3   border-left border-bottom py-2 "> 冻结</div>
+                        </th:block>
+                        <div class="col-4 col-md-3 bg-light  py-2 text-primary border-left border-bottom"><b>实名认证</b></div>
+                        <div class="col-8 col-md-3   border-left border-bottom py-2 " th:switch="${member.idCardState}">
+                             <span class="badge badge-danger mr-1 text-white"
+                                   th:case="${application.infoState['已驳回']}">已驳回</span>
+                            <span class="badge badge-secondary mr-1 text-white"
+                                  th:case="${application.infoState['未提交']}">未提交</span>
+                            <span class="badge badge-warning mr-1 text-white"
+                                  th:case="${application.infoState['审核中']}">审核中</span>
+                            <span class="badge badge-success mr-1 text-white"
+                                  th:case="${application.infoState['已完成']}">已完成</span>
+                        </div>
+                        <div class="col-4 col-md-3 bg-light  py-2 text-primary border-left border-bottom"><b>个人信息</b></div>
+                        <div class="col-8 col-md-3   border-left border-bottom py-2 " th:switch="${member.infoState}">
+                             <span class="badge badge-danger mr-1 text-white"
+                                   th:case="${application.infoState['已驳回']}">已驳回</span>
+                            <span class="badge badge-secondary mr-1 text-white"
+                                  th:case="${application.infoState['未提交']}">未提交</span>
+                            <span class="badge badge-warning mr-1 text-white"
+                                  th:case="${application.infoState['审核中']}">审核中</span>
+                            <span class="badge badge-success mr-1 text-white"
+                                  th:case="${application.infoState['已完成']}">已完成</span>
+                        </div>
+                        <div class="col-4 col-md-3 bg-light  py-2 text-primary border-left border-bottom"><b>联系人导入</b></div>
+                        <div class="col-8 col-md-3   border-left border-bottom py-2 " th:switch="${member.contactsState}">
+                             <span class="badge badge-danger mr-1 text-white"
+                                   th:case="${application.infoState['已驳回']}">已驳回</span>
+                            <span class="badge badge-secondary mr-1 text-white"
+                                  th:case="${application.infoState['未提交']}">未导入</span>
+                            <span class="badge badge-warning mr-1 text-white"
+                                  th:case="${application.infoState['审核中']}">审核中</span>
+                            <span class="badge badge-success mr-1 text-white"
+                                  th:case="${application.infoState['已完成']}">已完成</span>
+                        </div>
+                        <div class="col-4 col-md-3 bg-light  py-2 text-primary border-left border-bottom"><b>芝麻分</b></div>
+                        <div class="col-8 col-md-3   border-left border-bottom py-2 " th:switch="${member.zhimaState}">
+                             <span class="badge badge-danger mr-1 text-white"
+                                   th:case="${application.infoState['已驳回']}">已驳回</span>
+                            <span class="badge badge-secondary mr-1 text-white"
+                                  th:case="${application.infoState['未提交']}">未认证</span>
+                            <span class="badge badge-warning mr-1 text-white"
+                                  th:case="${application.infoState['审核中']}">审核中</span>
+                            <span class="badge badge-success mr-1 text-white"
+                                  th:case="${application.infoState['已完成']}">已完成</span>
+                        </div>
+                        <div class="col-4 col-md-3 bg-light  py-2 text-primary border-left border-bottom"><b>银行卡绑定</b></div>
+                        <div class="col-8 col-md-3   border-left border-bottom py-2 " th:switch="${member.bankState}">
+                             <span class="badge badge-danger mr-1 text-white"
+                                   th:case="${application.infoState['已驳回']}">已驳回</span>
+                            <span class="badge badge-secondary mr-1 text-white"
+                                  th:case="${application.infoState['未提交']}">未绑定</span>
+                            <span class="badge badge-warning mr-1 text-white"
+                                  th:case="${application.infoState['审核中']}">审核中</span>
+                            <span class="badge badge-success mr-1 text-white"
+                                  th:case="${application.infoState['已完成']}">已完成</span>
+                        </div>
+                        <div class="col-4 col-md-3 bg-light  py-2 text-primary border-left border-bottom"><b>注册时间</b></div>
+                        <div class="col-8 col-md-3   border-left border-bottom py-2 "><span th:text="${#dates.format(member.createDate,'yyyy-MM-dd')}"></span></div>
+                        <div class="col-4 col-md-3 bg-light  py-2 text-primary border-left border-bottom"><b>所在省市（省/市）</b></div>
+                        <div class="col-8 col-md-3   border-left border-bottom py-2 "><span th:text="${member.province}"></span>/<span th:text="${member.city}"></span></div>
+                        <div class="col-4 col-md-3 bg-light  py-2 text-primary border-left border-bottom"><b>超级vip还款中</b></div>
+                        <div class="col-8 col-md-3   border-left border-bottom py-2 "><span th:text="${member.svipRepaymentCount}"></span></div>
+                        <div class="col-4 col-md-3 bg-light  py-2 text-primary border-left border-bottom"><b>普通还款中</b></div>
+                        <div class="col-8 col-md-3   border-left border-bottom py-2 "><span th:text="${member.repanymentCount}"></span></div>
+                        <div class="col-4 col-md-3 bg-light  py-2 text-primary border-left border-bottom"><b>客户等级</b></div>
+                        <div class="col-8 col-md-9 border-left border-bottom py-2 " th:switch="${member.level}">
+                             <span class="user-initials bg-info-light25 text-info"
+                                   th:case="${application.memberLevel['B类客户']}">B类</span>
+                            <span class="user-initials bg-primary-light25 text-primary"
+                                  th:case="*">A类</span>
+                        </div>
+                        <th:block th:unless="${member.channel == null}">
+                        <div class="col-12 col-md-12 bg-light  py-2 text-primary border-left border-bottom"><b>渠道商信息</b></div>
+                        <div class="col-4 col-md-3 bg-light  py-2 text-primary border-left border-bottom"><b>公司名称</b></div>
+                        <div class="col-8 col-md-3   border-left border-bottom py-2 "><span th:text="${member.channel.companyName}"></span></div>
+                        <div class="col-4 col-md-3 bg-light  py-2 text-primary border-left border-bottom"><b>登陆名称</b></div>
+                        <div class="col-8 col-md-3   border-left border-bottom py-2 "><span th:text="${member.channel.userName}"></span></div>
+                        <div class="col-4 col-md-3 bg-light  py-2 text-primary border-left border-bottom"><b>联系人</b></div>
+                        <div class="col-8 col-md-3   border-left border-bottom py-2 "><span th:text="${member.channel.name}"></span></div>
+                        <div class="col-4 col-md-3 bg-light  py-2 text-primary border-left border-bottom"><b>手机号</b></div>
+                        <div class="col-8 col-md-3   border-left border-bottom py-2 "><span th:text="${member.channel.mobile}"></span></div>
+                        </th:block>
+
+                        <th:block th:if="${invite.merchant != null}">
+                            <th:block th:each="merchant:${invite.merchant}">
+                                <div th:name="'merchant'+${merchant.id}" class="col-4 col-md-3 bg-light  py-2 text-primary border-left border-bottom"><b>邀请商户</b></div>
+                                <div th:name="'merchant'+${merchant.id}" class="col-8 col-md-9 border-left border-bottom py-2 ">
+                                    <span th:text="${merchant.name}"></span>
+                                </div>
+                            </th:block>
+                        </th:block>
+
+                        <th:block th:if="${member.merchant != null}">
+                        <th:block th:each="merchant:${member.merchant}">
+                            <div th:name="'merchant'+${merchant.id}" class="col-4 col-md-3 bg-light  py-2 text-primary border-left border-bottom"><b>所属商户</b></div>
+                            <div th:name="'merchant'+${merchant.id}" class="col-8 col-md-9 border-left border-bottom py-2 ">
+                                <span th:text="${merchant.name}"></span>
+                                <button th:attr="data-member-id=${member.id},data-merchant-id=${merchant.id}"
+                                       name="btnRemoveMerchant" class="btn btn-sm btn-outline-danger float-right">解除关系</button>
+                            </div>
+                        </th:block>
+                        </th:block>
+
+                    </div>
+                </div>
+                <div class="tab-pane fade" id="profile5" role="tabpanel" aria-labelledby="profile-tab">
+                    <div class="tab-pane fade show active" id="home6" role="tabpanel" aria-labelledby="home-tab">
+                        <div class="row text-center border-top border-right  ">
+                            <th:block th:unless="${member.memberIdCard == null}">
+                            <div class="col-4 col-md-3 bg-light  py-2 text-primary border-left border-bottom"><b>姓名</b></div>
+                            <div class="col-8 col-md-3   border-left border-bottom py-2 ">
+                                <th:block th:if="${member.memberIdCard == null}"><span>未实名</span></th:block>
+                                <th:block th:unless="${member.memberIdCard == null}"><span th:text="${member.memberIdCard.name}"/></th:block>
+                            </div>
+                            <div class="col-4 col-md-3 bg-light  py-2 text-primary border-left border-bottom"><b>提交时间</b></div>
+                            <div class="col-8 col-md-3   border-left border-bottom py-2 "><span th:text="${#dates.format(member.createDate,'yyyy-MM-dd')}"></span></div>
+                            <div class="col-4 col-md-3 bg-light  py-2 text-primary border-left border-bottom"><b>身份证号</b></div>
+                            <div class="col-8 col-md-9 border-left border-bottom py-2 ">
+                                <th:block th:if="${member.memberIdCard == null}"><span>未实名</span></th:block>
+                                <th:block th:unless="${member.memberIdCard == null}"><span th:text="${member.memberIdCard.cardNumber}"/></th:block>
+                            </div>
+                            <div class="col-4 col-md-3 bg-light  py-2 text-primary border-left border-bottom"><b>身份证正面:</b></div>
+                            <div class="col-8 col-md-9 border-left border-bottom py-2 ">
+                                <th:block th:if="${member.memberIdCard.cardPic1 != null}">
+                                    <!--<img th:src='@{imgSite/{filename}(filename=${member.memberIdCard.cardPic1})}' style="width: 300px;height: 300px">-->
+                                    <img th:src='${application.imgSite}+${member.memberIdCard.cardPic1}' style="width: 300px;height: 300px">
+                                </th:block>
+                                <th:block th:if="${member.memberIdCard.cardPic1 == null}">
+                                    <img src='/img/admin/logo2.png' style="width: 100px;height: 100px">
+                                </th:block>
+                            </div>
+                            <div class="col-4 col-md-3 bg-light  py-2 text-primary border-left border-bottom"><b>身份证反面:</b></div>
+                            <div class="col-8 col-md-9 border-left border-bottom py-2 ">
+                                <th:block th:if="${member.memberIdCard.cardPic2 != null}">
+                                    <!--<img th:src='@{http://pkftq2q2c.bkt.clouddn.com/{filename}(filename=${member.memberIdCard.cardPic2})}' style="width: 300px;height: 300px">-->
+                                    <img th:src='${application.imgSite}+${member.memberIdCard.cardPic2}' style="width: 300px;height: 300px">
+                                </th:block>
+                                <th:block th:if="${member.memberIdCard.cardPic2 == null}">
+                                    <img src='/img/admin/logo2.png' style="width: 100px;height: 100px">
+                                </th:block>
+                            </div>
+                                <div class="col-4 col-md-3 bg-light  py-2 text-primary border-left border-bottom"><b>手持身份证:</b></div>
+                                <div class="col-8 col-md-9 border-left border-bottom py-2 ">
+                                    <th:block th:if="${member.memberIdCard.cardPic3 != null}">
+                                        <!--<img th:src='@{http://pkftq2q2c.bkt.clouddn.com/{filename}(filename=${member.memberIdCard.cardPic3})}' style="width: 300px;height: 300px">-->
+                                        <img th:src='${application.imgSite}+${member.memberIdCard.cardPic3}' style="width: 300px;height: 300px">
+                                    </th:block>
+                                    <th:block th:if="${member.memberIdCard.cardPic3 == null}">
+                                        <img src='/img/admin/logo2.png' style="width: 100px;height: 100px">
+                                    </th:block>
+                                </div>
+                            </th:block>
+                        </div>
+                    </div>
+                </div>
+                <div class="tab-pane fade" id="contact5" role="tabpanel" aria-labelledby="contact-tab">
+                    <div class="row text-center border-top border-right  ">
+                        <th:block th:if="${member.memberInfo != null}">
+                            <div class="col-4 col-md-3 bg-light  py-2 text-primary border-left border-bottom"><b>第1紧急联系人</b></div>
+
+                            <div class="col-8 col-md-9  border-left border-bottom py-2 ">
+                                <th:block th:if="${memberContacts.size()>0}">
+                                <span class="badge badge-success text-white"
+                                      th:text="${memberContacts.get(0).relation}"></span>
+                                <th:block th:text="${memberContacts.get(0).name}"/>
+                                <span class="text-primary">([[${memberContacts.get(0).telphone}]])</span>
+                                </th:block>
+                                <th:block th:unless="${memberContacts.size()>0}">
+                                    <span class="text-primary">暂无</span>
+                                </th:block>
+                            </div>
+
+                            <div class="col-4 col-md-3 bg-light  py-2 text-primary border-left border-bottom"><b>第2紧急联系人</b></div>
+                            <div class="col-8 col-md-9  border-left border-bottom py-2 ">
+                                <th:block th:if="${memberContacts.size()>0}">
+                                <span class="badge badge-success text-white"
+                                      th:text="${memberContacts.get(1).relation}"></span>
+                                    <th:block th:text="${memberContacts.get(1).name}"/>
+                                    <span class="text-primary">([[${memberContacts.get(1).telphone}]])</span>
+                                </th:block>
+                                <th:block th:unless="${memberContacts.size()>0}">
+                                        <span class="text-primary">暂无</span>
+                                </th:block>
+                            </div>
+                            <div class="col-4 col-md-3 bg-light  py-2 text-primary border-left border-bottom"><b>邮箱</b></div>
+                            <div class="col-8 col-md-3  border-left border-bottom py-2 "> <th:block th:text="${member.memberInfo.email}"/></div>
+                            <div class="col-4 col-md-3 bg-light  py-2 text-primary border-left border-bottom"><b>微信</b></div>
+                            <div class="col-8 col-md-3  border-left border-bottom py-2 "><th:block th:text="${member.memberInfo.wechat}"/></div>
+                            <div class="col-4 col-md-3 bg-light  py-2 text-primary border-left border-bottom"><b>QQ</b></div>
+                            <div class="col-8 col-md-3  border-left border-bottom py-2 "><th:block th:text="${member.memberInfo.qq}"/></div>
+                            <div class="col-4 col-md-3 bg-light  py-2 text-primary border-left border-bottom"><b>现居地</b></div>
+                            <div class="col-8 col-md-3  border-left border-bottom py-2 "><th:block th:text="${member.memberInfo.address}"/></div>
+                            <div class="col-4 col-md-3 bg-light  py-2 text-primary border-left border-bottom"><b>公司名称</b></div>
+                            <div class="col-8 col-md-3  border-left border-bottom py-2 "><th:block th:text="${member.memberInfo.companyName}"/></div>
+                            <div class="col-4 col-md-3 bg-light  py-2 text-primary border-left border-bottom"><b>公司电话</b></div>
+                            <div class="col-8 col-md-3  border-left border-bottom py-2 "><th:block th:text="${member.memberInfo.companyTelphone}"/></div>
+                            <div class="col-4 col-md-3 bg-light  py-2 text-primary border-left border-bottom"><b>公司地址</b></div>
+                            <div class="col-8 col-md-3  border-left border-bottom py-2 "><th:block th:text="${member.memberInfo.companyAddress}"/></div>
+                            <div class="col-4 col-md-3 bg-light  py-2 text-primary border-left border-bottom"><b>工作年限（年）</b></div>
+                            <div class="col-8 col-md-3  border-left border-bottom py-2 "><th:block th:text="${member.memberInfo.workYear}"/></div>
+                            <div class="col-4 col-md-3 bg-light  py-2 text-primary border-left border-bottom"><b>行业类别</b></div>
+                            <div class="col-8 col-md-3  border-left border-bottom py-2 "><th:block th:text="${member.memberInfo.industry}"/></div>
+                            <div class="col-4 col-md-3 bg-light  py-2 text-primary border-left border-bottom"><b>职称</b></div>
+                            <div class="col-8 col-md-3  border-left border-bottom py-2 "><th:block th:text="${member.memberInfo.positions}"/></div>
+                        </th:block>
+                    </div>
+                </div>
+                <div class="tab-pane fade" id="voucher5" role="tabpanel" aria-labelledby="voucher-tab">
+                        <div class="row align-items-center">
+                            <table class="table table-bordered-sm bg-white responsive-table table-hover table-striped text-md-center align-middle-table">
+                                <thead class="thead-light2">
+                                <tr>
+                                    <th scope="col">券号</th>
+                                    <th scope="col">金额</th>
+                                    <th scope="col">状态</th>
+                                    <th scope="col">发放时间</th>
+                                    <th scope="col">操作</th>
+                                </tr>
+                                </thead>
+                                <tbody>
+                                <th:block th:if="${list.size() >0}">
+                                <tr th:each="item : ${list}">
+                                    <td data-label="券号" th:text="${item.id}"></td>
+                                    <td data-label="金额" th:text="${#numbers.formatCurrency(item.amount)}"></td>
+                                    <td data-label="状态" th:switch="${item.state}">
+                                        <strong th:id="'wei'+${item.id}" class="text-danger" th:case="0">未用</strong>
+                                        <div th:id="'yi'+${item.id}">
+                                            <strong th:id="'yis'+${item.id}" class="text-success" style="display: none">已用</strong>
+                                        <strong class="text-success" th:case="1">已用</strong>
+                                        </div>
+                                    </td>
+                                    <td data-label="发放时间" th:text="${#dates.format(item.createDate, 'yyyy-MM-dd HH:mm:ss')}"></td>
+                                    <td data-label="操作" class="dropdown dropleft">
+                                        <th:block th:switch="${item.state}">
+                                            <strong class="text-danger" th:case="0" th:id="'btn'+${item.id}">
+                                                <a th:href="'javascript:updateVoucher('+${item.id}+')'"
+                                                   class="btn text-white btn-sm btn-primary mr-1 mr-lg-0">使用</a>
+                                            </strong>
+                                            <div th:id="'in'+${item.id}">
+                                                <span class="text-success" th:id="'ins'+${item.id}" style="display: none">已用</span>
+                                            <stong class="text-success" th:case="1">
+                                                <span>已用</span>
+                                            </stong>
+                                            </div>
+                                        </th:block>
+
+                                    </td>
+                                </tr>
+                                </th:block>
+                                </tbody>
+                            </table>
+                            <th:block th:unless="${list.size()>0}">
+                                    <p style="text-align: center;width: 100%">该用户没有代金券!</p>
+                            </th:block>
+                        </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+</div>
+<th:block th:replace="fragments/js :: managePublic(~{})"></th:block>
+<script>
+    $(function () {
+        $("button[name='btnRemoveMerchant']").click(function () {
+            var memberId = $(this).data("member-id");
+            var merchantId = $(this).data("merchant-id");
+            layer.confirm('确认解除客户与该商户的关系？', {
+                btn: ['确认', '取消'] //按钮
+            }, function () {
+
+                var divSelector =$("div[name='merchant"+merchantId+"']");
+                divSelector.fadeOut();
+                $.post("/admin/merchant/member/remove", {
+                    "merchantId": merchantId,
+                    "memberId": memberId
+                }, function (data) {
+                    if(data == "0"){
+                        layer.msg("解除关系成功");
+                        divSelector.remove();
+                    }else{
+                        layer.msg(data)
+                        divSelector.fadeIn();
+                    }
+                });
+            });
+
+        })
+    })
+    function updateVoucher(id) {
+        $.post('/admin/member/voucher/update/state',{id:id},function (data) {
+            if(data == null || data==""){
+                $("#btn"+id).hide();
+                $("#ins"+id).show();
+                $("#wei"+id).hide();
+                $("#yis"+id).show();
+            }
+        },'text')
+    }
+</script>
+</body>
+</html>

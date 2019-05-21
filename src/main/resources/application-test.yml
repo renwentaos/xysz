@@ -1,0 +1,126 @@
+server:
+  port: 8080
+spring:
+  thymeleaf:
+    mode: HTML
+    cache: false
+  datasource:
+    name: yunshuidi
+    url: jdbc:mysql://rm-bp132ggw0na05ynv4.mysql.rds.aliyuncs.com/yunshuidi?useUnicode=true&characterEncoding=utf8&useSSL=false&serverTimezone=GMT%2B8&allowMultiQueries=true
+    username: yunshuidi
+    password: Yunshuidi2018db
+    type: com.alibaba.druid.pool.DruidDataSource
+    driver-class-name: com.mysql.jdbc.Driver
+    druid:
+      #初始化连接数
+      initial-size: 1
+      #最大连接数
+      max-active: 100
+      #获取连接时最大等待时间，单位毫秒
+      max-wait: 3600000
+      #最小连接数量
+      min-idle: 1
+      #是否缓存preparedStatement，也就是PSCache。PSCache对支持游标的数据库性能提升巨大，比如说oracle。在mysql下建议关闭
+      pool-prepared-statements: false
+      #要启用PSCache，必须配置大于0，当大于0时，poolPreparedStatements自动触发修改为true。在Druid中，不会存在Oracle下PSCache占用内存过多的问题，可以把这个数值配置大一些，比如说100
+      max-open-prepared-statements: 20
+      #用来检测连接是否有效的sql，要求是一个查询语句。
+      validation-query: select 1
+      #申请连接时执行validationQuery检测连接是否有效，做了这个配置会降低性能
+      test-on-borrow: false
+      #归还连接时执行validationQuery检测连接是否有效，做了这个配置会降低性能
+      test-on-return: false
+      #建议配置为true，不影响性能，并且保证安全性。申请连接的时候检测，如果空闲时间大于timeBetweenEvictionRunsMillis，执行validationQuery检测连接是否有效
+      test-while-idle: true
+      #1.Destroy线程会检测连接的间隔时间 2.testWhileIdle的判断依据，详细看testWhileIdle属性的说明
+      time-between-eviction-runs-millis: 60000
+      min-evictable-idle-time-millis: 300000
+      #自动清除无用连接
+      remove-abandoned: true
+      remove-abandoned-timeout: 1800
+      #属性类型是字符串，通过别名的方式配置扩展插件，常用的插件有：监控统计用的filter:stat日志用的filter:log4j防御sql注入的filter:wall
+      filters: stat
+  redis:
+    host: 127.0.0.1
+    port: 6379
+    database: 1
+    password: ysd
+    timeout: 3000
+    jedis:
+      pool:
+        max-active: -1
+        max-wait: -1
+        max-idle: 2000
+        min-idle: 50
+
+
+
+mybatis:
+  #pojo扫描的包名
+  type-aliases-package: com.tkq.yunshuidi.model
+  #Mapper.xml所在的位置
+  mapper-locations: classpath:com/tkq/yunshuidi/dao/impl/**/*.xml
+  #字段转换实体类驼峰式命名
+  configuration:
+    map-underscore-to-camel-case: true
+    # 解决map对象转出为null 不输出字段
+    call-setters-on-nulls: true
+
+#pageInfo配置
+pagehelper:
+  helper-dialect: mysql
+  reasonable: true
+  support-methods-arguments: true
+  params: count=countSql
+
+
+#同盾相关
+td:
+  url: https://apitest.tongdun.cn/bodyguard/apply/v4.4
+  app-name: ysd_web
+  partner:
+    code: ysd
+    key: 1b009a43254d4f8eb4b00fe30faacf29
+
+
+#魔盒相关
+mh:
+  partner:
+    code: tgq_mohe
+    key: 90110bb9db3541579fced577a4b84d9d
+  yys:
+    url: https://api.shujumohe.com/octopus/report.task.query/v2
+
+
+#安存电子签章
+ac:
+  url: http://pre-openapi.ancun-inc.com
+  site: https://pre.51cunzheng.com/
+  key: 6a349a711208214f3a32071bf7775a29
+  secret: de1736241d5d593c49eaccb486ca9de94fcf18f4
+  item:
+    key: I-0641001
+  flow:
+    number: X-4703001
+
+#富友
+fy:
+  code-url: http://www-1.fuiou.com:18670/mobile_pay/newpropay/bindMsg.pay
+  card-url: http://www-1.fuiou.com:18670/mobile_pay/newpropay/bindCommit.pay
+  pay-url: http://www-1.fuiou.com:18670/mobile_pay/newpropay/order.pay
+  mchntcd: 0002900F0096235
+  key: 5old71wihg2tqjug9kkpxnhx9hiujoqj
+  pay-key: 123456
+  #代收付
+  other-pay-url: https://fht-test.fuiou.com/fuMer/req.do
+  #用于划扣测试
+  user-id: ccc
+  #代收付商户号
+  pay-mchntcd: 0002900F0345178
+#  back-url: http://2309b2759w.iok.la/with/hold
+
+#极光appkey
+push:
+  app-key: 2e2d030fe7b8491e8bf416b5
+  master-secret: 91ca6e17b74a2dd2f4a7bb64
+  is-test: false

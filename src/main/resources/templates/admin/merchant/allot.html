@@ -1,0 +1,556 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:replace="fragments/header :: managePublic('分配客户 - 行游神州管理员后台',~{::link})">
+    <link href="/js/myPages/myPages.css" rel="stylesheet" type="text/css"/>
+
+</head>
+<body>
+<th:block th:replace="fragments/top :: adminPublic('分配客户','为商户分配客户',~{::#content},~{::#rightTop})">
+    <div id="rightTop" class="col controls-wrapper mt-3 mt-md-0 d-none d-md-block">
+        <div class="controls d-flex justify-content-center justify-content-md-end">
+            <form id="form" method="post">
+                <input id="merchantId" name="merchantId" type="hidden"/>
+                <input type="hidden" name="token" th:value="${token}">
+                <button type="button" id="btnSubmit" class="btn btn-primary text-white px-3"
+                        style="line-height:1.6rem;">
+                    <span class="material-icons mr-1 align-top">save</span><b>保存</b>
+                </button>
+            </form>
+        </div>
+    </div>
+
+    <div class="content" id="content">
+        <div class="card">
+            <div class="row no-gutters">
+                <div class="loader-wrapper incomponent" id="loaderDiv">
+                    <div class="spinner">
+                        <svg viewBox="0 0 66 66" xmlns="http://www.w3.org/2000/svg">
+                            <circle class="length" fill="none" stroke-width="6" stroke-linecap="round" cx="33"
+                                    cy="33" r="28"></circle>
+                        </svg>
+                        <svg viewBox="0 0 66 66" xmlns="http://www.w3.org/2000/svg">
+                            <circle fill="none" stroke-width="6" stroke-linecap="round" cx="33" cy="33"
+                                    r="28"></circle>
+                        </svg>
+                        <svg viewBox="0 0 66 66" xmlns="http://www.w3.org/2000/svg">
+                            <circle fill="none" stroke-width="6" stroke-linecap="round" cx="33" cy="33"
+                                    r="28"></circle>
+                        </svg>
+                        <svg viewBox="0 0 66 66" xmlns="http://www.w3.org/2000/svg">
+                            <circle fill="none" stroke-width="6" stroke-linecap="round" cx="33" cy="33"
+                                    r="28"></circle>
+                        </svg>
+                    </div>
+                </div>
+                <div class="col-lg-4 col-xl-3  d-block border-lg-right">
+                    <div class="card-header" style="padding: 18.5px 1.25rem">
+                        <div class="input-group">
+                            <input type="search" id="merchantName" class="form-control bg-light rounded"
+                                   placeholder="商户名称/ID(回车直接搜索)">
+                            <div class="input-group-append">
+                                <button type="button" id="btnMerchantSearch" class="btn btn-info py-1 px-2"
+                                        data-toggle="modal"
+                                        data-target="#gridFilters"><span
+                                        class="material-icons align-text-bottom">search</span>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                    <div id="merchantDiv">
+
+                    </div>
+                </div>
+
+                <div class="col-lg-8 col-xl-7">
+                    <div class="card-header py-3">
+                        <div class="media align-items-center mb-0 row">
+                            <div class="media-body col-md-6">
+                                <h6 class="m-0 weight-400">选择客户</h6>
+                                <small class="text-muted">不显示上限已满或已分配到此商户</small>
+                            </div>
+                            <div class="col-md-8 ">
+                                <div class="input-group">
+                                    <input type="text" class="form-control bg-light"
+                                           id="memberInfo"
+                                           placeholder="输入要搜索的用户信息 回车直接搜索">
+                                    <div class="input-group-append">
+                                    <select id="province" name="province" class="form-control flat">
+                                                <option></option>
+                                    </select>
+                                    </div>
+                                    <div class="input-group-append">
+                                    <select id="city" name="city" class="form-control flat ">
+                                            <option></option>
+                                    </select>
+                                    </div>
+                                    <div class="input-group-append">
+                                        <button class="btn btn-outline-secondary dropdown-toggle" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">筛选</button>
+                                        <div class="dropdown-menu" x-placement="bottom-start" style="position: absolute; transform: translate3d(449px, 38px, 0px); top: 0px; left: 0px; will-change: transform;">
+                                            <a class="dropdown-item"  th:each="lv : ${application.memberLevel}"
+                                               th:text="${lv.key}" th:href="'javascript:loadMembers('+${lv.value}+')'">A类</a>
+                                            <div role="separator" class="dropdown-divider"></div>
+                                            <a class="dropdown-item" href="javascript:loadMembers()">全部分类</a>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+
+                        </div>
+
+                    </div>
+
+                    <div class="card-body p-0 table-responsive">
+
+                        <table class="table m-0 table-hover  table-striped  table-borderless text-md-center align-middle-table">
+                            <thead class="bg-warning-light25 ">
+                            <tr>
+                                <th>分类</th>
+                                <th>用户信息</th>
+                                <th>地区</th>
+                                <th>已有商户数</th>
+                            </tr>
+                            </thead>
+                            <tbody id="memberContent">
+
+                            </tbody>
+                        </table>
+                    </div>
+                    <div class="card-footer bg-light-light25">
+                        <div class="row">
+                            <div class="col-12">
+                                <div id="memberPages" class="pagesDiv"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-xl-2 d-block border-xl-left border-top border-xl-top-0">
+                    <div class="card-body" id="selectedMemberDiv">
+
+                    </div>
+                </div>
+            </div>
+
+
+        </div>
+    </div>
+</th:block>
+<th:block th:replace="fragments/js :: managePublic(~{})"></th:block>
+<script src="/js/ChineseCities.min.js"></script>
+
+<script src="/js/jquery.animate-colors-min.js"></script>
+<script src="/js/myPages/myPages.js" type="text/javascript"></script>
+
+
+<script>
+    var merchantLevel = $.parseJSON("[[${application.merchantLevel}]]".replaceAll("=", ":")
+        .replace(/(?:\s*['"]*)?([\u4e00-\u9fa5_a-zA-Z0-9]+)(?:['"]*\s*)?:/g, "\"$1\":"));
+
+    var memberLevel = $.parseJSON("[[${application.memberLevel}]]".replaceAll("=", ":")
+        .replace(/(?:\s*['"]*)?([\u4e00-\u9fa5_a-zA-Z0-9]+)(?:['"]*\s*)?:/g, "\"$1\":"));
+
+    var imgSite = "[[${application.imgSite}]]";
+    var nowTime = "[[${nowTime}]]";
+
+    var nowMerchantId = 0;
+    var nowAvailableAPushCount = 0;
+    var nowAvailableBPushCount = 0;
+
+    function loadMerchants(pageNo) {
+        nowMerchantId = 0;
+        $("#memberContent").html("");
+        $("#memberPages").html("");
+        clearMember();
+
+        if (!pageNo || pageNo < 1) {
+            pageNo = 1;
+        }
+        var element = $("#merchantDiv");
+        timeLoader($("#loaderDiv"), element, 100, 300, $("#merchantName"))
+        $.post("/admin/merchant/member/merlists", {
+            "info": $("#merchantName").val(),
+            "number": pageNo,
+            "size": 6
+        }, function (data) {
+            loaderData = data;
+            buildMerchantHtml(data, element);
+        });
+    }
+
+    function loadMembers(level,pageNo) {
+        if(nowMerchantId == 0){
+            layer.msg("请先选择商户");
+            return;
+        }
+        if (!pageNo || pageNo <= 0) {
+            pageNo = 1;
+        }
+        if(!level){
+            level = null;
+        }
+        var province = $("#province").val();
+        var city = $("#city").val();
+        if(!province){
+            province = null;
+        }
+        if(!city){
+            city = null;
+        }
+        var element = $("#memberContent");
+        timeLoader($("#loaderDiv"), element, 100, 300,$("#memberInfo"))
+        $.post("/admin/merchant/member/lists", {
+            "merchantId": nowMerchantId,
+            "number": pageNo,
+            "level":level,
+            "memberInfo":$("#memberInfo").val(),
+            "province":province,
+            "city":city
+        }, function (data) {
+            loaderData = data;
+            buildMemberHtml(level,data, element);
+        });
+    }
+
+    function buildMerchantHtml(data, element) {
+        element.children().remove();
+        $(data.list).each(function (number, item) {
+            var merchantDiv = $("<div name='merchantDiv'></div>");
+            merchantDiv.addClass("media border-bottom px-3 py-4");
+            merchantDiv.css("cursor", "pointer");
+            merchantDiv.hover(function () {
+                if ($(this).attr("data-select") != "true")
+                    $(this).toggleClass("bg-light");
+            });
+            merchantDiv.data("merchantId", item.id);
+            merchantDiv.data("availableAPushCount", item.apushCount-item.apushedCount);
+            merchantDiv.data("availableBPushCount", item.bpushCount-item.bpushedCount);
+            merchantDiv.data("level", item.level);
+            merchantDiv.data("province",item.province);
+            merchantDiv.data("city",item.city);
+            merchantDiv.click(function () {
+                clearMember();
+                var merchantId = $(this).data("merchantId");
+                if (merchantId != nowMerchantId) {
+                    nowMerchantId = merchantId;
+                    nowAvailableAPushCount = merchantDiv.data("availableAPushCount");
+                    nowAvailableBPushCount = merchantDiv.data("availableBPushCount");
+                    $("#merchantId").val(merchantId);
+                    $("div[data-select]").css({"background-color": '', "color": ""});
+                    $("div[data-select]").removeAttr("data-select");
+                    $(this).removeClass("bg-light");
+                    $(this).animate({backgroundColor: '#343a40', color: "white"});
+                    $(this).attr("data-select", "true");
+                    loadMembers();
+
+                    var lv = $(this).data("level");
+                    var province = $(this).data("province");
+                    var city = $(this).data("city");
+                    if (lv == merchantLevel["普通商户"]) {
+                        $("#province").val(province).change().attr("disabled","disabled");
+                        $("#city").val(city).change().attr("disabled","disabled");
+                    } else if (lv == merchantLevel["VIP商户"]) {
+                        $("#province").val(province).change().attr("disabled","disabled");
+                        $("#city").removeAttr("disabled");
+                    } else{
+                        $("#province").removeAttr("disabled");
+                        $("#city").removeAttr("disabled");
+                    }
+                }
+            })
+
+            var logImg = $("<img />");
+            logImg.appendTo(merchantDiv);
+            logImg.addClass("mr-3 rounded");
+            logImg.width(30);
+            logImg.attr("src", imgSite+item.logo);
+
+            var content = $("<div></div>");
+            content.appendTo(merchantDiv);
+            content.addClass("media-body");
+
+            var title = $("<h6></h6>");
+            title.appendTo(content);
+            title.addClass("m-0 weight-400");
+            title.text(item.name);
+
+            var level = $("<span></span>");
+            level.appendTo(title);
+            level.addClass("badge mr-1 text-white ml-2");
+
+            if (item.level == merchantLevel["普通商户"]) {
+                level.text("普通商户");
+                level.addClass("badge-info");
+            } else if (item.level == merchantLevel["VIP商户"]) {
+                level.text("VIP商户");
+                level.addClass("badge-success");
+            } else if (item.level == merchantLevel["全国VIP商户"]) {
+                level.text("全国VIP商户");
+                level.addClass("badge-warning");
+            } else if (item.level == merchantLevel["超级VIP商户"]) {
+                level.text("超级VIP商户");
+                level.addClass("badge-primary");
+            }
+
+
+            if(item.availableBalance < 500){
+                var tip = $("<span></span>");
+                tip.appendTo(title);
+                tip.addClass("badge mr-1 text-white ml-2 badge-danger");
+                tip.text("流量余额不足500元");
+            }
+            if(item.expiryDate < nowTime){
+                var tip = $("<span></span>");
+                tip.appendTo(title);
+                tip.addClass("badge mr-1 text-white ml-2 badge-danger");
+                tip.text("系统已到期");
+            }
+
+
+            var desc = $("<small></small>");
+            desc.appendTo(content);
+            desc.addClass("text-muted");
+            desc.text("地区:" + item.province + " - " + item.city);
+
+            var push = $("<br><small></small>");
+            push.appendTo(content);
+            push.addClass("text-muted");
+            push.html("推送(已分/上限):<span class='text-primary'>A类["
+                +item.apushedCount+ "/"
+                +item.apushCount+"]</span><span class='text-info ml-4'>B类["
+                +item.bpushedCount+"/"
+                +item.bpushCount+"]</span>");
+            element.append(merchantDiv);
+
+        })
+
+        var merchantPages = $("<div id='merchantPages' class='mt-3 float-right'></div>");
+        // var merchantPages = merchantPagesDiv.find("#merchantPages");
+        merchantPages.appendTo(element);
+        merchantPages.myPages({
+            pageNo: data.pageNum,
+            pageSize: data.pageSize,
+            lastPage: data.pages,
+            preText: "上一页",
+            nextText: "下一页",
+            url: "javascript:loadMerchants({pageNo})"
+        })
+    }
+
+    function buildMemberHtml(level,data, element) {
+        element.children().remove();
+
+        $(data.list).each(function (number, item) {
+            var tr = $("<tr></tr>");
+            tr.attr("id", "tr" + item.id);
+            tr.data("toggle", "tooltip");
+            tr.data("placement", "top");
+            tr.attr("title",item.remark);
+            tr.css("cursor", "pointer");
+            if (item.memberIdCard != null && item.memberIdCard.name != null) {
+                tr.data("name", item.memberIdCard.name);
+            }
+            tr.data("mobile", item.mobile);
+            tr.data("level", item.level);
+            tr.data("id", item.id);
+            tr.tooltip();
+            tr.click(function () {
+                var isSelect = selectMember($(this));
+                if (!isSelect) {
+                    return;
+                }
+                $(this).data("selectMember", "true");
+                $(this).toggleClass("bg-secondary text-white ")
+
+                var id = $(this).data("id");
+                var addMember = $("<a></a>");
+                addMember.attr("id", "add" + id);
+                addMember.attr("href", "javascript:void(0)");
+                addMember.css("text-decoration", "none");
+                addMember.data("toggle", "tooltip");
+                addMember.data("placement", "top");
+                addMember.addClass("badge mr-1 pr-0 mt-1");
+
+                var name = $(this).data("name");
+                var mobile = $(this).data("mobile");
+                var showTxt, tipTxt = "";
+                if (name == undefined) {
+                    showTxt = mobile;
+                } else {
+                    showTxt = name;
+                    tipTxt = "姓名：" + name;
+                }
+                tipTxt += " 手机号:" + mobile;
+
+                var level = $(this).data("level");
+                if (level == memberLevel["B类客户"]) {
+                    addMember.addClass("bg-info-light25 text-info")
+                    tipTxt += " B类客户";
+                } else if (level == memberLevel["A类客户"]) {
+                    addMember.addClass("bg-primary-light25 text-primary")
+                    tipTxt += " A类客户";
+                }
+
+                addMember.text(showTxt);
+                addMember.attr("title", tipTxt);
+                addMember.tooltip();
+                var close = $("<a class='btn-sm btn-link' aria-hidden='true' href='javascript:void(0)'>&times;</a>");
+                close.appendTo(addMember);
+                close.data("id", id);
+                close.hover(function () {
+                    $(this).toggleClass("text-white")
+                })
+                close.click(function () {
+                    $(this).parent().tooltip('hide');
+                    removeMember($(this).data("id"))
+                })
+                $("#selectedMemberDiv").append(addMember);
+            })
+
+
+            var levelTD = $("<td></td>");
+            levelTD.appendTo(tr);
+            var level = $("<span></span>");
+            level.appendTo(levelTD);
+            level.addClass("user-initials");
+            if (item.level == memberLevel["B类客户"]) {
+                level.text("B类");
+                level.addClass("bg-info-light25 text-info");
+            } else if (item.level == memberLevel["A类客户"]) {
+                level.text("A类");
+                level.addClass("bg-primary-light25 text-primary");
+            }
+
+            var memberInfo = $("<td></td>");
+            memberInfo.appendTo(tr);
+
+
+            if (item.memberIdCard != null && item.memberIdCard.name != null) {
+                var memberInfoName = $("<small></small>");
+                memberInfoName.appendTo(memberInfo);
+                memberInfoName.addClass("text-muted");
+                memberInfoName.text(item.memberIdCard.name);
+            }
+            var memberInfoMobile = $("<div></div>");
+            memberInfoMobile.appendTo(memberInfo);
+            memberInfoMobile.addClass("text-primary");
+            memberInfoMobile.text(item.mobile);
+
+            var area = $("<td></td>")
+            area.appendTo(tr);
+            area.text(item.province+" - "+item.city);
+
+            var merchantCount = $("<td></td>");
+            merchantCount.appendTo(tr);
+            merchantCount.text(item.merchantCount);
+
+
+            element.append(tr);
+
+        })
+        $("#memberPages").html("")
+        $("#memberPages").myPages({
+            pageNo: data.pageNum,
+            pageSize: data.pageSize,
+            lastPage: data.pages,
+            preText: "上一页",
+            nextText: "下一页",
+            url: "javascript:loadMembers("+level+",{pageNo})",
+            showPageButton: 4
+        })
+    }
+
+    function selectMember(element) {
+        var id = element.data("id");
+        if (element.data("selectMember") == "true") {
+            removeMember(id);
+            return false;
+        }
+        var level = element.data("level");
+        if (level == memberLevel["B类客户"]) {
+            if(nowAvailableBPushCount - 1 < 0 ){
+                layer.msg("此商户今日推送B类客户已达到上限");
+                return false;
+            }
+            nowAvailableBPushCount--;
+        } else if (level == memberLevel["A类客户"]) {
+            if(nowAvailableAPushCount - 1 <0 ){
+                layer.msg("此商户今日推送A类客户已达到上限");
+                return false;
+            }
+            nowAvailableAPushCount--;
+        }
+        element.data("selectMember", "true");
+        element.toggleClass("bg-secondary text-white ")
+        var membersId = $("<input type='hidden' name='membersId'>");
+        membersId.attr("id", "membersId" + id);
+        membersId.val(id);
+        $("#form").append(membersId);
+        return true;
+    }
+
+    function removeMember(memberId) {
+        $("#tr" + memberId).data("selectMember", "");
+        $("#add" + memberId).remove();
+        $("#membersId" + memberId).remove();
+        var level = $("#tr" + memberId).data("level");
+        if (level == memberLevel["B类客户"]) {
+            nowAvailableBPushCount++;
+        } else if (level == memberLevel["A类客户"]) {
+            nowAvailableAPushCount++;
+        }
+    }
+
+    function clearMember() {
+        $("a[id^='add']").remove();
+        $("input[name='membersId']").remove();
+    }
+
+    $(function () {
+        var chineseCities = new ChineseCities({
+            'province': 'province', //省份ID
+            'city': 'city',
+            'hasSelect': function (data) {
+                //选择后的回调函数
+                if(data.change == "province"){
+                    $("#city").prepend("<option value=''>请选择城市</option>");
+                    $("#city").val("");
+                }
+            }
+        });
+
+        loadMerchants();
+
+        $("#btnSubmit").click(function () {
+            if (nowMerchantId == 0) {
+                layer.msg("您还没有选择任何商户");
+            } else if ($("input[name='membersId']").length == 0) {
+                layer.msg("您还没有选择要分配的客户");
+            } else {
+                layer.confirm('确认为商户分配客户？', {
+                    btn: ['确认', '取消'] //按钮
+                }, function () {
+                    $("#form").submit();
+                });
+            }
+        })
+
+        $("#merchantName").keyup(function (event) {
+            if (event.keyCode == 13) {
+                loadMerchants()
+            }
+        })
+
+        $("#btnMerchantSearch").click(function () {
+            loadMerchants();
+        })
+
+        $("#memberInfo").keyup(function (event) {
+            if (event.keyCode == 13) {
+                loadMembers()
+            }
+        })
+    })
+</script>
+</body>
+</html>

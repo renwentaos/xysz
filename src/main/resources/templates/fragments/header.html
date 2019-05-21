@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+
+
+<th:block th:fragment="priv(title,links)">
+    <meta name="renderer" content="webkit">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
+    <title th:text="${title}"></title>
+    <meta name="description" content=""/>
+    <meta name="keywords" content=""/>
+    <th:block th:replace="${links}" />
+</th:block>
+
+<!--公用header-->
+<head th:fragment="public(title,links)">
+    <th:block th:replace="fragments/header :: priv(${title},${links})"></th:block>
+</head>
+
+
+<!--管理员、商户公共头部-->
+<head th:fragment="managePublic(title,links)">
+    <title th:text="${title}"></title>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+    <meta name="renderer" content="webkit">
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
+    <link rel="icon" href="/cosmo/images/favicon.ico">
+
+    <!-- Base CSS -->
+    <link rel="stylesheet" href="/cosmo/css/basestyle/style.css">
+    <!-- Material Icons -->
+    <link href="https://cdn.bootcss.com/material-design-icons/3.0.1/iconfont/material-icons.min.css" rel="stylesheet">
+    <!--<link href="https://cdnjs.cloudflare.com/ajax/libs/material-design-icons/3.0.1/iconfont/material-icons.min.css" rel="stylesheet">-->
+
+    <th:block th:replace="${links}" />
+</head>
+
+
+</html>

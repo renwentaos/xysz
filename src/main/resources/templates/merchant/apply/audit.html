@@ -1,0 +1,1788 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:replace="fragments/header :: managePublic('额度审核 - 云水滴商户后台',~{::link})">
+    <link href="/js/pagination/pagination.css" rel="stylesheet">
+</head>
+<body>
+<style>
+    .my-info {
+        font-size: 0.85rem;
+    }
+
+    .my-info td {
+        font-size: 0.75rem;
+    }
+
+    .my-tip-info, .my-tip-info i {
+        font-size: 13px;
+    }
+</style>
+<div class="modal fade" id="contactRemarkModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel"
+     style="display: none;" aria-hidden="true">
+    <div class="modal-dialog" style="width:420px;" role="document">
+        <div class="modal-content">
+            <div class="modal-header px-4">
+                <h5 class="modal-title" id="exampleModalLabel">联系人快速标记</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span class="material-icons ">close</span>
+                </button>
+            </div>
+            <div class="modal-body p-4">
+                <div class="form-group">
+                    <label>是否能打通电话?</label>
+                    <div class="input-group">
+                        <div class="custom-control custom-radio custom-control-inline">
+                            <input type="radio" name="radioTh" id="radioYDT" class="custom-control-input" value="已打通">
+                            <label class="custom-control-label" for="radioYDT">已打通</label>
+                        </div>
+                        <div class="custom-control custom-radio custom-control-inline">
+                            <input type="radio" name="radioTh" id="radioWDT" class="custom-control-input" value="未打通">
+                            <label class="custom-control-label" for="radioWDT">未打通</label>
+                        </div>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label>关系</label>
+                    <div class="input-group">
+                        <div class="custom-control custom-radio custom-control-inline">
+                            <input type="radio" name="radioRelation" id="radioRelationFQ" class="custom-control-input"
+                                   value="夫妻">
+                            <label class="custom-control-label" for="radioRelationFQ">夫妻</label>
+                        </div>
+                        <div class="custom-control custom-radio custom-control-inline">
+                            <input type="radio" name="radioRelation" id="radioRelationQS" class="custom-control-input"
+                                   value="亲属">
+                            <label class="custom-control-label" for="radioRelationQS">亲属</label>
+                        </div>
+                        <div class="custom-control custom-radio custom-control-inline">
+                            <input type="radio" name="radioRelation" id="radioRelationPY" class="custom-control-input"
+                                   value="朋友">
+                            <label class="custom-control-label" for="radioRelationPY">朋友</label>
+                        </div>
+                        <div class="custom-control custom-radio custom-control-inline">
+                            <input type="radio" name="radioRelation" id="radioRelationTS" class="custom-control-input"
+                                   value="同事">
+                            <label class="custom-control-label" for="radioRelationTS">同事</label>
+                        </div>
+                        <div class="custom-control custom-radio custom-control-inline">
+                            <input type="radio" name="radioRelation" id="radioRelationNone" class="custom-control-input"
+                                   value="不属实">
+                            <label class="custom-control-label" for="radioRelationNone">不属实</label>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer px-4">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">取消</button>
+                <button type="button" id="btnSaveContactsRemark" class="btn btn-primary">保存</button>
+            </div>
+        </div>
+    </div>
+</div>
+<th:block th:replace="fragments/top :: noSidebarPublic('额度审核','',~{::#content},~{::#filter})">
+    <div id="filter" class="col controls-wrapper mt-3 mt-md-0">
+        <div class="controls d-flex justify-content-center justify-content-md-end">
+            <button type="button" class="btn btn-danger" name="btnQuickReject"
+                    th:if="${apply.state == 0}">
+                拒批
+            </button>
+            <div class="btn-group" role="group" aria-label="Basic example">
+                <button type="button" class="btn btn-outline-primary" name="btnPrevStep">上一步</button>
+                <button type="button" class="btn btn-outline-primary" name="btnNextStep">下一步</button>
+            </div>
+        </div>
+    </div>
+    <div class="content" id="content">
+        <div>
+            <button type="button" class="buynow-btn btn btn-light" name="btnTop"
+                th:style="${apply.state == 0}?'bottom:14rem':'bottom:10rem'">
+                <span class="material-icons mr-2 align-middle">arrow_upward</span>
+                <span class="text">回到顶部</span>
+            </button>
+            <button type="button" class="buynow-btn btn btn-danger" name="btnQuickReject" style="bottom:10rem"
+                    th:if="${apply.state == 0}">
+                <span class="material-icons mr-2 align-middle">close</span>
+                <span class="text">拒批</span>
+            </button>
+            <button type="button" class="buynow-btn btn btn-primary" name="btnPrevStep" style="bottom:6rem">
+                <span class="material-icons mr-2 align-middle">navigate_before</span>
+                <span class="text">上一步</span>
+            </button>
+            <button type="button" class="buynow-btn btn btn-primary" name="btnNextStep">
+                <span class="material-icons mr-2 align-middle">navigate_next</span>
+                <span class="text">下一步</span>
+            </button>
+        </div>
+        <div class="card wizard border-top-0">
+            <div class="card-header p-0 border-top">
+                <ul id="tabStep" class="list-unstyled steps overflow-horizontal-scroll list-inline m-0 ">
+                    <li name="tabStep" data-switch="true" style="cursor:pointer"
+                        class="py-3 px-4 mr-1 list-inline-item text-primary border-primary ">
+                        <h5 class="m-0 weight-400">第 1 步</h5>
+                        <small class="text-muted weight-300">客户基础信息</small>
+                    </li>
+                    <li name="tabStep" class="py-3 px-4 mr-1 list-inline-item ">
+                        <h5 class="m-0 weight-400">第 2 步</h5>
+                        <small class="text-muted weight-300">风险大数据分析</small>
+                    </li>
+                    <li name="tabStep" class="py-3 px-4 mr-1 list-inline-item ">
+                        <h5 class="m-0 weight-400">第 3 步</h5>
+                        <small class="text-muted weight-300">本地通讯录</small>
+                    </li>
+                    <li name="tabStep" class="py-3 px-4 mr-1 list-inline-item  ">
+                        <h5 class="m-0 weight-400">第 4 步</h5>
+                        <small class="text-muted weight-300">运营商数据分析</small>
+                    </li>
+                    <li name="tabStep" class="py-3 px-4 mr-1 list-inline-item  ">
+                        <h5 class="m-0 weight-400">第 5 步</h5>
+                        <small class="text-muted weight-300">出行记录</small>
+                    </li>
+                    <li name="tabStep" class="py-3 px-4 mr-1 list-inline-item"
+                        th:if="${apply.project.jd == 1 || apply.project.tb == 1}">
+                        <h5 class="m-0 weight-400">第 6 步</h5>
+                        <small class="text-muted weight-300">电商大数据分析</small>
+                    </li>
+                    <li name="tabStep" class="py-3 px-4 mr-1 list-inline-item " th:if="${apply.state == 0}">
+                        <h5 class="m-0 weight-400">最终</h5>
+                        <small class="text-muted weight-300">审批额度</small>
+                    </li>
+                </ul>
+            </div>
+            <div class="card-body" name="bodyStep" id="bodyStep">
+                <div class="row text-secondary my-info" id="alls">
+                    <div class="col-12 pt-3 text-dark  "><h6><span class="pl-1 mr-1 bg-primary"></span>账号信息</h6></div>
+                    <div class="col-12">
+                        <div class="row border-top border-right">
+                            <div class="col-6 col-xl-1 py-2 bg-light  border-left border-bottom text-center weight-400">
+                                手机号
+                            </div>
+                            <div class="col-6 col-xl-3 py-2  border-left border-bottom">
+                                [[${member.mobile}]]
+                                <span th:if="${haveContacts!=null}" class="badge badge-pill badge-danger" data-html="true"
+                                      data-toggle="tooltip"  th:title="${haveContacts}">!</span>
+                            </div>
+                            <div class="col-6 col-xl-1 py-2 bg-light  border-left border-bottom text-center weight-400">
+                                地区
+                            </div>
+                            <div class="col-6 col-xl-3 py-2  border-left border-bottom"
+                                 th:text="${member.province}+'-'+${member.city}"></div>
+                            <div class="col-6 col-xl-1 py-2 bg-light  border-left border-bottom text-center weight-400">
+                                客户等级
+                            </div>
+                            <div class="col-6 col-xl-3 py-2  border-left border-bottom" th:switch="${member.level}">
+                                 <span class="badge bg-info-light25 text-info text-white"
+                                       th:case="${application.memberLevel['B类客户']}">B类</span>
+                                <span class="badge bg-primary-light25 text-primary"
+                                      th:case="*">A类</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-12 pt-4 text-dark"><h6><span class="pl-1 mr-1 bg-primary"></span>实名认证信息</h6></div>
+                    <div class="col-12">
+                        <div class="row border-top border-right">
+                            <div class="col-6 col-xl-1 py-2 bg-light border-left border-bottom text-center weight-400">
+                                姓名
+                            </div>
+                            <div class="col-6 col-xl-3 py-2 border-left border-bottom"
+                                 th:text="${member.memberIdCard.name}"></div>
+                            <div class="col-6 col-xl-1 py-2 bg-light border-left border-bottom text-center weight-400">
+                                身份证
+                            </div>
+                            <div class="col-6 col-xl-3 py-2 border-left border-bottom"
+                                 th:text="${member.memberIdCard.cardNumber}"></div>
+                            <div class="d-none d-lg-block col-xl py-2  border-bottom"></div>
+                        </div>
+                    </div>
+
+                    <div class="col-12 pt-4  text-dark"><h6><span class="pl-1 mr-1 bg-primary"></span>基础信息</h6></div>
+                    <div class="col-12">
+                        <div class="row border-top border-right">
+                            <div class="col-6 col-xl-1 py-2 border-left border-bottom bg-light text-center weight-400">
+                                邮箱
+                            </div>
+                            <div class="col-6 col-xl-3 py-2 border-left border-bottom"
+                                 th:text="${member.memberInfo.email}"></div>
+                            <div class="col-6 col-xl-1 py-2 border-left border-bottom bg-light text-center weight-400">
+                                QQ号
+                            </div>
+                            <div class="col-6 col-xl-3 py-2 border-left border-bottom"
+                                 th:text="${member.memberInfo.qq}"></div>
+                            <div class="col-6 col-xl-1 py-2 border-left border-bottom bg-light text-center weight-400">
+                                微信号
+                            </div>
+                            <div class="col-6 col-xl-3 py-2 border-left border-bottom"
+                                 th:text="${member.memberInfo.wechat}"></div>
+                            <div class="col-6 col-xl-1 py-2 border-left border-bottom bg-light text-center weight-400">
+                                现居地
+                            </div>
+                            <div class="col-6 col-xl-11 py-2 border-left border-bottom"
+                                 th:text="${member.memberInfo.address}"></div>
+                            <div class="col-6 col-xl-1 py-2 border-left border-bottom bg-light text-center weight-400">
+                                公司名称
+                            </div>
+                            <div class="col-6 col-xl-3 py-2 border-left border-bottom"
+                                 th:text="${member.memberInfo.companyName}"></div>
+                            <div class="col-6 col-xl-1 py-2 border-left border-bottom bg-light text-center weight-400">
+                                公司电话
+                            </div>
+                            <div class="col-6 col-xl-3 py-2 border-left border-bottom"
+                                 th:text="${member.memberInfo.companyTelphone}"></div>
+                            <div class="col-6 col-xl-1 py-2 border-left border-bottom bg-light text-center weight-400">
+                                公司地址
+                            </div>
+                            <div class="col-6 col-xl-3 py-2 border-left border-bottom"
+                                 th:text="${member.memberInfo.companyAddress}"></div>
+                            <div class="col-6 col-xl-1 py-2 border-left border-bottom bg-light text-center weight-400">
+                                行业类别
+                            </div>
+                            <div class="col-6 col-xl-3 py-2 border-left border-bottom"
+                                 th:text="${member.memberInfo.industry}"></div>
+                            <div class="col-6 col-xl-1 py-2 border-left border-bottom bg-light text-center weight-400">
+                                <b>职称</b></div>
+                            <div class="col-6 col-xl-3 py-2 border-left border-bottom">
+                                <th:block th:text="${member.memberInfo.positions}"/>
+                            </div>
+                            <div class="col-6 col-xl-1 py-2 border-left border-bottom bg-light text-center weight-400">
+                                <b>工作年限</b></div>
+                            <div class="col-6 col-xl-3 py-2 border-left border-bottom">
+                                <th:block th:text="${member.memberInfo.workYear}+'年'"/>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-12 pt-3  text-dark"><h6><span class="pl-1 mr-1 bg-primary"></span>相关信息照片</h6></div>
+                    <div class="col-6 col-xl-2 py-2  border-bottom  weight-400"><b>身份证正面</b></div>
+                    <div class="col-6 col-xl-4 py-2  border-bottom">
+                        <img th:src='${application.imgSite}+${member.memberIdCard.cardPic1}'
+                             th:attr="data-img=${application.imgSite}+'/'+${member.memberIdCard.cardPic1}"
+                             class="img-fluid img-thumbnail">
+                    </div>
+                    <div class="col-6 col-xl-2 py-2  border-bottom  weight-400"><b>身份证背面</b></div>
+                    <div class="col-6 col-xl-4 py-2  border-bottom">
+                        <img th:src='${application.imgSite}+${member.memberIdCard.cardPic2}'
+                             th:attr="data-img=${application.imgSite}+'/'+${member.memberIdCard.cardPic2}"
+                             class="img-fluid img-thumbnail">
+                    </div>
+                    <div class="col-6 col-xl-2 py-2   weight-400"><b>手持身份证</b></div>
+                    <div class="col-6 col-xl-4 py-2  ">
+                        <img th:src='${application.imgSite}+${member.memberIdCard.cardPic3}'
+                             th:attr="data-img=${application.imgSite}+'/'+${member.memberIdCard.cardPic3}"
+                             class="img-fluid img-thumbnail">
+                    </div>
+                    <div class="col-6 col-xl-2 py-2   weight-400"><b>银行卡正面</b></div>
+                    <div class="col-6 col-xl-4 py-2  ">
+                        <img th:src='${application.imgSite}+${apply.memberBankCard.bankCardPic1}'
+                             th:attr="data-img=${application.imgSite}+'/'+${apply.memberBankCard.bankCardPic1}"
+                             class="img-fluid img-thumbnail">
+                    </div>
+                    <div class="col-6 col-xl-2 py-2   weight-400" id="houseC" style="display: none"><b>房产证</b></div>
+                    <div class="col-6 col-xl-4 py-2" id="one"></div>
+                    <div class="col-6 col-xl-2 py-2   weight-400" id="carC" style="display: none"><b>行车证</b></div>
+                    <div class="col-6 col-xl-4 py-2" id="two"></div>
+                    <div class="col-6 col-xl-2 py-2   weight-400" id="parkC" style="display: none"><b>车位合同</b></div>
+                    <div class="col-6 col-xl-4 py-2" id="three"></div>
+                    <div class="col-6 col-xl-2 py-2   weight-400" id="otherC" style="display: none"><b>其他</b></div>
+                    <div class="col-6 col-xl-4 py-2" id="four"></div>
+                </div>
+            </div>
+
+            <div id="loanPreBody" name="bodyStep" class="card-body" style="display: none">
+            </div>
+            <div id="contactBody" name="bodyStep" class="card-body" style="display: none">
+            </div>
+            <div id="yysBody" name="bodyStep" class="card-body" style="display: none">
+            </div>
+            <div id="travelBody" name="bodyStep" class="card-body" style="display: none">
+            </div>
+            <div id="dsBody" name="bodyStep" class="card-body" style="display: none"
+                 th:if="${apply.project.jd == 1 || apply.project.tb == 1}"
+                 th:attr="data-tb=${apply.project.tb},data-jd=${apply.project.jd}">
+            </div>
+            <div class="card-body" name="bodyStep" style="display: none">
+                <div class="row my-info text-secondary">
+                    <div class="col-12 pt-3 text-dark "><h6><span class="pl-1 mr-1 bg-primary"></span>产品信息</h6>
+                    </div>
+                    <div class="col-6 col-xl-1 py-2 border-bottom weight-400">产品名</div>
+                    <div class="col-6 col-xl-3 py-2 border-bottom"
+                         th:text="${apply.project.name}"></div>
+                    <div class="col-6 col-xl-1 py-2 border-bottom weight-400">额度范围</div>
+                    <div class="col-6 col-xl-3 py-2 border-bottom">
+                        [[${#numbers.formatCurrency(apply.project.minAmount)}]] ~
+                        [[${#numbers.formatCurrency(apply.project.maxAmount)}]]
+                    </div>
+                    <div class="col-6 col-xl-1 py-2 border-bottom weight-400">日息</div>
+                    <div class="col-6 col-xl-3 py-2 border-bottom">
+                        [[${#format.formatDecimal(apply.project.dayRates*100,'#.#######')}+'%']]
+                    </div>
+
+                    <div class="col-12 pt-5 text-dark ">
+                        <h6>
+                            <span class="pl-1 mr-1 bg-primary"></span>
+                            额度申请订单：<span class="text-info">[[${apply.orderId}]]</span>
+                        </h6></div>
+                    <div class="col-6 col-xl-2 py-2 border-bottom weight-400">申请额度</div>
+                    <div class="col-6 col-xl-4 py-2 border-bottom"
+                         th:text="${#numbers.formatCurrency(apply.applyAmount)}"></div>
+                    <!--<div class="col-6 col-xl-1 py-2 border-bottom weight-400">申请用途</div>-->
+                    <!--<div class="col-6 col-xl-3 py-2 border-bottom"-->
+                    <!--th:text="${apply.use}"></div>-->
+                    <div class="col-6 col-xl-2 py-2 border-bottom weight-400">申请时间</div>
+                    <div class="col-6 col-xl-4 py-2 border-bottom"
+                         th:text="${#dates.format(apply.createDate, 'yyyy-MM-dd HH:mm:ss')}"></div>
+                    <div class="col-6 col-xl-2 py-2 border-bottom weight-400">银行名称</div>
+                    <div class="col-6 col-xl-4 py-2 border-bottom"
+                         th:text="${apply.memberBankCard.bankName}"></div>
+                    <div class="col-6 col-xl-2 py-2 border-bottom weight-400">银行卡号</div>
+                    <div class="col-6 col-xl-4 py-2 border-bottom"
+                         th:text="${apply.memberBankCard.bankCardNumber}"></div>
+
+
+                    <div class="col-12 pt-5 text-dark "><h6><span class="pl-1 mr-1 bg-primary"></span>审批</h6></div>
+                    <div class="col-12 " th:if="${apply.state == 0}">
+                        <div class="form-group row">
+                            <label for="amount" class="col-6 col-xl-1 col-form-label weight-400">批准额度</label>
+                            <div class="col-6 col-xl-3">
+                                <input type="text" class="form-control" id="amount" placeholder="请输入要批准的额度"
+                                       th:value="${apply.applyAmount}">
+                            </div>
+                            <label for="opinion" class="col-6 col-xl-1 col-form-label mt-2 mt-xl-0">审批意见</label>
+                            <div class="col-6 col-xl-5 mt-2 mt-xl-0">
+                                <input type="text" id="opinion" class="form-control" placeholder="请输入审批意见">
+                            </div>
+                            <div class="col-12 col-xl-2 text-right mt-2 mt-xl-0">
+                                <button class="btn btn-danger" onclick="formSubmit('reject')">拒批</button>
+                                <button class="btn btn-success text-white" onclick="formSubmit('pass')">通过</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <form method="post" id="form">
+                    <input type="hidden" name="type" id="type"/>
+                    <input type="hidden" name="amount" id="relAmount"/>
+                    <input type="hidden" name="opinion" id="relOpinion"/>
+                    <input type="hidden" name="token" id="token" th:value="${token}"/>
+                    <input type="hidden" name="id" id="applyId" th:value="${param.id}"/>
+                    <input type="hidden" name="memberId" id="memberId" th:value="${param.memberId}"/>
+                </form>
+            </div>
+
+        </div>
+</th:block>
+<th:block th:replace="fragments/js :: managePublic(~{})"></th:block>
+<script src="/js/jsrender.min.js"></script>
+<script src="/js/chart/Chart.min.js"></script>
+<script src="/js/chart/chartjs-plugin-doughnutlabel.min.js"></script>
+<script src="/js/pagination/pagination.js"></script>
+
+
+<script id="loanPreTmpl" type="text/x-jsrender">
+    <div class="row">
+                    <div class="col-12">
+                        <div class="card">
+
+                            <div class="card-body">
+                            <div class="row">
+                                <div class="col-12 col-xl-4">
+                                    <div class="media align-items-center p-2">
+                                         {{if score <= 20}}
+                                           <div class="border-info text-center" style="border:5px solid;border-radius: 100%;height:100px;width:100px;position: relative;">
+                                           <div style="position: absolute;top:15px;left:20px;">
+                                             <div class="text-dark weight-400" style="font-size:22px;">
+                                             低
+                                         {{else score > 20 && score<=50}}
+                                           <div class="border-warning text-center" style="border:5px solid;border-radius: 100%;height:100px;width:100px;position: relative;">
+                                           <div style="position: absolute;top:15px;left:20px;">
+                                             <div class="text-dark weight-400" style="font-size:22px;">
+                                             中
+                                         {{else}}
+                                           <div class="border-danger text-center" style="border:5px solid;border-radius: 100%;height:100px;width:100px;position: relative;">
+                                           <div style="position: absolute;top:15px;left:20px;">
+                                             <div class="text-dark weight-400" style="font-size:22px;">
+                                             高
+                                         {{/if}}
+                                             </div>
+                                             <small class="text-muted border-top border-bottom" style="font-size:12px;">风险评估</small>
+                                             </div>
+                                           </div>
+                                            <div class="media-body ml-5">
+                                                <h5 class="weight-400 m-0">共发现 <span class="text-primary">{{:tdRiskList.length}}</span> 条风险信息</h5>
+                                                <small class="text-muted">风险等级越高，给该客户贷款的风险越大</small>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-12 col-xl-8 ">
+                                    <h6 class="text-dark"><span class="pl-1 mr-1 bg-primary"></span>基本信息</h6>
+                                            <div class="row my-info ">
+                                                <div class="col-6 col-lg-1 py-1 weight-400">姓名：</div>
+                                                <div class="col-6 col-lg-3 py-1 "
+                                                     th:text="${member.memberIdCard.name}"></div>
+                                                <div class="col-6 col-lg-2 py-1 weight-400">年龄性别：</div>
+                                                <div class="col-6 col-lg-6 py-1  ">{{:age}}岁 {{:sex}}</div>
+                                                <div class="col-6 col-lg-1 py-1 weight-400">手机号：</div>
+                                                <div class="col-6 col-lg-3 py-1"
+                                                     th:text="${member.mobile}"></div>
+                                                <div class="col-6 col-lg-2 py-1  weight-400">手机号归属：</div>
+                                                <div class="col-6 col-lg-6 py-1 ">{{:mobileAddress}}</div>
+                                                <div class="col-6 col-lg-1 py-1  weight-400">身份证：</div>
+                                                <div class="col-6 col-lg-3 py-1 "
+                                                     th:text="${member.memberIdCard.cardNumber}"></div>
+                                                <div class="col-6 col-lg-2 py-1  weight-400">身份证归属：</div>
+                                                <div class="col-6 col-lg-6 py-1 ">{{:idCardAddress}}</div>
+                                            </div>
+                                        </div>
+                                </div>
+                                <!--<div class="bg-light py-2 my-3"></div>-->
+                                <!--<h6 class="text-dark"><span class="pl-1 mr-1 bg-primary"></span>基本信息</h6>-->
+
+
+                                <div class="bg-light py-2 my-3"></div>
+                                <h6 class="text-dark"><span class="pl-1 mr-1 bg-primary"></span>多头信息</h6>
+                                    <div class="row my-info border-top border-right">
+                                    <div class="col-6 col-xl-2 py-2 bg-light  border-left border-bottom text-center weight-400">近7天多头申请</div>
+                                    <div class="col-6 col-xl-2 py-2 border-left border-bottom">共 {{:applyPlatform7Day.platformCount}} 个平台</div>
+                                    <div class="col-6 col-xl-2 py-2 bg-light  border-left border-bottom text-center weight-400">近1个月多头申请</div>
+                                    <div class="col-6 col-xl-2 py-2 border-left border-bottom">共 {{:applyPlatform30Day.platformCount}} 个平台</div>
+                                    <div class="col-6 col-xl-2 py-2 bg-light  border-left border-bottom text-center weight-400">近3个月多头申请</div>
+                                    <div class="col-6 col-xl-2 py-2 border-left border-bottom">共 {{:applyPlatform90Day.platformCount}} 个平台</div>
+                                    <div class="col-6 col-xl-2 py-2 bg-light  border-left border-bottom text-center weight-400">近3个月多头放款</div>
+                                    <div class="col-6 col-xl-10 py-2 border-left border-bottom">共 {{:loanPlatform90Day.platformCount}} 个平台
+                                    <span class="ml-5">平均放款金额:{{:loanPlatform90Day.avgAmount}}元</span></div>
+                                    <div class="col-6 col-xl-2 py-2 bg-light  border-left border-bottom text-center weight-400">近3个月多头放款平台</div>
+                                    <div class="col-6 col-xl-10 py-2 border-left border-bottom">
+                                        <div class="row">
+                                            {{if loanPlatform90Day.detailList != null}}
+                                            {{for loanPlatform90Day.detailList}}
+                                            <div class="col-12 col-xl-4 mt-2">
+                                                <span class="text-info">{{:industry_display_name}}：</span>
+                                                {{:count}} 家
+                                            </div>
+                                            {{/for}}
+                                            {{/if}}
+                                        </div>
+                                    </div>
+                                </div>
+
+                                 <div class="bg-light py-2 my-3"></div>
+                                 <h6 class="text-dark"><span class="pl-1 mr-1 bg-primary"></span>身份证逾期信息</h6>
+                                 <div class="row my-info">
+
+                                      <div class="alert alert-info col-12 text-secondary" role="alert">
+                                        提示：30天内、30天-90天 等代表的是逾期的时长，1000元以内，1000元 - 5000元 等代表的是逾期金额的范围
+                                      </div>
+                                <table class="table table-bordered bg-white responsive-table text-md-center mt-1
+                                        align-middle-table border-top-0 border-left-0 border-right-0 my-info table-hover">
+                                    <thead class="thead-light">
+                                    <tr>
+                                        <th class="text-dark" scope="col">逾期金额/逾期时长</th>
+                                        <th class="text-dark" scope="col">30天内</th>
+                                        <th class="text-dark" scope="col">30天-90天</th>
+                                        <th class="text-dark" scope="col">90天-180天</th>
+                                        <th class="text-dark" scope="col">180天以上</th>
+                                    </tr>
+                                    </thead>
+                                    <tbody>
+                                    {{for idCardOverdueList}}
+                                    <tr>
+                                        <td data-label="逾期金额">
+                                            <span class="weight-400 text-dark">{{:overdueAmountRange}}</span>
+                                        </td>
+                                        <td data-label="30天内">
+                                        {{if overdueCount0To30Day==0}}
+                                            <span class="weight-400 text-success" style="font-size:0.9rem">
+                                        {{else overdueCount0To30Day<3}}
+                                            <span class="weight-400 text-info" style="font-size:0.9rem">
+                                        {{else overdueCount0To30Day<6}}
+                                            <span class="weight-400 text-warning" style="font-size:0.9rem">
+                                        {{else}}
+                                            <span class="weight-400 text-danger" style="font-size:0.9rem">
+                                        {{/if}}
+                                                {{:overdueCount0To30Day}} 笔
+                                            </span>
+                                        </td>
+                                        <td data-label="30天-90天">
+                                        {{if overdueCount30To90Day==0}}
+                                            <span class="weight-400 text-success" style="font-size:0.9rem">
+                                        {{else overdueCount30To90Day<3}}
+                                            <span class="weight-400 text-info" style="font-size:0.9rem">
+                                        {{else overdueCount30To90Day<6}}
+                                            <span class="weight-400 text-warning" style="font-size:0.9rem">
+                                        {{else}}
+                                            <span class="weight-400 text-danger" style="font-size:0.9rem">
+                                        {{/if}}
+                                                {{:overdueCount30To90Day}} 笔
+                                            </span>
+
+                                        </td>
+                                        <td data-label="90天-180天">
+                                        {{if overdueCount90To180Day==0}}
+                                            <span class="weight-400 text-success" style="font-size:0.9rem">
+                                        {{else overdueCount90To180Day<3}}
+                                            <span class="weight-400 text-info" style="font-size:0.9rem">
+                                        {{else overdueCount90To180Day<6}}
+                                            <span class="weight-400 text-warning" style="font-size:0.9rem">
+                                        {{else}}
+                                            <span class="weight-400 text-danger" style="font-size:0.9rem">
+                                        {{/if}}
+                                            {{:overdueCount90To180Day}} 笔
+                                            </span>
+
+                                        </td>
+                                        <td data-label="180天以上">
+                                        {{if overdueCount180ToMoreDay==0}}
+                                            <span class="weight-400 text-success" style="font-size:0.9rem">
+                                        {{else overdueCount180ToMoreDay<3}}
+                                            <span class="weight-400 text-info" style="font-size:0.9rem">
+                                        {{else overdueCount180ToMoreDay<6}}
+                                            <span class="weight-400 text-warning" style="font-size:0.9rem">
+                                        {{else}}
+                                            <span class="weight-400 text-danger" style="font-size:0.9rem">
+                                        {{/if}}
+                                            {{:overdueCount180ToMoreDay}} 笔
+                                            </span>
+
+                                        </td>
+                                    </tr>
+                                    {{/for}}
+                                    </tbody>
+                                </table>
+                                 </div>
+
+
+                                <div class="bg-light py-2 my-3"></div>
+                                 <h6 class="text-dark"><span class="pl-1 mr-1 bg-primary"></span>身份证法院、犯罪相关信息</h6>
+                                 <div class="row my-info">
+                                <table class="table table-bordered bg-white responsive-table text-md-center mt-1
+                                        align-middle-table border-top-0 border-left-0 border-right-0 my-info table-hover">
+                                    <thead class="thead-light">
+                                    <tr>
+                                        <th class="text-dark" scope="col">项目名</th>
+                                        <th class="text-dark" scope="col">数量</th>
+                                        <th class="text-dark" scope="col">详情</th>
+                                    </tr>
+                                    </thead>
+                                    <tbody>
+                                    <tr>
+                                        <td data-label="项目名">
+                                            <span class="weight-400 text-dark">犯罪通缉名单</span>
+                                        </td>
+                                        <td data-label="数量">
+                                            {{if tongJiRisk == null}}
+                                                <span class="text-success weight-400">0</span>
+                                            {{else}}
+                                                <span class="text-danger weight-400">存在</span>
+                                            {{/if}}
+                                        </td>
+                                        <td data-label="详情">
+                                            {{if tongJiRisk == null}}
+                                                无
+                                            {{else}}
+                                                {{:tongJiRisk.fraudTypeDisplayName}}
+                                            {{/if}}
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td data-label="项目名">
+                                            <span class="weight-400 text-dark">法院失信名单</span>
+                                        </td>
+                                        <td data-label="数量">
+                                            {{if shiXinCourts.length == 0}}
+                                            <span class="text-success weight-400">
+                                            {{else}}
+                                            <span class="text-danger weight-400">
+                                            {{/if}}
+                                            {{:shiXinCourts.length}}</span>
+                                        </td>
+                                        <td data-label="详情">
+                                            {{if shiXinCourts.length == 0}}
+                                                无
+                                            {{else}}
+                                                {{for shiXinCourts}}
+                                                <div class="mt-1 mb-1">
+                                                    {{if caseCode != null}}
+                                                        {{:caseCode}} -
+                                                    {{/if}}
+                                                    {{:executeCourt}}
+                                                    <a name="btnCourt" href="javascript:void(0)" data-type='shixin' data-index="{{:#index}}">查看详情</a>
+                                                </div>
+                                                {{/for}}
+                                            {{/if}}
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td data-label="项目名">
+                                            <span class="weight-400 text-dark">法院执行名单</span>
+                                        </td>
+                                        <td data-label="数量">
+                                            {{if zhiXingCourts.length == 0}}
+                                            <span class="text-success weight-400">
+                                            {{else}}
+                                            <span class="text-danger weight-400">
+                                            {{/if}}
+                                            {{:zhiXingCourts.length}}
+                                            </span>
+                                        </td>
+                                        <td data-label="详情">
+                                            {{if zhiXingCourts.length == 0}}
+                                                无
+                                            {{else}}
+                                                {{for zhiXingCourts}}
+                                                <div class="mt-1 mb-1">
+                                                    {{if caseCode != null}}
+                                                        {{:caseCode}} -
+                                                    {{/if}}
+                                                    {{:executeCourt}}
+                                                    <a name="btnCourt" href="javascript:void(0)" data-type='zhixing' data-index="{{:#index}}">查看详情</a>
+                                                </div>
+                                                {{/for}}
+                                            {{/if}}
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td data-label="项目名">
+                                            <span class="weight-400 text-dark">法院结案名单</span>
+                                        </td>
+                                        <td data-label="数量">
+                                            {{if jieAnCourts.length == 0}}
+                                            <span class="text-success weight-400">
+                                            {{else}}
+                                            <span class="text-danger weight-400">
+                                            {{/if}}
+                                            {{:jieAnCourts.length}}
+                                            </span>
+                                        </td>
+                                        <td data-label="详情">
+                                            {{if jieAnCourts.length == 0}}
+                                                无
+                                            {{else}}
+                                                {{for jieAnCourts}}
+                                                <div class="mt-1 mb-1">
+                                                    {{if caseCode != null}}
+                                                        {{:caseCode}} -
+                                                    {{/if}}
+                                                    {{:executeCourt}}
+                                                    <a name="btnCourt" href="javascript:void(0)" data-type='jiean' data-index="{{:#index}}">查看详情</a>
+                                                </div>
+                                                {{/for}}
+                                            {{/if}}
+                                        </td>
+                                    </tr>
+                                    </tbody>
+                                </table>
+                                 </div>
+
+
+                                <div class="bg-light py-2 my-3"></div>
+                                <h6 class="text-dark"><span class="pl-1 mr-1 bg-primary"></span>风险详情</h6>
+                                <table class="table table-bordered-sm bg-white responsive-table text-md-center align-middle-table border-0 my-info">
+                                    <thead class="thead-light2">
+                                        <tr>
+                                            <th class="text-info" scope="col" width="4">风险项目</th>
+                                            <th class="text-info" scope="col" width="1">风险等级</th>
+                                            <th class="text-info" scope="col">详情</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                    {{for tdRiskList}}
+                                        <tr>
+                                            <td data-label="项目" class="text-dark" >
+                                                {{:riskName}}
+                                            </td>
+                                            <td data-label="风险分数">
+                                                {{if score <= 20}}
+                                                  <h6 class="text-info">低
+                                                {{else score > 20 && score<=50}}
+                                                  <h6 class="text-warning">中
+                                                {{else}}
+                                                  <h6 class="text-danger">高
+                                                {{/if}}
+                                                </h6>
+                                            </td>
+                                            <td data-label="详情" style="white-space: normal" class="text-left">
+                                            <ul>
+
+                                            {{if  tdPlatform != null && tdPlatform.detailList.length> 0 }}
+                                                <li class="text-secondary weight-400">共
+                                                <span class="text-danger weight-300">{{:fraudTypeDisplayName}}</span> 个平台
+                                                </li>
+                                                <li class="text-secondary weight-400">平台详情:
+                                                <div class="row">
+                                                {{for tdPlatform.detailList}}
+                                                    <div class="col-12 col-xl-4 mt-2">
+                                                    <span class="text-danger weight-400">
+                                                        {{:industry_display_name}}：{{:count}} 家
+                                                    </span>
+                                                    </div>
+                                                {{/for}}
+                                                </div>
+                                                </li>
+                                            {{else}}
+                                                {{if fraudTypeDisplayName != null}}
+                                                <li class="text-secondary weight-400">风险类型:
+                                                <span class="text-danger weight-300">{{:fraudTypeDisplayName}}</span>
+                                                </li>
+                                                {{/if}}
+                                                {{if hitTypeDisplayName != null}}
+                                                    <li class="text-secondary weight-400">匹配字段:
+                                                    <span class="text-warning weight-300">{{:hitTypeDisplayName}}</span>
+                                                    </li>
+                                                {{/if}}
+                                                {{if tdOverdueList.length> 0}}
+                                                {{for tdOverdueList}}
+                                                    <li class="text-secondary weight-400">
+                                                    逾期金额: <span class="text-danger mr-2">{{:overdueAmountRange}}</span>
+                                                    <!--逾期天数: <span class="text-danger  mr-2">{{:overdueDayRange}}</span>-->
+                                                    <!--逾期入库时间: <span class="text-danger">{{:overdueTime}}</span>-->
+                                                    </li>
+                                                {{/for}}
+                                                {{/if}}
+                                            {{/if}}
+                                            </ul>
+                                            </td>
+                                        </tr>
+                                    {{/for}}
+                                    </tbody>
+                                </table>
+                                <!--<i class="material-icons d-block mb-1 text-success">done</i>-->
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+
+
+
+</script>
+<script id="contactTmpl" type="text/x-jsrender">
+<div class="row my-info text-secondary">
+    <table class="table table-bordered bg-white responsive-table table-hover table-striped text-md-center align-middle-table">
+        <thead class="thead-light2">
+        <tr>
+            <th scope="col">联系人名称</th>
+            <th scope="col">联系人电话</th>
+            <th scope="col">联系人名称</th>
+            <th scope="col">联系人电话</th>
+        </tr>
+        </thead>
+        <tbody>
+           {{for  start=0 end=contacts.length step=2 ~list=contacts}}
+                <tr>
+                <td data-label="联系人名称">
+                    <span class="text-info weight-400">
+                        {{:~list[#getIndex()*2].name}}
+                    </span>
+                    {{if ~list[#getIndex()*2].contactsType != null}}
+                    <span class="badge badge-primary" id="jj1" data-mobile="{{:~list[#getIndex()*2].telphone}}">
+                          第{{:~list[#getIndex()*2].contactsType}}紧急联系人
+                    </span>
+                    {{/if}}
+                    {{if ~list[#getIndex()*2].relation != null}}
+                    <span class="badge badge-success text-white"
+                               id="relation{{:~list[#getIndex()*2].id}}">
+                               {{:~list[#getIndex()*2].relation}}
+                    </span>
+                    {{/if}}
+                     <span class="badge badge-success text-white"
+                          style="{{:~list[#getIndex()*2].isCall==null?'display:none':none}}"
+                          id ="relations{{:~list[#getIndex()*2].id}}">
+                                   {{:~list[#getIndex()*2].isCall}}-{{:~list[#getIndex()*2].marRelation}}
+                            </span>
+                    <a name="btnContactRemark"  data-id="{{:~list[#getIndex()*2].id}}"
+                       href="javascript:void(0)"><i class="material-icons align-middle"
+                                                    style="font-size:16px;">create</i></a>
+                </td>
+                <td  data-label="联系人电话" >
+                    {{:~list[#getIndex()*2].telphone}}
+                    {{if ~list[#getIndex()*2].bigData != null}}
+                    <span class="badge badge-pill badge-danger" data-html="true"
+                       data-toggle="tooltip"  title="{{:~list[#getIndex()*2].bigData}}">!</span>
+                    {{/if}}
+                </td>
+                {{if #getIndex()*2+1 < ~list.length}}
+                <td data-label="联系人名称">
+                    <span class="text-info weight-400">
+                        {{:~list[#getIndex()*2+1].name}}
+                    </span>
+                    {{if ~list[#getIndex()*2+1].contactsType != null}}
+                    <span class="badge badge-primary" id="jj1" data-mobile="{{:~list[#getIndex()*2+1].telphone}}">
+                          第{{:~list[#getIndex()*2+1].contactsType}}紧急联系人
+                    </span>
+                    {{/if}}
+                    {{if ~list[#getIndex()*2+1].relation != null}}
+                    <span class="badge badge-success text-white"
+                               id="relation{{:~list[#getIndex()*2+1].id}}">
+                               {{:~list[#getIndex()*2+1].relation}}
+                    </span>
+                    {{/if}}
+                     <span class="badge badge-success text-white"
+                          style="{{:~list[#getIndex()*2+1].isCall==null?'display:none':''}}"
+                          id ="relations{{:~list[#getIndex()*2+1].id}}">
+                                   {{:~list[#getIndex()*2+1].isCall}}-{{:~list[#getIndex()*2+1].marRelation}}
+                            </span>
+                    <a name="btnContactRemark"  data-id="{{:~list[#getIndex()*2+1].id}}"
+                       href="javascript:void(0)"><i class="material-icons align-middle"
+                                                    style="font-size:16px;">create</i></a>
+                </td>
+                <td  data-label="联系人电话" >
+                    {{:~list[#getIndex()*2+1].telphone}}
+                    {{if ~list[#getIndex()*2+1].bigData != null}}
+                    <span class="badge badge-pill badge-danger" data-html="true"
+                       data-toggle="tooltip"  title="{{:~list[#getIndex()*2+1].bigData}}">!</span>
+                    {{/if}}
+                </td>
+                {{/if}}
+
+            </tr>
+           {{/for}}
+        </tbody>
+    </table>
+</div>
+</script>
+<script id="yysTmpl" type="text/x-jsrender">
+                <div class="card">
+                    <div class="card-body">
+                        <div class="row my-info text-secondary">
+                            <div class="col-12">
+                                <h6 class="text-dark mt-2"><span class="pl-1 mr-1 bg-primary"></span>基本信息</h6>
+                                <div class="row border-top border-right mt-3">
+                                    <div class="col-6 col-lg-2 py-2 text-center bg-light border-bottom border-left weight-400">姓名:</div>
+                                    <div class="col-6 col-lg-4 border-bottom border-left py-2">
+                                        [[${member.memberIdCard.name}]]
+                                        {{if realNameCheckYys == '完全匹配' || realNameCheckYys == '模糊匹配'}}
+                                        <span class="text-success ml-1 my-tip-info">
+                                            <i class="material-icons align-text-top">check_circle</i>和运营商数据{{:realNameCheckYys}}
+                                        </span>
+                                        {{else}}
+                                        <span class="text-danger ml-1 my-tip-info">
+                                            <i class="material-icons align-text-top">cancel</i>{{:realNameCheckYys}}
+                                        </span>
+                                        {{/if}}
+                                        {{if realName != null && realName != ''}}
+                                        <div>(运营商登记姓名:{{:realName}})</div>
+                                        {{/if}}
+                                    </div>
+                                    <div class="col-6 col-lg-2 text-center bg-light border-bottom border-left py-2 weight-400">身份证号:</div>
+                                    <div class="col-6 col-lg-4 border-bottom border-left py-2">
+                                        [[${member.memberIdCard.cardNumber}]]
+                                        {{if identityCodeCheckYys == '完全匹配' || identityCodeCheckYys == '模糊匹配'}}
+                                        <span class="text-success ml-1 my-tip-info">
+                                            <i class="material-icons align-text-top">check_circle</i>和运营商数据{{:identityCodeCheckYys}}
+                                        </span>
+                                        {{else}}
+                                        <span class="text-danger ml-1 my-tip-info">
+                                            <i class="material-icons align-text-top">cancel</i>{{:identityCodeCheckYys}}
+                                        </span>
+                                        {{/if}}
+                                        {{if identityCode != null && identityCode != ''}}
+                                        <div>(运营商登记证件号:{{:identityCode}})</div>
+                                        {{/if}}
+                                    </div>
+                                </div>
+
+                            </div>
+
+                            <!--<div class="col-12 col-xl-6">-->
+                                <!--<div class="row">-->
+                                    <!--<div class="d-none d-xl-block col-xl-3"></div>-->
+                                    <!--<div class="col-12 col-xl-6">-->
+                                        <!--<canvas id="totalScoreChart"></canvas>-->
+                                    <!--</div>-->
+                                    <!--<div class="col-12 text-muted text-center" style="font-size:12px;">用户综合评分越好</div>-->
+
+                                <!--</div>-->
+                            <!--</div>-->
+                            <div class="col-12 mt-2">
+                                <h6 class="text-dark mt-2"><span class="pl-1 mr-1 bg-primary"></span>手机信息</h6>
+                                <div class="row border-top border-right mt-2">
+                                    <div class="col-6 col-lg-2 py-2 text-center bg-light border-bottom border-left weight-400">手机号:</div>
+                                    <div class="col-6 col-lg-2 py-2 border-left border-bottom"
+                                         th:text="${member.mobile}"></div>
+                                    <div class="col-6 col-lg-2 py-2 text-center bg-light border-bottom border-left weight-400">归属地:</div>
+                                    <div class="col-6 col-lg-2 py-2 border-left border-bottom">{{:mobileAddress}}</div>
+                                    <div class="col-6 col-lg-2 py-2 text-center bg-light border-bottom border-left weight-400">运营商:</div>
+                                    <div class="col-6 col-lg-2 py-2 border-left border-bottom">{{:mobileCarrier}}</div>
+                                    <div class="col-6 col-lg-2 py-2 text-center bg-light border-bottom border-left weight-400">账户状态:</div>
+                                    <div class="col-6 col-lg-2 py-2 border-left border-bottom">
+                                        {{:accountStatus}}
+                                        {{if accountStatus == "正常"}}
+                                        <span class="text-success ml-1 my-tip-info">
+                                            <i class="material-icons align-text-top">check_circle</i>
+                                        {{else}}
+                                        <span class="text-danger ml-1 my-tip-info">
+                                            <i class="material-icons align-text-top">cancel</i>
+                                        {{/if}}
+                                            账户状态{{:accountStatus}}
+                                        </span>
+                                    </div>
+                                    <div class="col-6 col-lg-2 py-2 text-center bg-light border-bottom border-left weight-400">账户余额:</div>
+                                    <div class="col-6 col-lg-2 py-2 border-left border-bottom">{{:accountBalance}}元</div>
+                                    <div class="col-6 col-lg-2 py-2 text-center bg-light border-bottom border-left weight-400">入网时间:</div>
+                                    <div class="col-6 col-lg-2 py-2 border-left border-bottom">
+                                        {{:mobileNetTime}}
+                                        {{if mobileNetAge >= 3}}
+                                        <span class="text-success ml-1 my-tip-info">
+                                            <i class="material-icons align-text-top">check_circle</i>入网超过3个月
+                                        </span>
+                                        {{else}}
+                                        <span class="text-success ml-1 my-tip-info">
+                                            <i class="material-icons align-text-top">cancel</i>入网不足3个月
+                                        </span>
+                                        {{/if}}
+                                    </div>
+                                    <div class="col-6 col-lg-2 py-2 text-center bg-light border-bottom border-left weight-400">近3月无通话和发送短信天数</div>
+                                    <div class="col-6 col-lg-2 py-2 border-left border-bottom"> {{:silenceDay0Call0MsgSend3Month}} 天</div>
+                                    <div class="col-6 col-lg-2 py-2 text-center bg-light border-bottom border-left weight-400">近6月无通话和发送短信天数</div>
+                                    <div class="col-6 col-lg-6 py-2 border-left border-bottom">{{:silenceDay0Call0MsgSend6Month}} 天</div>
+                                </div>
+                            </div>
+
+                            <!--<div class="col-12 col-xl-6">-->
+                                <!--<canvas id="scoreChart"></canvas>-->
+                            <!--</div>-->
+
+                            <div class="bg-light mt-4 py-2 my-3 col-12"></div>
+                            <div class="text-center col-12 mt-4 text-secondary mb-3"><h5
+                                    class="weight-300 border-bottom pb-2 px-5 d-inline-block">紧急联系人通话详情</h5></div>
+                            <div class="col-12">
+                                <table class="table table-bordered-sm bg-white responsive-table text-md-center
+                                align-middle-table border-top-0 border-left-0 border-right-0 my-info table-hover">
+                                    <thead class="thead-light">
+                                    <tr>
+                                        <th class="text-dark" scope="col">号码</th>
+                                        <th class="text-dark" scope="col">号码归属地</th>
+                                        <th class="text-dark" scope="col">近1月通话次数</th>
+                                        <th class="text-dark" scope="col">近1月通话时长(秒)</th>
+                                        <th class="text-dark" scope="col">近3月通话次数</th>
+                                        <th class="text-dark" scope="col">近3月通话时长(秒)</th>
+                                        <th class="text-dark" scope="col">近6月通话次数</th>
+                                        <th class="text-dark" scope="col">近6月通话时长(秒)</th>
+                                    </tr>
+                                    </thead>
+                                    <tbody>
+                                    {{for jj}}
+                                    <tr>
+                                        <td data-label="号码">
+                                            <div>{{:contactMobile}}</div>
+                                            <small class="text-primary">{{:contactName}}</small>
+                                        </td>
+
+                                        <td data-label="号码归属地">
+                                            {{:contactArea}}
+                                        </td>
+                                        <td data-label="近1月通话次数">
+                                            {{:callCountActive1month+callCountPassive1month}}
+                                        </td>
+                                        <td data-label="近1月通话时长(秒)">
+                                            {{:callTimeActive1month+callTimePassive1month}}
+                                        </td>
+                                        <td data-label="近3月通话次数">
+                                            {{:callCountActive3month+callCountPassive3month}}
+                                        </td>
+                                        <td data-label="近3月通话时长(秒)">
+                                            {{:callTimeActive3month+callTimePassive3month}}
+                                        </td>
+                                        <td data-label="近6月通话次数">
+                                            {{:callCountActive6month+callCountPassive6month}}
+                                        </td>
+                                        <td data-label="近6月通话时长(秒)">
+                                            {{:callTimeActive6month+callTimePassive6month}}
+                                        </td>
+                                    </tr>
+                                    {{/for}}
+                                    </tbody>
+                                </table>
+                            </div>
+
+
+                            <div class="bg-light mt-4 py-2 my-3 col-12"></div>
+                            <div class="text-center col-12 mt-4 text-secondary mb-3"><h5
+                                    class="weight-300 border-bottom pb-2 px-5 d-inline-block">近1周  TOP 5  联系人通话详情</h5></div>
+                            <div class="col-12">
+                                <table class="table table-bordered-sm bg-white responsive-table text-md-center
+                                align-middle-table border-top-0 border-left-0 border-right-0 my-info table-hover">
+                                    <thead class="thead-light">
+                                    <tr>
+                                        <th class="text-dark" scope="col">号码</th>
+                                        <th class="text-dark" scope="col">号码标签</th>
+                                        <th class="text-dark" scope="col">号码归属地</th>
+                                        <th class="text-dark" scope="col">最近联系时间</th>
+                                        <th class="text-dark" scope="col">首次联系时间</th>
+                                        <th class="text-dark" scope="col">通话次数</th>
+                                    </tr>
+                                    </thead>
+                                    <tbody>
+                                    {{for mhYysWeekTop5ContactList}}
+                                    <tr>
+                                        <td data-label="号码">
+                                            {{:contactMobile}}
+                                        </td>
+                                        <td data-label="号码标签">
+                                            {{:contactName}}
+                                        </td>
+                                        <td data-label="号码归属地">
+                                            {{:contactArea}}
+                                        </td>
+                                        <td data-label="最近联系时间">
+                                            {{:lastTimeCall6month}}
+                                        </td>
+                                        <td data-label="首次联系时间">
+                                            {{:firstTimeCall6month}}
+                                        </td>
+                                        <td data-label="通话次数">
+                                            {{:callCount1week}}
+                                        </td>
+                                    </tr>
+                                    {{/for}}
+                                    </tbody>
+                                </table>
+                            </div>
+
+                            <div class="bg-light mt-4 py-2 my-3 col-12"></div>
+                            <div class="text-center col-12 mt-4 text-secondary mb-3"><h5
+                                    class="weight-300 border-bottom pb-2 px-5 d-inline-block">近1月  TOP 10  联系人通话详情</h5></div>
+                            <div class="col-12">
+                                <table class="table table-bordered-sm bg-white responsive-table text-md-center
+                                align-middle-table border-top-0 border-left-0 border-right-0 my-info table-hover">
+                                    <thead class="thead-light">
+                                    <tr>
+                                        <th class="text-dark" scope="col">号码</th>
+                                        <th class="text-dark" scope="col">号码归属地</th>
+                                        <th class="text-dark" scope="col">最近联系时间</th>
+                                        <th class="text-dark" scope="col">首次联系时间</th>
+                                        <th class="text-dark" scope="col">主叫次数</th>
+                                        <th class="text-dark" scope="col">被叫次数</th>
+                                        <th class="text-dark" scope="col">主叫时长(秒)</th>
+                                        <th class="text-dark" scope="col">被叫时长(秒)</th>
+                                    </tr>
+                                    </thead>
+                                    <tbody>
+                                    {{for mhYysMonthTop10ContactList}}
+                                    <tr>
+                                        <td data-label="号码">
+                                            <div>{{:contactMobile}}</div>
+                                            <small class="text-primary">{{:contactName}}</small>
+                                        </td>
+                                        <td data-label="号码归属地">
+                                            {{:contactArea}}
+                                        </td>
+                                        <td data-label="最近联系时间">
+                                            {{:lastTimeCall6month}}
+                                        </td>
+                                        <td data-label="首次联系时间">
+                                            {{:firstTimeCall6month}}
+                                        </td>
+                                        <td data-label="主叫次数">
+                                            {{:callCountActive1month}}
+                                        </td>
+                                        <td data-label="被叫次数">
+                                            {{:callCountPassive1month}}
+                                        </td>
+                                        <td data-label="主叫时长(秒)">
+                                            {{:callTimeActive1month}}
+                                        </td>
+                                        <td data-label="被叫时长(秒)">
+                                            {{:callTimePassive1month}}
+                                        </td>
+                                    </tr>
+                                    {{/for}}
+                                    </tbody>
+                                </table>
+                            </div>
+
+
+                            <div class="bg-light py-2 my-3 col-12 mt-4"></div>
+                            <div class="text-center col-12 mt-4 text-secondary mb-3"><h5
+                                    class="weight-300 border-bottom pb-2 px-5 d-inline-block">TOP 10 手机联系人风险分析</h5></div>
+                            <div class="col-6 col-xl-3 text-center">
+                                <h5 class="text-danger">{{:blackTop10ContactTotalCountRatio}}%</h5>
+                                <small class="text-muted">黑名单人数占比</small>
+                            </div>
+                            <div class="col-6 col-xl-3 text-center">
+                                <h5 class="text-danger">{{:manyheadsTop10ContactRecent6monthHavePartnercodeCount}}人</h5>
+                                <small class="text-muted">申请过平台的人数</small>
+                            </div>
+                            <div class="col-6 col-xl-3 text-center">
+                                <h5 class="text-danger">{{:manyheadsTop10ContactRecent6monthPartnercodeCountAvg}}个</h5>
+                                <small class="text-muted">人均申请平台数</small>
+                            </div>
+                            <div class="col-6 col-xl-3 text-center">
+                                <h5 class="text-warning">{{:creditscoreTop10ContactAvg}}</h5>
+                                <small class="text-muted">平均信用分</small>
+                            </div>
+                            <div class="col-xl-6 col-12 mt-3">
+                                <canvas id="contactBlackListChart"></canvas>
+                            </div>
+                            <div class="col-xl-6 col-12 mt-3">
+                                <table class="table table-bordered-sm bg-white responsive-table text-md-center
+                                align-middle-table border-top-0 border-left-0 border-right-0 my-info table-hover">
+                                    <thead class="thead-light">
+                                    <tr>
+                                        <th class="text-dark" scope="col">名称</th>
+                                        <th class="text-dark" scope="col">近1月</th>
+                                        <th class="text-dark" scope="col">近3月</th>
+                                        <th class="text-dark" scope="col">近6月</th>
+                                    </tr>
+                                    </thead>
+                                    <tbody>
+                                    <tr>
+                                        <td data-label="名称">
+                                            人均申请平台数
+                                        </td>
+                                        <td data-label="近1月">
+                                            {{:manyheadsTop10ContactRecent1monthPartnercodeCountAvg}}
+                                        </td>
+                                        <td data-label="近3月">
+                                            {{:manyheadsTop10ContactRecent3monthPartnercodeCountAvg}}
+                                        </td>
+                                        <td data-label="近6月">
+                                            {{:manyheadsTop10ContactRecent6monthPartnercodeCountAvg}}
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td data-label="名称">
+                                            最大申请平台数
+                                        </td>
+                                        <td data-label="近1月">
+                                            {{:manyheadsTop10ContactRecent1monthPartnercodeCountMax}}
+                                        </td>
+                                        <td data-label="近3月">
+                                            {{:manyheadsTop10ContactRecent3monthPartnercodeCountMax}}
+                                        </td>
+                                        <td data-label="近6月">
+                                            {{:manyheadsTop10ContactRecent6monthPartnercodeCountMax}}
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td data-label="名称">
+                                            申请过平台人数
+                                        </td>
+                                        <td data-label="近1月">
+                                            {{:manyheadsTop10ContactRecent1monthHavePartnercodeCount}}
+                                        </td>
+                                        <td data-label="近3月">
+                                            {{:manyheadsTop10ContactRecent3monthHavePartnercodeCount}}
+                                        </td>
+                                        <td data-label="近6月">
+                                            {{:manyheadsTop10ContactRecent6monthHavePartnercodeCount}}
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td data-label="名称">
+                                            申请2个及以上人数
+                                        </td>
+                                        <td data-label="近1月">
+                                            {{:manyheadsTop10ContactRecent1monthPartnercodeCountOver2}}
+                                        </td>
+                                        <td data-label="近3月">
+                                            {{:manyheadsTop10ContactRecent3monthPartnercodeCountOver2}}
+                                        </td>
+                                        <td data-label="近6月">
+                                            {{:manyheadsTop10ContactRecent6monthPartnercodeCountOver2}}
+                                        </td>
+                                    </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+
+                            <div class="bg-light mt-4 py-2 my-3 col-12"></div>
+                            <div class="text-center col-12 mt-4 text-secondary mb-3"><h5
+                                    class="weight-300 border-bottom pb-2 px-5 d-inline-block">风险联系人明细</h5></div>
+                            <div class="col-12">
+                                <table class="table table-bordered-sm bg-white responsive-table text-md-center
+                                align-middle-table border-top-0 border-left-0 border-right-0 my-info table-hover">
+                                    <thead class="thead-light">
+                                    <tr>
+                                        <th class="text-dark" scope="col">号码</th>
+                                        <th class="text-dark" scope="col">近3月通话次数</th>
+                                        <th class="text-dark" scope="col">近3月通话时长(秒)</th>
+                                        <th class="text-dark" scope="col">近6月通话次数</th>
+                                        <th class="text-dark" scope="col">近6月通话时长(秒)</th>
+                                        <th class="text-dark" scope="col">近6月主叫次数</th>
+                                        <th class="text-dark" scope="col">近6月被叫次数</th>
+                                    </tr>
+                                    </thead>
+                                    <tbody>
+                                    {{for mhYysRiskContactList}}
+                                    <tr>
+                                        <td data-label="号码">
+                                            <div>{{:contactMobile}}</div>
+                                            <small class="text-primary">{{:contactName}}</small>
+                                        </td>
+
+                                        <td data-label="近3月通话次数">
+                                            {{:callCountActive3month+callCountPassive3month}}
+                                        </td>
+                                        <td data-label="近3月通话时长(秒)">
+                                            {{:callTimeActive3month+callTimePassive3month}}
+                                        </td>
+                                        <td data-label="近6月通话次数">
+                                            {{:callCountActive6month+callCountPassive6month}}
+                                        </td>
+                                        <td data-label="近6月通话时长(秒)">
+                                            {{:callTimeActive6month+callTimePassive6month}}
+                                        </td>
+                                        <td data-label="近6月主叫次数">
+                                            {{:callCountActive6month}}
+                                        </td>
+                                        <td data-label="近6月被叫次数">
+                                            {{:callCountPassive6month}}
+                                        </td>
+                                    </tr>
+                                    {{/for}}
+                                    </tbody>
+                                </table>
+                            </div>
+
+
+
+                            <div class="bg-light mt-4 py-2 my-3 col-12"></div>
+                            <div class="text-center col-12 mt-4 text-secondary mb-3"><h5
+                                    class="weight-300 border-bottom pb-2 px-5 d-inline-block">金融机构联系人明细</h5></div>
+                            <div class="col-12">
+                                <table class="table table-bordered-sm bg-white responsive-table text-md-center
+                                align-middle-table border-top-0 border-left-0 border-right-0 my-info table-hover">
+                                    <thead class="thead-light">
+                                    <tr>
+                                        <th class="text-dark" scope="col">号码</th>
+                                        <th class="text-dark" scope="col">近3月通话次数</th>
+                                        <th class="text-dark" scope="col">近3月通话时长(秒)</th>
+                                        <th class="text-dark" scope="col">近6月通话次数</th>
+                                        <th class="text-dark" scope="col">近6月通话时长(秒)</th>
+                                        <th class="text-dark" scope="col">近6月主叫次数</th>
+                                        <th class="text-dark" scope="col">近6月被叫次数</th>
+                                    </tr>
+                                    </thead>
+                                    <tbody>
+                                    {{for mhYysFinanceContactList}}
+                                    <tr>
+                                        <td data-label="号码">
+                                            <div>{{:contactMobile}}</div>
+                                            <small class="text-primary">{{:contactName}}</small>
+                                        </td>
+
+                                        <td data-label="近3月通话次数">
+                                            {{:callCountActive3month+callCountPassive3month}}
+                                        </td>
+                                        <td data-label="近3月通话时长(秒)">
+                                            {{:callTimeActive3month+callTimePassive3month}}
+                                        </td>
+                                        <td data-label="近6月通话次数">
+                                            {{:callCountActive6month+callCountPassive6month}}
+                                        </td>
+                                        <td data-label="近6月通话时长(秒)">
+                                            {{:callTimeActive6month+callTimePassive6month}}
+                                        </td>
+                                        <td data-label="近6月主叫次数">
+                                            {{:callCountActive6month}}
+                                        </td>
+                                        <td data-label="近6月被叫次数">
+                                            {{:callCountPassive6month}}
+                                        </td>
+                                    </tr>
+                                    {{/for}}
+                                    </tbody>
+                                </table>
+                            </div>
+
+                            <div class="bg-light py-2  mt-4 my-3 col-12"></div>
+                            <div class="text-center col-12 mt-4 text-secondary mb-3"><h5
+                                    class="weight-300 border-bottom pb-2 px-5 d-inline-block">每月通话统计</h5></div>
+                            <div class="col-12 col-xl-6">
+                                <canvas id="monthCallCountStatsChart"></canvas>
+                            </div>
+                            <div class="col-12 col-xl-6">
+                                <canvas id="monthCallTimeStatsChart"></canvas>
+                            </div>
+                            <div class="col-12 mt-3">
+                                <table class="table table-bordered-sm bg-white responsive-table text-md-center
+                                align-middle-table border-top-0 border-left-0 border-right-0 my-info table-hover">
+                                    <thead class="thead-light">
+                                    <tr>
+                                        <th class="text-dark" scope="col">月份</th>
+                                        <th class="text-dark" scope="col">通话号码数量</th>
+                                        <th class="text-dark" scope="col">通话次数</th>
+                                        <th class="text-dark" scope="col">主叫次数</th>
+                                        <th class="text-dark" scope="col">被叫次数</th>
+                                        <th class="text-dark" scope="col">通话时长(秒)</th>
+                                        <th class="text-dark" scope="col">主叫时长(秒)</th>
+                                        <th class="text-dark" scope="col">被叫时长(秒)</th>
+                                        <th class="text-dark" scope="col">短信次数</th>
+                                    </tr>
+                                    </thead>
+                                    <tbody>
+                                    <tr>
+                                    {{for mhYysMonthStatsList}}
+                                        <td data-label="月份">
+                                            {{:month}}
+                                        </td>
+                                        <td data-label="通话号码数量">
+                                            {{:contactCount}}
+                                        </td>
+                                        <td data-label="通话次数">
+                                            {{:callCountActive+callCountPassive}}
+                                        </td>
+                                        <td data-label="主叫次数">
+                                            {{:callCountActive}}
+                                        </td>
+                                        <td data-label="被叫次数">
+                                            {{:callCountPassive}}
+                                        </td>
+                                        <td data-label="通话时长(秒)">
+                                            {{:callTimeActive+callTimePassive}}
+                                        </td>
+                                        <td data-label="主叫时长(秒)">
+                                            {{:callTimeActive}}
+                                        </td>
+                                        <td data-label="被叫时长(秒)">
+                                            {{:callTimePassive}}
+                                        </td>
+                                        <td data-label="短信次数">
+                                            {{:msgCount}}
+                                        </td>
+                                    </tr>
+                                    {{/for}}
+                                    </tbody>
+                                </table>
+                            </div>
+
+
+
+                            <div class="bg-light py-2 my-3 col-12 mt-4"></div>
+                            <div class="text-center col-12 mt-4 text-secondary mb-3"><h5
+                                    class="weight-300 border-bottom pb-2 px-5 d-inline-block">每月消费统计</h5></div>
+
+                            <div class="col-12 col-xl-6">
+                                <table class="table table-bordered-sm bg-white responsive-table text-md-center
+                                align-middle-table border-top-0 border-left-0 border-right-0 my-info table-hover">
+                                    <thead class="thead-light">
+                                    <tr>
+                                        <th class="text-dark" scope="col">月份</th>
+                                        <th class="text-dark" scope="col">月消费金额(元)</th>
+                                        <th class="text-dark" scope="col">月充值金额(元)</th>
+                                    </tr>
+                                    </thead>
+                                    <tbody>
+                                    {{for mhYysMonthStatsList}}
+                                    <tr>
+                                        <td data-label="月份">
+                                            {{:month}}
+                                        </td>
+                                        <td data-label="月消费金额(元)">
+                                            {{:consumeAmount}}
+                                        </td>
+                                        <td data-label="月充值金额(元)">
+                                            {{:rechargeAmount}}
+                                        </td>
+                                    </tr>
+                                    {{/for}}
+                                    </tbody>
+                                </table>
+                            </div>
+
+                            <div class="col-12 col-xl-6">
+                                <canvas id="monthMoneyStatsChart"></canvas>
+                            </div>
+
+
+                            <div class="bg-light mt-4 py-2 my-3 col-12"></div>
+                            <div class="text-center col-12 mt-4 text-secondary mb-3"><h5
+                                    class="weight-300 border-bottom pb-2 px-5 d-inline-block">全部联系人明细</h5></div>
+                            <div class="col-12">
+                                <table class="table table-bordered-sm bg-white responsive-table text-md-center
+                                align-middle-table border-top-0 border-left-0 border-right-0 my-info table-hover">
+                                    <thead class="thead-light">
+                                    <tr>
+                                        <th class="text-dark" scope="col">号码</th>
+                                        <th class="text-dark" scope="col">号码归属地</th>
+                                        <th class="text-dark" scope="col">近1月通话次数</th>
+                                        <th class="text-dark" scope="col">近1月通话时长(秒)</th>
+                                        <th class="text-dark" scope="col">近3月通话次数</th>
+                                        <th class="text-dark" scope="col">近3月通话时长(秒)</th>
+                                        <th class="text-dark" scope="col">近6月通话次数</th>
+                                        <th class="text-dark" scope="col">近6月通话时长(秒)</th>
+                                    </tr>
+                                    </thead>
+                                    <tbody id="yysContactBody">
+                                    </tbody>
+                                </table>
+                            </div>
+                            <div class="col-12 text-right" >
+                                <div class="htpage" id="htPage"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+</script>
+<script id="yysContactTmpl" type="text/x-jsrender">
+<tr>
+    <td data-label="号码">
+        <div>{{:contactMobile}}</div>
+        <small class="text-primary">{{:contactName}}</small>
+    </td>
+
+    <td data-label="号码归属地">
+        {{:contactArea}}
+    </td>
+    <td data-label="近1月通话次数">
+        {{:callCountActive1month+callCountPassive1month}}
+    </td>
+    <td data-label="近1月通话时长(秒)">
+        {{:callTimeActive1month+callTimePassive1month}}
+    </td>
+    <td data-label="近3月通话次数">
+        {{:callCountActive3month+callCountPassive3month}}
+    </td>
+    <td data-label="近3月通话时长(秒)">
+        {{:callTimeActive3month+callTimePassive3month}}
+    </td>
+    <td data-label="近6月通话次数">
+        {{:callCountActive6month+callCountPassive6month}}
+    </td>
+    <td data-label="近6月通话时长(秒)">
+        {{:callTimeActive6month+callTimePassive6month}}
+    </td>
+</tr>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+</script>
+
+<script id="dsTmpl" type="text/x-jsrender">
+                {{if mhTB}}
+                <div class="bg-light py-2 my-3 mt-4"></div>
+                <div class="text-center col-12 mt-4 text-secondary mb-3"><h5
+                        class="weight-300 border-bottom pb-2 px-5 d-inline-block">淘宝数据</h5></div>
+                <div class="row my-info">
+                    <div class="col-12 pt-3 text-dark "><h6><span class="pl-1 mr-1 bg-primary"></span>基本信息</h6></div>
+                    <div class="col-6 col-xl-1 py-2  border-bottom  weight-400">用户名</div>
+                    <div class="col-6 col-xl-3 py-2  border-bottom">{{:mhTB.userName}}</div>
+                    <div class="col-6 col-xl-1 py-2  border-bottom  weight-400">真实姓名</div>
+                    <div class="col-6 col-xl-3 py-2  border-bottom">{{:mhTB.realVName}}</div>
+                    <div class="col-6 col-xl-1 py-2  border-bottom  weight-400">身份证</div>
+                    <div class="col-6 col-xl-3 py-2  border-bottom">{{:mhTB.realVNumber}}</div>
+                    <div class="col-6 col-xl-1 py-2  border-bottom  weight-400">花呗额度</div>
+                    <div class="col-6 col-xl-3 py-2  border-bottom">{{:mhTB.creditQuota / 100.00}} 元</div>
+                    <div class="col-6 col-xl-1 py-2  border-bottom  weight-400">已用额度</div>
+                    <div class="col-6 col-xl-3 py-2  border-bottom">{{:mhTB.consumeQuota / 100.00}} 元</div>
+                    <div class="col-6 col-xl-1 py-2  border-bottom  weight-400">可用额度</div>
+                    <div class="col-6 col-xl-3 py-2  border-bottom">{{:mhTB.availableQuota / 100.00}} 元</div>
+                    <div class="col-6 col-xl-1 py-2  border-bottom  weight-400">芝麻信用</div>
+                    <div class="col-6 col-xl-3 py-2  border-bottom">{{:mhTB.zhimaPoint}}</div>
+                    <div class="col-6 col-xl-1 py-2  border-bottom  weight-400">绑定手机</div>
+                    <div class="col-6 col-xl-7 py-2  border-bottom">{{:mhTB.telephone}}</div>
+
+                    <div class="col-12 pt-3 text-dark "><h6><span class="pl-1 mr-1 bg-primary"></span>收货地址</h6></div>
+                    <div class="col-12 mt-3">
+                        <table class="table table-bordered-sm bg-white responsive-table text-md-center
+                                align-middle-table border-top-0 border-left-0 border-right-0 my-info table-hover">
+                            <thead class="thead-light">
+                            <tr>
+                                <th class="text-dark" scope="col">收货人</th>
+                                <th class="text-dark" scope="col">手机号</th>
+                                <th class="text-dark" scope="col">地区</th>
+                                <th class="text-dark" scope="col">地址</th>
+                            </tr>
+                            </thead>
+                            <tbody>
+                            {{for mhTB.mhReceiveList}}
+                            <tr>
+                                <td data-label="收货人">
+                                    <div>
+                                        {{:receiver}}
+                                    </div>
+                                    {{if isDefault==1}}
+                                    <span class="badge bg-primary-light25 text-primary weight-300">默认收货地址</span>
+                                    {{/if}}
+                                </td>
+                                <td data-label="手机号">
+                                    {{:telephone}}
+                                </td>
+                                <td data-label="地区">
+                                    {{:city}}
+                                </td>
+                                <td data-label="地址">
+                                    {{:address}}
+                                </td>
+                            </tr>
+                            {{/for}}
+                            </tbody>
+                        </table>
+                    </div>
+                    <div class="col-12 pt-3 text-dark "><h6><span class="pl-1 mr-1 bg-primary"></span>最近的淘宝订单</h6></div>
+                    <div class="col-12 mt-3">
+                        <table class="table table-bordered-sm bg-white responsive-table text-md-center
+                                align-middle-table border-top-0 border-left-0 border-right-0 my-info table-hover">
+                            <thead class="thead-light">
+                            <tr>
+                                <th class="text-dark" scope="col">订单时间</th>
+                                <th class="text-dark" scope="col">订单金额</th>
+                                <th class="text-dark" scope="col">收货信息</th>
+                                <th class="text-dark" scope="col">订单状态</th>
+                            </tr>
+                            </thead>
+                            <tbody>
+                            {{for mhTB.mhDsOrderList}}
+                            <tr>
+                                <td data-label="订单时间">
+                                    {{:orderTime}}
+                                </td>
+                                <td data-label="订单金额" >
+                                    <div class="text-primary">
+                                        {{:orderAmount / 100.00}}元
+                                    </div>
+                                    <span class="badge badge-light">{{:orderType}}</span>
+
+                                </td>
+                                <td data-label="收货信息" class="text-info weight-400">
+                                    {{:receiverName}}
+                                    {{:receiverMobile}}
+                                    {{if receiverAddr !=null && receiverAddr != 'null'}}
+                                    <div class="text-muted weight-300">
+                                    {{:receiverAddr}}
+                                    </div>
+                                    {{/if}}
+                                </td>
+                                <td data-label="订单状态">
+                                    {{if orderStatus == "交易成功"}}
+                                        <span class="badge badge-success text-white">{{:orderStatus}}</span>
+                                    {{else}}
+                                        <span class="badge badge-danger">{{:orderStatus}}</span>
+                                    {{/if}}
+                                </td>
+                            </tr>
+                            {{/for}}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+                {{/if}}
+                {{if mhJD}}
+                <div class="bg-light py-2 my-3 mt-4"></div>
+                <div class="text-center col-12 mt-4 text-secondary mb-3"><h5
+                        class="weight-300 border-bottom pb-2 px-5 d-inline-block">京东数据</h5></div>
+                <div class="row my-info">
+                    <div class="col-12 pt-3 text-dark "><h6><span class="pl-1 mr-1 bg-primary"></span>基本信息</h6></div>
+                    <div class="col-6 col-xl-1 py-2  border-bottom  weight-400">用户名</div>
+                    <div class="col-6 col-xl-3 py-2  border-bottom">{{:mhJD.userName}}</div>
+                    <div class="col-6 col-xl-1 py-2  border-bottom  weight-400">真实姓名</div>
+                    <div class="col-6 col-xl-3 py-2  border-bottom">{{:mhJD.realVName}}</div>
+                    <div class="col-6 col-xl-1 py-2  border-bottom  weight-400">身份证</div>
+                    <div class="col-6 col-xl-3 py-2  border-bottom">{{:mhJD.realVNumber}}</div>
+                    <div class="col-6 col-xl-1 py-2  border-bottom  weight-400">小白信用</div>
+                    <div class="col-6 col-xl-3 py-2  border-bottom">{{:mhJD.creditPoint}}</div>
+                    <div class="col-6 col-xl-1 py-2  border-bottom  weight-400">小白额度</div>
+                    <div class="col-6 col-xl-3 py-2  border-bottom">{{:mhJD.creditQuota / 100.00}} 元</div>
+                    <div class="col-6 col-xl-1 py-2  border-bottom  weight-400">已用额度</div>
+                    <div class="col-6 col-xl-3 py-2  border-bottom">{{:mhJD.consumeQuota / 100.00}} 元</div>
+                    <div class="col-6 col-xl-1 py-2  border-bottom  weight-400">绑定手机</div>
+                    <div class="col-6 col-xl-11 py-2  border-bottom">{{:mhJD.bankingTel}}</div>
+
+                    <div class="col-12 pt-3 text-dark "><h6><span class="pl-1 mr-1 bg-primary"></span>收货地址</h6></div>
+                    <div class="col-12 mt-3">
+                        <table class="table table-bordered-sm bg-white responsive-table text-md-center
+                                align-middle-table border-top-0 border-left-0 border-right-0 my-info table-hover">
+                            <thead class="thead-light">
+                            <tr>
+                                <th class="text-dark" scope="col">收货人</th>
+                                <th class="text-dark" scope="col">手机号</th>
+                                <th class="text-dark" scope="col">地区</th>
+                                <th class="text-dark" scope="col">地址</th>
+                            </tr>
+                            </thead>
+                            <tbody>
+                            {{for mhJD.mhReceiveList}}
+                            <tr>
+                                <td data-label="收货人">
+                                    <div>
+                                        {{:receiver}}
+                                    </div>
+                                    {{if isDefault==1}}
+                                    <span class="badge bg-primary-light25 text-primary weight-300">默认收货地址</span>
+                                    {{/if}}
+                                </td>
+                                <td data-label="手机号">
+                                    {{:telephone}}
+                                </td>
+                                <td data-label="地区">
+                                    {{:city}}
+                                </td>
+                                <td data-label="地址">
+                                    {{:address}}
+                                </td>
+                            </tr>
+                            {{/for}}
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <div class="col-12 pt-3 text-dark "><h6><span class="pl-1 mr-1 bg-primary"></span>最近的京东订单</h6></div>
+                    <div class="col-12 mt-3">
+                        <table class="table table-bordered-sm bg-white responsive-table text-md-center
+                                align-middle-table border-top-0 border-left-0 border-right-0 my-info table-hover">
+                            <thead class="thead-light">
+                            <tr>
+                                <th class="text-dark" scope="col">订单时间</th>
+                                <th class="text-dark" scope="col">订单金额</th>
+                                <th class="text-dark" scope="col">收货信息</th>
+                                <th class="text-dark" scope="col">订单状态</th>
+                            </tr>
+                            </thead>
+                            <tbody>
+                            {{for mhJD.mhDsOrderList}}
+                            <tr>
+                                <td data-label="订单时间">
+                                    {{:orderTime}}
+                                </td>
+                                <td data-label="订单金额" >
+                                    <div class="text-primary">
+                                        {{:orderAmount}}元
+                                    </div>
+                                    <span class="badge badge-light">{{:orderType}}</span>
+
+                                </td>
+                                <td data-label="收货信息" class="text-info weight-400">
+                                    {{:receiverName}}
+                                    {{:receiverMobile}}
+                                    {{if receiverAddr != null && receiverAddr != 'null'}}
+                                    <div class="text-muted weight-300">
+                                    {{:receiverAddr}}
+                                    {{/if}}
+                                    </div>
+                                </td>
+                                <td data-label="订单状态">
+                                    {{if orderStatus == "交易成功"}}
+                                        <span class="badge badge-success text-white">{{:orderStatus}}</span>
+                                    {{else}}
+                                        <span class="badge badge-danger">{{:orderStatus}}</span>
+                                    {{/if}}
+                                </td>
+                            </tr>
+                            {{/for}}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+                {{/if}}
+
+
+
+
+
+
+
+
+
+
+</script>
+<script id="travelTmpl" type="text/x-jsrender">
+                <div class="row my-info text-secondary">
+                    <div class="col-12 pt-3 text-dark "><h6><span class="pl-1 mr-1 bg-primary"></span>出行轨迹回放</h6></div>
+                    <div class="col-12 border" id="mapDiv" style="height:350px;">
+                    </div>
+                    <div class="col-12 pt-3 text-dark "><h6><span class="pl-1 mr-1 bg-primary"></span>出行记录详情</h6></div>
+                    <table class="table table-bordered-sm bg-white responsive-table table-hover table-striped text-md-center align-middle-table">
+                        <thead class="thead-light2">
+                        <tr>
+                            <th scope="col">出发日期</th>
+                            <th scope="col">出发城市</th>
+                            <th scope="col">到达日期</th>
+                            <th scope="col">到达城市</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                            {{if mhYysTravelList == null}}
+                                <tr><td col="4">暂无出行记录</td></tr>
+                            {{else}}
+                            {{for mhYysTravelList}}
+                            <tr>
+                                <td data-label="出发日期" >
+                                    {{if leaveDayType=="工作日"}}
+                                    <span class="badge badge-primary">{{:leaveDayType}}</span>
+                                    {{else}}
+                                    <span class="badge badge-success text-white">{{:leaveDayType}}</span>
+                                    {{/if}}
+                                    {{:leaveDay}}
+                                </td>
+                                <td data-label="出发城市" >{{:leaveCity}}</td>
+                                <td data-label="到达日期" >
+                                    {{if arriveDayType=="工作日"}}
+                                    <span class="badge badge-primary">{{:arriveDayType}}</span>
+                                    {{else}}
+                                    <span class="badge badge-success text-white">{{:arriveDayType}}</span>
+                                    {{/if}}
+                                    {{:arriveDay}}
+                                </td>
+                                <td data-label="到达城市" >{{:arriveCity}}</td>
+                            </tr>
+                            {{/for}}
+                            {{/if}}
+                        </tbody>
+                    </table>
+                </div>
+
+
+
+
+
+
+
+
+</script>
+
+<script src="/js/apply.js"></script>
+<script type="text/javascript"
+        src="https://api.map.baidu.com/api?v=3.0&ak=O5OPfGBiIzkMTiijPYGOGjRHcmEpQofG&s=1"></script>
+
+</body>
+<script type="text/javascript">
+        var house = "[[${member.memberInfo.houseCertificates}]]";
+        var car = "[[${member.memberInfo.carCertificates}]]";
+        var park = "[[${member.memberInfo.parkingLot}]]";
+        var others = "[[${member.memberInfo.otherCertificates}]]";
+        if(house !=null&& house != ''){
+            addPic("#houseC",house,"#one");
+        }
+        if(car !=null&& car != ''){
+            addPic("#carC",car,"#two");
+        }
+        if(park !=null&& park != ''){
+            addPic("#parkC",park,"#three");
+        }
+        if(others !=null&& others != ''){
+            addPic("#otherC",others,"#four");
+        }
+        function addPic(ids,pics,id) {
+            $(ids).show();
+            var pic = pics.split(",");
+            for(var i=0;i<pic.length;i++){
+                $(id).append(function () {
+                    return '<img src="'+"[[${application.imgSite}]]"+ pic[i] + '" class="img-fluid img-thumbnail" data-img="'+"[[${application.imgSite}]]"+"/"+pic[i]+'" title="点击查看原图"  style="cursor: pointer;">';
+                })
+            }
+        }
+</script>
+</html>

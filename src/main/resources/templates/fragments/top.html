@@ -1,0 +1,474 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<body>
+
+<!--公用头部-->
+<th:block th:fragment="public">
+
+</th:block>
+
+
+<!--admin公用头部-->
+<th:block th:fragment="adminPublic(title,desc,content,filter)">
+    <style>
+        .sidebar .navigation ul li.active > a {
+            box-shadow: inset 3px 0px 0px #0064d2;
+        }
+    </style>
+    <section class="wrapper">
+        <!-- SIDEBAR -->
+        <aside class="sidebar">
+            <nav class="navbar navbar-dark bg-danger"
+                 style="background-color: #0064d2 !important;">
+                <a class="navbar-brand m-0 py-2 brand-title" href="/"
+                   style="font-size: 18px !important;font-weight:bold!important;">
+                    行游神州管理员后台
+                </a>
+                <span></span>
+                <a class="navbar-brand py-2 material-icons toggle-sidebar" href="#">menu</a>
+            </nav>
+            <nav class="navigation">
+                <ul>
+                    <li th:class="${item.isEnter}?'active open'" th:each="item : ${session.rightsTree}">
+                        <a th:href="${item.url}" th:switch="${item.rightName}">
+                            <span class="nav-icon material-icons" th:case="首页">dashboard</span>
+                            <span class="nav-icon material-icons" th:case="用户管理">group</span>
+                            <span class="nav-icon material-icons" th:case="渠道商管理">dehaze</span>
+                            <span class="nav-icon material-icons" th:case="产品管理">work</span>
+                            <span class="nav-icon material-icons" th:case="财务系统">attach_money</span>
+                            <span class="nav-icon material-icons" th:case="商城管理">store</span>
+                            <span class="nav-icon material-icons" th:case="公告新闻">tap_and_play</span>
+                            <span class="nav-icon material-icons" th:case="系统设置">settings</span>
+                            <span class="nav-icon material-icons" th:case="*">color_lens</span>
+                            [[${item.rightName}]]
+                            <span class="toogle-sub-nav material-icons"
+                                  th:if="${item.children != null && item.children.size()>0 &&item.rightName!='首页'}"
+                            >keyboard_arrow_right</span>
+                        </a>
+                        <ul class="sub-nav"
+                            th:if="${item.children != null && item.children.size()>0 &&item.rightName!='首页'}">
+                            <li th:each="child : ${item.children}" th:if="${child.isView}"
+                                th:class="${child.isEnter}?'active'">
+                                <a th:href="${child.url}" th:text="${child.rightName}"></a>
+                            </li>
+                        </ul>
+                    </li>
+                </ul>
+                <!--<label><span><span>云水滴后台管理系统</span></span></label>-->
+                <!--<ul>-->
+                <!--<li>-->
+                <!--<a href="/">-->
+                <!--<span class="nav-icon material-icons">color_lens</span>设置主题-->
+                <!--</a>-->
+                <!--</li>-->
+                <!--</ul>-->
+            </nav>
+
+        </aside>
+
+        <!--RIGHT CONTENT AREA-->
+        <div class="content-area">
+            <header class="header sticky-top">
+                <nav class="navbar navbar-light bg-white px-sm-4 ">
+                    <a class="navbar-brand py-2 d-md-none  m-0 material-icons toggle-sidebar" href="#">menu</a>
+                    <ul class="navbar-nav flex-row ml-auto">
+                        <!--<li class="nav-item" data-toggle="tooltip" data-placement="bottom" title=""-->
+                        <!--data-original-title="Switch Application">-->
+                        <!--<a data-toggle="modal" href="#" data-target="#switchApp" class="nav-link"><span-->
+                        <!--class="material-icons align-middle">apps</span></a>-->
+                        <!--</li>-->
+                        <!--<li class="nav-item notification">-->
+                        <!--<a href="#" id="notificationDropdown" data-toggle="dropdown" class="nav-link"><span-->
+                        <!--class="material-icons align-middle">notifications_none</span></a>-->
+                        <!--<div class="dropdown-menu p-0 dropdown-lg notificationDropdown dropdown-menu-right"-->
+                        <!--aria-labelledby="notificationDropdown">-->
+
+                        <!--<a class="dropdown-item py-3 border-bottom" href="#">-->
+                        <!--<p class="text-muted mb-1">-->
+                        <!--<small>John Doe Application</small>-->
+                        <!--</p>-->
+                        <!--<div class="progress" style="height:8px;">-->
+                        <!--<div class="progress-bar bg-success" role="progressbar" style="width: 25%"-->
+                        <!--aria-valuenow="25" aria-valuemin="0" aria-valuemax="100"></div>-->
+                        <!--</div>-->
+                        <!--</a>-->
+                        <!--<a class="dropdown-item py-3 border-bottom" href="#">-->
+                        <!--<p class="text-muted mb-1">-->
+                        <!--<small>Akshay Application</small>-->
+                        <!--</p>-->
+                        <!--<div class="progress" style="height:8px;">-->
+                        <!--<div class="progress-bar bg-warning" role="progressbar" style="width: 75%"-->
+                        <!--aria-valuenow="75" aria-valuemin="0" aria-valuemax="100"></div>-->
+                        <!--</div>-->
+                        <!--</a>-->
+                        <!--<a class="dropdown-item whitespace-normal py-3 border-bottom" href="#">-->
+                        <!--<div class="media">-->
+                        <!--<div class="media-body">-->
+                        <!--<h6 class="m-0 weight-400">Media heading</h6>-->
+                        <!--<small class="text-muted">Cras sit amet nibh libero, in gravida nulla. Nulla-->
+                        <!--vel metus scelerisque ante.-->
+                        <!--</small>-->
+                        <!--</div>-->
+                        <!--</div>-->
+                        <!--</a>-->
+                        <!--<a class="dropdown-item py-3 border-bottom" href="#">-->
+                        <!--<p class="text-muted mb-1">-->
+                        <!--<small>Uploading Documents</small>-->
+                        <!--</p>-->
+                        <!--<div class="progress" style="height:8px;">-->
+                        <!--<div class="progress-bar-animated bg-primary progress-bar-striped"-->
+                        <!--role="progressbar" style="width: 40%" aria-valuenow="10" aria-valuemin="0"-->
+                        <!--aria-valuemax="100"></div>-->
+                        <!--</div>-->
+                        <!--</a>-->
+                        <!--<a class="dropdown-item py-3 border-bottom" href="#">-->
+                        <!--<span class="badge badge-pill badge-danger mr-2">Warning</span>-->
+                        <!--<small class="text-muted">Somthing went wrong !</small>-->
+                        <!--</a>-->
+                        <!--<button type="button" class="btn btn-light btn-sm btn-block">View All</button>-->
+                        <!--</div>-->
+                        <!--</li>-->
+                        <li class="nav-item ml-sm-3 user-logedin dropdown">
+                            <a href="#" id="adminLogedinDropdown" data-toggle="dropdown"
+                               class="nav-link weight-400 dropdown-toggle" th:text="${session.adminInfo.name}"></a>
+                            <div class="dropdown-menu dropdown-menu-right" aria-labelledby="adminLogedinDropdown">
+                                <a class="dropdown-item" href="/admin/password">修改密码</a>
+                                <a class="dropdown-item" href="/admin/flush">刷新权限</a>
+                                <div class="dropdown-divider"></div>
+                                <a class="dropdown-item" name="logout" href="/admin/logout">登出</a>
+                            </div>
+                        </li>
+
+                    </ul>
+                </nav>
+            </header>
+
+            <div class="content-wrapper">
+                <div class="row page-tilte align-items-center">
+                    <div class="col-12 col-lg-auto">
+                        <a href="#" class="mt-3 d-md-none float-right toggle-controls"><span class="material-icons">keyboard_arrow_down</span></a>
+                        <h1 class="weight-300 h3 title" th:text="${title}"></h1>
+                        <p class="text-muted m-0 desc" th:text="${desc}"></p>
+                    </div>
+                    <div th:replace="${filter}">
+                    </div>
+                </div>
+                <div th:replace="${content}">
+                </div>
+                <footer class="footer">
+                    <p class="text-muted m-0">
+                        <small class="float-right">行游神州-管理员后台</small>
+                    </p>
+                </footer>
+            </div>
+        </div>
+    </section>
+</th:block>
+
+<!--商户管理后台公用头部-->
+<th:block th:fragment="merchantPublic(title,desc,content,filter)">
+    <section class="wrapper">
+        <!-- SIDEBAR -->
+        <aside class="sidebar">
+            <nav class="navbar navbar-dark bg-danger">
+                <a class="navbar-brand m-0 py-2 brand-title" href="/"
+                   style="font-size: 18px !important;font-weight:bold!important;">
+                    云水滴商户后台
+                </a>
+                <span></span>
+                <a class="navbar-brand py-2 material-icons toggle-sidebar" href="#">menu</a>
+            </nav>
+            <nav class="navigation">
+                <ul>
+                    <li id="navIndex"><a href="/merchant/index" title="首页"><span
+                            class="nav-icon material-icons">public</span> 首页</a></li>
+                    <li><a href="/merchant/member/1-10" title="客户管理"><span
+                            class="nav-icon material-icons">group</span> 客户管理
+                        <span class="toogle-sub-nav material-icons">keyboard_arrow_right</span></a>
+                        <ul class="sub-nav">
+                            <li id="navMember">
+                                <a href="/merchant/member/1-10">客户列表</a>
+                            </li>
+                            <li id="navBlack">
+                                <a href="/merchant/back/1-10">黑名单</a>
+                            </li>
+                        </ul>
+                    </li>
+                    <!--<li id="backMember"><a href="/merchant/back/1-10" title="黑名单"><span-->
+                    <!--class="nav-icon material-icons">group</span> 黑名单</a></li>-->
+                    <li id="navProject"><a href="/merchant/project/1-10" title="我的产品"><span
+                            class="nav-icon material-icons">work</span> 我的产品</a></li>
+                    <li id="navApply"><a href="/merchant/apply/1-10" title="额度申请列表"><span
+                            class="nav-icon material-icons">credit_card</span> 额度申请列表</a></li>
+                    <li id="navLoan"><a href="/merchant/loan/1-10" title="贷款申请列表"><span
+                            class="nav-icon material-icons">pages</span> 贷款申请列表</a></li>
+                    <li id="navRepayment"><a href="/merchant/repayment/1-12" title="催收管理"><span
+                            class="nav-icon material-icons">view_carousel</span> 催收管理</a></li>
+                    <li><a href="/merchant/money/1-10" title="财务相关"><span
+                            class="nav-icon material-icons">attach_money</span> 财务相关
+                        <span class="toogle-sub-nav material-icons">keyboard_arrow_right</span></a>
+                        <ul class="sub-nav">
+                            <li id="navMoney">
+                                <a href="/merchant/money/1-10">流量记录</a>
+                            </li>
+                            <li id="navWallet">
+                                <a href="/merchant/wallet/1-10">钱包记录</a>
+                            </li>
+                        </ul>
+                    </li>
+                    <li id="navNews"><a href="/merchant/news/list/1001-1-10" title="公告"><span
+                            class="nav-icon material-icons">tap_and_play</span> 公告</a></li>
+
+
+                    <!--<li><a href="index.html" title="业务员管理"><span-->
+                    <!--class="nav-icon material-icons">assignment_ind</span> 业务员管理-->
+                    <!--<span class="toogle-sub-nav material-icons">keyboard_arrow_right</span></a>-->
+                    <!--<ul class="sub-nav">-->
+                    <!--<li>-->
+                    <!--<a href="#">新增业务员</a>-->
+                    <!--</li>-->
+                    <!--<li>-->
+                    <!--<a href="#">业务员列表</a>-->
+                    <!--</li>-->
+                    <!--</ul>-->
+                    <!--</li>-->
+                    <!--<li><a href="index.html" title="商户中心"><span-->
+                    <!--class="nav-icon material-icons">settings</span> 商户中心</a></li>-->
+
+
+                </ul>
+
+            </nav>
+
+        </aside>
+
+        <!--RIGHT CONTENT AREA-->
+        <div class="content-area">
+            <header class="header sticky-top">
+                <nav class="navbar navbar-light bg-white px-sm-4 ">
+                    <a class="navbar-brand py-2 d-md-none  m-0 material-icons toggle-sidebar" href="#">menu</a>
+                    <ul class="navbar-nav flex-row ml-auto">
+                        <!--<li class="nav-item notification">-->
+                        <!--<a href="#" id="notificationDropdown" data-toggle="dropdown" class="nav-link"><span-->
+                        <!--class="material-icons align-middle">notifications_none</span></a>-->
+                        <!--<div class="dropdown-menu p-0 dropdown-lg notificationDropdown dropdown-menu-right"-->
+                        <!--aria-labelledby="notificationDropdown">-->
+
+                        <!--<a class="dropdown-item py-3 border-bottom" href="#">-->
+                        <!--<p class="text-muted mb-1">-->
+                        <!--<small>John Doe Application</small>-->
+                        <!--</p>-->
+                        <!--<div class="progress" style="height:8px;">-->
+                        <!--<div class="progress-bar bg-success" role="progressbar" style="width: 25%"-->
+                        <!--aria-valuenow="25" aria-valuemin="0" aria-valuemax="100"></div>-->
+                        <!--</div>-->
+                        <!--</a>-->
+                        <!--<a class="dropdown-item py-3 border-bottom" href="#">-->
+                        <!--<p class="text-muted mb-1">-->
+                        <!--<small>Akshay Application</small>-->
+                        <!--</p>-->
+                        <!--<div class="progress" style="height:8px;">-->
+                        <!--<div class="progress-bar bg-warning" role="progressbar" style="width: 75%"-->
+                        <!--aria-valuenow="75" aria-valuemin="0" aria-valuemax="100"></div>-->
+                        <!--</div>-->
+                        <!--</a>-->
+                        <!--<a class="dropdown-item whitespace-normal py-3 border-bottom" href="#">-->
+                        <!--<div class="media">-->
+                        <!--<div class="media-body">-->
+                        <!--<h6 class="m-0 weight-400">Media heading</h6>-->
+                        <!--<small class="text-muted">Cras sit amet nibh libero, in gravida nulla. Nulla-->
+                        <!--vel metus scelerisque ante.-->
+                        <!--</small>-->
+                        <!--</div>-->
+                        <!--</div>-->
+                        <!--</a>-->
+                        <!--<a class="dropdown-item py-3 border-bottom" href="#">-->
+                        <!--<p class="text-muted mb-1">-->
+                        <!--<small>Uploading Documents</small>-->
+                        <!--</p>-->
+                        <!--<div class="progress" style="height:8px;">-->
+                        <!--<div class="progress-bar-animated bg-primary progress-bar-striped"-->
+                        <!--role="progressbar" style="width: 40%" aria-valuenow="10" aria-valuemin="0"-->
+                        <!--aria-valuemax="100"></div>-->
+                        <!--</div>-->
+                        <!--</a>-->
+                        <!--<a class="dropdown-item py-3 border-bottom" href="#">-->
+                        <!--<span class="badge badge-pill badge-danger mr-2">Warning</span>-->
+                        <!--<small class="text-muted">Somthing went wrong !</small>-->
+                        <!--</a>-->
+                        <!--<button type="button" class="btn btn-light btn-sm btn-block">View All</button>-->
+                        <!--</div>-->
+                        <!--</li>-->
+                        <li class="nav-item ml-sm-3 user-logedin dropdown">
+                            <a href="#" id="merchantLogedinDropdown" data-toggle="dropdown"
+                               class="nav-link weight-400 dropdown-toggle">
+                                <img th:src="${application.imgSite}+'/'+${session.merchantInfo.logo}"
+                                     class="mr-2 rounded" width="28" id="merchantLogo">
+                                [[${session.merchantInfo.name}]]
+                                <span class="badge badge-info" th:if="${session.fake!=null}">F</span>
+                            </a>
+                            <div class="dropdown-menu dropdown-menu-right" aria-labelledby="merchantLogedinDropdown">
+                                <a class="dropdown-item" href="/merchant/config/push">推送设置</a>
+                                <a class="dropdown-item" href="/merchant/password">修改密码</a>
+                                <div class="dropdown-divider"></div>
+                                <a class="dropdown-item" name="logout" href="/merchant/logout">登出</a>
+                            </div>
+                        </li>
+
+                    </ul>
+                </nav>
+            </header>
+
+            <div class="content-wrapper">
+                <div class="row page-tilte align-items-center">
+                    <div class="col-12 col-lg-auto">
+                        <a href="#" class="mt-3 d-md-none float-right toggle-controls"><span class="material-icons">keyboard_arrow_down</span></a>
+                        <h1 class="weight-300 h3 title" th:text="${title}"></h1>
+                        <p class="text-muted m-0 desc" th:text="${desc}"></p>
+                    </div>
+                    <div th:replace="${filter}">
+                    </div>
+                </div>
+                <div th:replace="${content}">
+                </div>
+                <footer class="footer">
+                    <p class="text-muted m-0">
+                        <small class="float-right">行游神州-供应商后台</small>
+                    </p>
+                </footer>
+            </div>
+        </div>
+    </section>
+    <script>
+        var host = window.location.host;
+        var url = window.location.href;
+        url = url.substring(url.indexOf(host) + host.length)
+        var navId = "navIndex";
+        if (url.indexOf("/merchant/back") == 0) {
+            navId = "navBlack";
+        } else if (url.indexOf("/merchant/member") == 0) {
+            navId = "navMember";
+        } else if (url.indexOf("/merchant/project") == 0) {
+            navId = "navProject";
+        } else if (url.indexOf("/merchant/apply") == 0) {
+            navId = "navApply";
+        } else if (url.indexOf("/merchant/loan") == 0) {
+            navId = "navLoan";
+        } else if (url.indexOf("/merchant/repayment") == 0) {
+            navId = "navRepayment";
+        } else if (url.indexOf("/merchant/money") == 0) {
+            navId = "navMoney";
+        } else if (url.indexOf("/merchant/wallet") == 0) {
+            navId = "navWallet";
+        } else if (url.indexOf("/merchant/news") ==0){
+            navId = "navNews";
+        }
+        var nav = document.getElementById(navId);
+        nav.classList.add("active");
+        if (nav.parentNode.parentNode.tagName == "LI") {
+            nav.parentNode.parentNode.classList.add("active", "open")
+        }
+    </script>
+</th:block>
+
+
+<th:block th:fragment="noSidebarPublic(title,desc,content,filter)">
+    <section class="wrapper">
+        <!--RIGHT CONTENT AREA-->
+        <div class="content-area">
+            <div class="content-wrapper">
+                <div class="row page-tilte align-items-center">
+                    <div class="col-12 col-lg-auto">
+                        <a href="#" class="mt-3 d-md-none float-right toggle-controls"><span class="material-icons">keyboard_arrow_down</span></a>
+                        <h1 class="weight-300 h3 title" th:text="${title}"></h1>
+                        <p class="text-muted m-0 desc" th:text="${desc}"></p>
+                    </div>
+                    <div th:replace="${filter}">
+                    </div>
+                </div>
+                <div th:replace="${content}">
+                </div>
+            </div>
+        </div>
+    </section>
+</th:block>
+
+
+<!--渠道商管理后台公用头部-->
+<th:block th:fragment="channelPublic(title,desc,content,filter)">
+    <section class="wrapper">
+        <!-- SIDEBAR -->
+        <aside class="sidebar">
+            <nav class="navbar navbar-dark bg-danger">
+                <a class="navbar-brand m-0 py-2 brand-title" href="/"
+                   style="font-size: 18px !important;font-weight:bold!important;">
+                    云水滴渠道商后台
+                </a>
+                <span></span>
+                <a class="navbar-brand py-2 material-icons toggle-sidebar" href="#">menu</a>
+            </nav>
+            <nav class="navigation">
+                <ul>
+                    <li id="navChannelIndex"><a href="/channel/index" title="首页"><span
+                            class="nav-icon material-icons">public</span> 首页</a></li>
+                    <li id="navChannelReport"><a href="/channel/report/1-10" title="统计报表"><span
+                            class="nav-icon material-icons">clear_all</span> 统计报表</a></li>
+                </ul>
+            </nav>
+        </aside>
+
+        <!--RIGHT CONTENT AREA-->
+        <div class="content-area">
+            <header class="header sticky-top">
+                <nav class="navbar navbar-light bg-white px-sm-4 ">
+                    <a class="navbar-brand py-2 d-md-none  m-0 material-icons toggle-sidebar" href="#">menu</a>
+                    <ul class="navbar-nav flex-row ml-auto">
+                        <li class="nav-item ml-sm-3 user-logedin dropdown">
+                            <a href="#" id="channelLogedinDropdown" data-toggle="dropdown"
+                               class="nav-link weight-400 dropdown-toggle">
+                                [[${session.channelInfo.companyName}]]
+                            </a>
+                            <div class="dropdown-menu dropdown-menu-right" aria-labelledby="channelLogedinDropdown">
+                                <a class="dropdown-item" href="/channel/password">修改密码</a>
+                                <div class="dropdown-divider"></div>
+                                <a class="dropdown-item" name="logout" href="/channel/logout">登出</a>
+                            </div>
+                        </li>
+
+                    </ul>
+                </nav>
+            </header>
+
+            <div class="content-wrapper">
+                <div class="row page-tilte align-items-center">
+                    <div class="col-12 col-lg-auto">
+                        <a href="#" class="mt-3 d-md-none float-right toggle-controls"><span class="material-icons">keyboard_arrow_down</span></a>
+                        <h1 class="weight-300 h3 title" th:text="${title}"></h1>
+                        <p class="text-muted m-0 desc" th:text="${desc}"></p>
+                    </div>
+                    <div th:replace="${filter}">
+                    </div>
+                </div>
+                <div th:replace="${content}">
+                </div>
+                <footer class="footer">
+                    <p class="text-muted m-0">
+                        <small class="float-right">云水滴-渠道商后台</small>
+                    </p>
+                </footer>
+            </div>
+        </div>
+    </section>
+    <script>
+        var host = window.location.host;
+        var url = window.location.href;
+        url = url.substring(url.indexOf(host) + host.length)
+        var navId = "navChannelIndex";
+        if (url.indexOf("/channel/report") == 0) {
+            navId = "navChannelReport";
+        }
+        document.getElementById(navId).classList.add("active");
+    </script>
+</th:block>
+</body>
+</html>

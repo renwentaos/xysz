@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:replace="fragments/header :: managePublic('商户详情 - 云水滴',~{})"></head>
+<body>
+<div class="container-fluid">
+    <ul class="nav nav-tabs mt-2" id="myTab" role="tablist">
+        <li class="nav-item">
+            <a class="nav-link px-4  active " id="home-tab" data-toggle="tab" href="#home5" role="tab"
+               aria-controls="home" aria-selected="true">账户信息</a>
+        </li>
+    </ul>
+    <div class="card border-top-0 mb-4">
+        <div class="card-body ">
+
+            <div class="tab-content" id="myTabContent">
+                <div class="tab-pane fade show active" id="home5" role="tabpanel" aria-labelledby="home-tab">
+                    <div class="row text-center border-top border-right  ">
+                        <div class="col-4 col-md-3 bg-light  py-2 text-primary border-left border-bottom"><b>商户等级</b>
+                        </div>
+                        <div class="col-8 col-md-9 border-left border-bottom py-2 " th:switch="${merchant.level}">
+                               <span class="badge badge-info mr-1 text-white"
+                                     th:case="${application.merchantLevel['普通商户']}">普通商户</span>
+                            <span class="badge badge-success mr-1 text-white"
+                                  th:case="${application.merchantLevel['VIP商户']}">VIP商户</span>
+                            <span class="badge badge-warning mr-1 text-white"
+                                  th:case="${application.merchantLevel['全国VIP商户']}">全国VIP商户</span>
+                            <span class="badge badge-primary mr-1 text-white"
+                                  th:case="${application.merchantLevel['超级VIP商户']}">超级VIP商户</span>
+                        </div>
+                        <div class="col-4 col-md-3  bg-light  py-2 text-primary border-left border-bottom"><b>用户名</b>
+                        </div>
+                        <div class="col-8 col-md-3  border-left border-bottom py-2 "><span
+                                th:text="${merchant.userName}"/></div>
+                        <div class="col-4 col-md-3 bg-light  py-2 text-primary border-left border-bottom"><b>商户名</b>
+                        </div>
+                        <div class="col-8 col-md-3   border-left border-bottom py-2 "><span th:text="${merchant.name}"/>
+                        </div>
+                        <div class="col-4 col-md-3 bg-light  py-2 text-primary border-left border-bottom"><b>状态</b>
+                        </div>
+                        <th:block th:if="${merchant.state == 0}">
+                            <div class="col-8 col-md-3   border-left border-bottom py-2 "> 正常</div>
+                        </th:block>
+                        <th:block th:if="${merchant.state != 0}">
+                            <div class="col-8 col-md-3   border-left border-bottom py-2 "> 冻结</div>
+                        </th:block>
+                        <div class="col-4 col-md-3 bg-light  py-2 text-primary border-left border-bottom"><b>营业执照号</b>
+                        </div>
+                        <div class="col-8 col-md-3   border-left border-bottom py-2 "><span
+                                th:text="${merchant.businessLicense}"/></div>
+                        <div class="col-4 col-md-3 bg-light  py-2 text-primary border-left border-bottom"><b>代理省/市</b>
+                        </div>
+                        <div class="col-8 col-md-3   border-left border-bottom py-2 "><span
+                                th:text="${merchant.province}"/>/<span th:text="${merchant.city}"/></div>
+                        <div class="col-4 col-md-3 bg-light  py-2 text-primary border-left border-bottom"><b>联系人名称</b>
+                        </div>
+                        <div class="col-8 col-md-3   border-left border-bottom py-2 "><span
+                                th:text="${merchant.contactName}"/></div>
+                        <div class="col-4 col-md-3 bg-light  py-2 text-primary border-left border-bottom"><b>联系人电话</b>
+                        </div>
+                        <div class="col-8 col-md-3   border-left border-bottom py-2 "><span
+                                th:text="${merchant.contactMobile}"/></div>
+                        <div class="col-4 col-md-3 bg-light  py-2 text-primary border-left border-bottom"><b>联系人地址</b>
+                        </div>
+                        <div class="col-8 col-md-3   border-left border-bottom py-2 "><span
+                                th:text="${merchant.contactAddress}"/></div>
+                        <div class="col-4 col-md-3 bg-light  py-2 text-primary border-left border-bottom"><b>联系邮箱</b>
+                        </div>
+                        <div class="col-8 col-md-3   border-left border-bottom py-2 "><span
+                                th:text="${merchant.contactEmail}"></span></div>
+                        <div class="col-4 col-md-3 bg-light  py-2 text-primary border-left border-bottom"><b>广告语</b>
+                        </div>
+                        <div class="col-8 col-md-3   border-left border-bottom py-2 "><span
+                                th:text="${merchant.slogan}"></span></div>
+                        <div class="col-4 col-md-3 bg-light  py-2 text-primary border-left border-bottom"><b>结算银行</b>
+                        </div>
+                        <div class="col-8 col-md-3   border-left border-bottom py-2 "><span
+                                th:text="${merchant.bankName}"></span></div>
+                        <div class="col-4 col-md-3 bg-light  py-2 text-primary border-left border-bottom"><b>结算卡号</b>
+                        </div>
+                        <div class="col-8 col-md-3   border-left border-bottom py-2 "><span
+                                th:text="${merchant.bankCard}"></span></div>
+                        <div class="col-4 col-md-3 bg-light  py-2 text-primary border-left border-bottom"><b>银行卡预留电话</b>
+                        </div>
+                        <div class="col-8 col-md-3   border-left border-bottom py-2 "><span
+                                th:text="${merchant.bankCardMobile}"></span></div>
+                        <div class="col-4 col-md-3 bg-light  py-2 text-primary border-left border-bottom"><b>结算户主</b>
+                        </div>
+                        <div class="col-8 col-md-3   border-left border-bottom py-2 "><span
+                                th:text="${merchant.bankCardOwnerName}"></span></div>
+                        <div class="col-4 col-md-3 bg-light  py-2 text-primary border-left border-bottom"><b>结算证件号</b>
+                        </div>
+                        <div class="col-8 col-md-3   border-left border-bottom py-2 "><span
+                                th:text="${merchant.bankCardOwnerIdCard}"></span></div>
+                        <div class="col-4 col-md-3 bg-light  py-2 text-primary border-left border-bottom"><b>注册时间</b>
+                        </div>
+                        <div class="col-8 col-md-3   border-left border-bottom py-2 "><span
+                                th:text="${#dates.format(merchant.createDate,'yyyy-MM-dd')}"></span></div>
+                        <div class="col-4 col-md-3 bg-light  py-2 text-primary border-left border-bottom"><b>流量余额</b>
+                        </div>
+                        <div class="col-8 col-md-3   border-left border-bottom py-2 "><span
+                                th:text="${#numbers.formatCurrency(merchant.availableBalance)}"></span></div>
+                        <div class="col-4 col-md-3 bg-light  py-2 text-primary border-left border-bottom"><b>到期时间</b>
+                        </div>
+                        <div class="col-8 col-md-3   border-left border-bottom py-2 "><span
+                                th:text="${#dates.format(merchant.expiryDate,'yyyy-MM-dd HH:mm:ss')}"></span></div>
+                        <div class="col-4 col-md-3 bg-light py-3 text-primary border-left border-bottom"><b>流量推送(每日)</b>
+                        </div>
+                        <div class="col-8 col-md-9 border-left border-bottom py-2 ">
+                            <div class="row">
+                                <div class="col-12 col-md-6 text-center">
+                                    <span class="user-initials bg-primary-light25 text-primary">A类</span>
+                                    上限[[${merchant.aPushCount}]]个,已推[[${merchant.aPushedCount}]]个
+                                </div>
+                                <div class="col-12 col-md-6 text-center">
+                                    <span class="user-initials bg-info-light25 text-info">B类</span>
+                                    上限[[${merchant.bPushCount}]]个,已推[[${merchant.bPushedCount}]]个
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-4 col-md-3 bg-light  py-2 text-primary border-left border-bottom"><b>备注</b>
+                        </div>
+                        <div class="col-8 col-md-9 border-left border-bottom py-2 "><span
+                                th:text="${merchant.remark}"></span></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </div>
+</div>
+</div>
+<th:block th:replace="fragments/js :: managePublic(~{})"></th:block>
+<script>
+</script>
+</body>
+</html>

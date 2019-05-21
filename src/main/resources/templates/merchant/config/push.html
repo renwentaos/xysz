@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:replace="fragments/header :: managePublic('流量推送设置 - 云水滴商户后台',~{})"></head>
+<body>
+<th:block th:replace="fragments/top :: merchantPublic('流量推送设置','设置自己商户每天分配流量的上限,建议提前一天设置好',~{::#content},~{})">
+    <div class="content" id="content">
+        <div class="row">
+            <div class=" col-lg-4 col-12 ">
+                <form method="post" id="form">
+                    <div class="form-group">
+                        <label for="aPushCount">A类客户每日上限</label>
+                        <input type="text" class="form-control" id="aPushCount" name="aPushCount"
+                               data-fieldname="A类客户每日上限" th:value="${mInfo.APushCount}"
+                               placeholder="请输入A类客户每日上限数量">
+                    </div>
+                    <div class="form-group">
+                        <label for="bPushCount">B类客户每日上限</label>
+                        <input type="text" class="form-control" id="bPushCount" name="bPushCount"
+                               data-fieldname="B类客户每日上限" th:value="${mInfo.BPushCount}"
+                               placeholder="请输入B类客户每日上限数量">
+                    </div>
+                    <div class="alert alert-danger" th:if="${msg != null}">
+                        <strong>提示:</strong><span th:text="${msg}"></span>
+                    </div>
+                    <input type="hidden" name="token" th:value="${token}">
+                    <button type="submit" class="btn btn-primary float-right px-5">保存</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</th:block>
+<th:block th:replace="fragments/js :: managePublic(~{})"></th:block>
+<script type="text/javascript" src="/js/validate/jquery.validate.min.js"></script>
+<script type="text/javascript" src="/js/validate/localization/messages_zh_layer.js"></script>
+<script>
+    $(document).ready(function () {
+        $("#form").validate({
+            rules: {
+                aPushCount: {
+                    required: true,
+                    digits:true,
+                    min: 0
+                },
+                bPushCount: {
+                    required: true,
+                    digits:true,
+                    min: 0
+                }
+            },
+            submitHandler: function (form) {
+                layer.confirm('确认保存推送设置？', {
+                    btn: ['确认', '取消'] //按钮
+                }, function () {
+                    form.submit();
+                });
+            }
+        });
+    })
+</script>
+</body>
+</html>

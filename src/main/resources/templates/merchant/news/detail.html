@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="zh">
+<head th:replace="fragments/header :: managePublic('公告信息 - 云水滴商户后台',~{::link})">
+</head>
+<body>
+
+<th:block th:replace="fragments/top :: merchantPublic('公告内容','',~{::#content},~{})">
+    <div class="content" id="content">
+        <div class="container_header wow" style="text-align: center">
+            <p class="title" th:text="${news.title}"></p>
+            <p class="subtitle" style="font-size: 14px;color: #999"><span th:text="'发布时间 ：'+${#dates.format(news.createDate,'yyyy-MM-dd HH:mm:ss')}"></span></p>
+        </div>
+        <div style="text-align: center" deep="3">
+            <p th:utext="${news.contents}"></p>
+        </div>
+    </div>
+</th:block>
+<th:block th:replace="fragments/js :: managePublic(~{})"></th:block>
+<script type="text/javascript" src="/js/validate/jquery.validate.js"></script>
+<script src="/js/jquery.animate-colors-min.js"></script>
+</body>
+<link rel="stylesheet" href="/js/umeditor/themes/default/css/umeditor.css">
+<script type="text/javascript" src="/js/umeditor/umeditor.config.js"></script>
+<script type="text/javascript" src="/js/umeditor/umeditor.js"></script>
+<script type="text/javascript" src="/js/umeditor/lang/zh-cn/zh-cn.js"></script>
+</html>

@@ -1,0 +1,12 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:replace="fragments/header :: managePublic('首页 - 行游神州管理员后台',~{})"></head>
+<body>
+<th:block th:replace="fragments/top :: adminPublic('首页','行游神州管理员后台',~{::#content},~{})">
+    <div class="content" id="content">
+
+    </div>
+</th:block>
+<th:block th:replace="fragments/js :: managePublic(~{})"></th:block>
+</body>
+</html>

@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.xws.xysz.dao.RoleDao">
+  <resultMap id="BaseResultMap" type="com.xws.xysz.model.Role">
+    
+    <!-- id -->
+    <id column="id" jdbcType="INTEGER" property="id" />
+    
+    <!-- 角色名称 -->
+    <result column="name" jdbcType="VARCHAR" property="name" />
+    
+    <!-- 角色权限，多个逗号隔开 -->
+    <result column="right_ids" jdbcType="LONGVARCHAR" property="rightIds" />
+  </resultMap>
+  <insert id="insert" keyColumn="id" keyProperty="id" useGeneratedKeys="true">
+    insert into role
+    <trim prefix="(" suffix=")" suffixOverrides=",">
+      <if test="name != null">
+        `name`,
+      </if>
+      <if test="rightIds != null">
+        right_ids,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides=",">
+      <if test="name != null">
+        #{name,jdbcType=VARCHAR},
+      </if>
+      <if test="rightIds != null">
+        #{rightIds,jdbcType=LONGVARCHAR},
+      </if>
+    </trim>
+  </insert>
+  <update id="updateById">
+    update role
+    <set>
+      <if test="name != null">
+        `name` = #{name,jdbcType=VARCHAR},
+      </if>
+      <if test="rightIds != null">
+        right_ids = #{rightIds,jdbcType=LONGVARCHAR},
+      </if>
+    </set>
+    where id = #{id,jdbcType=INTEGER}
+  </update>
+  <select id="selectById" parameterType="java.lang.Integer" resultMap="BaseResultMap">
+    select id, `name`, right_ids
+    from role
+    where id = #{id,jdbcType=INTEGER}
+  </select>
+  <select id="selectAll" resultMap="BaseResultMap">
+    select id, `name`, right_ids
+    from role
+  </select>
+  
+  <!-- Your codes goes here!!! -->
+  
+</mapper>

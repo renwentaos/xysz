@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:replace="fragments/header :: managePublic('公告列表 - 行游神州管理员后台',~{::link})">
+    <link href="/js/myPages/myPages.css" rel="stylesheet" type="text/css"/>
+    <!-- Date Range Picker -->
+</head>
+<body>
+<th:block th:replace="fragments/top :: adminPublic('公告信息列表','',~{::#content},~{::#filter})">
+    <div id="filter" class="col controls-wrapper mt-3 mt-md-0 d-none d-md-block">
+        <div class="controls d-flex justify-content-center justify-content-md-end">
+            <form method="get">
+                <div class="row">
+                    <div class="col-7 col-md-2 p-1">
+                        <input type="text" class="form-control d-inline-block" placeholder="关键字"
+                               name="keys" th:value="${param.keys}">
+                    </div>
+                    <div class="col-7 col-md-4 p-1">
+                        <input type="text" class="form-control d-inline-block" id="dateRange" placeholder="点击选择添加时间范围"
+                               th:value="${#strings.isEmpty(param.startTime)}?'':${param.startTime}+' - '+${param.endTime}">
+                    </div>
+                    <div class="col-5 col-md-2 p-1">
+                    <select class="form-control" name="type">
+                    <option value="">类别</option>
+                    <option th:selected="${param.type!=null}?${param.type[0]} eq ${codes.value}"
+                    th:each="codes : ${application.newsCode}"
+                    th:text="${codes.key}" th:value="${codes.value}"></option>
+                    </select>
+                    </div>
+                    <div class="col-5 col-md-2 p-1">
+                    <select class="form-control" name="state">
+                    <option value="">状态</option>
+                    <option th:selected="${param.state!=null}?${param.state[0]} eq ${sta.value}"
+                    th:each="sta : ${application.basicState}"
+                    th:text="${sta.key}" th:value="${sta.value}"></option>
+                    </select>
+                    </div>
+                    <div class="col-2 col-md-1 p-1">
+                        <input type="hidden" name="startTime" id="startTime" th:value="${param.startTime}">
+                        <input type="hidden" name="endTime" id="endTime" th:value="${param.endTime}">
+                        <button type="submit" class="btn btn-info py-1 px-2" data-toggle="modal"
+                                data-target="#gridFilters"><span
+                                class="material-icons align-text-bottom">search</span>
+                        </button>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+    <div class="content" id="content">
+        <div class="row align-items-center">
+            <table class="table table-bordered-sm bg-white responsive-table table-hover table-striped text-md-center">
+                <thead class="thead-light2">
+                <tr>
+                    <th scope="col">类别</th>
+                    <th scope="col">标题</th>
+                    <th scope="col">关键字</th>
+                    <th scope="col">内容</th>
+                    <th scope="col">时间</th>
+                    <th scope="col">操作</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr th:each="item : ${pageInfo.list}">
+                    <td data-label="类别" th:switch="${item.type}">
+                        <strong th:case="1001" class="text-success">商户公告</strong>
+                        <strong th:case="1002" class="text-warning">用户公告</strong>
+                        <strong th:case="*" class="text-danger">用户咨询</strong>
+                    </td>
+                    <td data-label="标题" th:text="${item.title}"></td>
+                    <td data-label="关键字" th:utext="${#strings.abbreviate(item.keys,15)}">
+                    </td>
+                    <td data-label="内容" th:title="点击查看详情" >
+                        <!--<a th:href="'/admin/news/info?id='+${item.id}" th:utext="${#strings.abbreviate(item.contents,20)}"></a>-->
+                        <a th:href="'javascript:newsDetail('+${item.id}+')'" >详情</a>
+                    </td>
+                    <td data-label="时间">
+                        <span class="text-success" th:text="${#dates.format(item.createDate,'yyyy-MM-dd HH:mm:ss')}"></span>
+                    </td>
+                    <td data-label="操作">
+                        <a th:href="'/admin/news/modify?id='+${item.id}" class="btn text-white btn-sm btn-warning">修改</a>
+                        <span th:if="${item.state == 0}"><a th:href="'javascript:updateState('+${item.id}+')'"
+                                                            class="btn text-white btn-sm btn-danger">下架</a></span>
+                        <span th:if="${item.state == -1}"><a th:href="'javascript:updateState('+${item.id}+')'"
+                                                             class="btn text-white btn-sm btn-success">上架</a></span>
+
+                    </td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+        <div class="row" th:if="${pageInfo.total > 0}">
+            <div class="col-12">
+                <div id="pages"></div>
+            </div>
+        </div>
+    </div>
+</th:block>
+<th:block th:replace="fragments/js :: managePublic(~{})"></th:block>
+<script src="/js/myPages/myPages.js" type="text/javascript"></script>
+<script src="/cosmo/js/lib/moment.min.js"></script>
+<script src="/cosmo/js/daterangepicker/daterangepicker.min.js"></script>
+<script src="/js/my-datarange.js"></script>
+<script src="/js/merchantPublic.js"></script>
+
+<script th:inline="javascript">
+    $(function () {
+        $("#pages").myPages({
+            pageNo: [[${pageInfo.pageNum}]],
+            pageSize: [[${pageInfo.pageSize}]],
+            lastPage: [[${pageInfo.pages}]],
+            preText: "上一页",
+            nextText: "下一页",
+            url: "/admin/news/list/1001-{pageNo}-{pageSize}",
+            showPageButton: 6
+        })
+        //时间范围选择器
+        myRange("#dateRange", "#startTime", "#endTime");
+    })
+
+
+
+    function newsDetail(id) {
+        var width = $(window).width();
+        var height = $(window).height();
+        if (width > 940) {
+            width = 940;
+            height = 623;
+        } else if (width <= 940 && width > 700) {
+            width = 700;
+            height = 450;
+        }
+        layer.open({
+            type: 2,
+            title: '公告详情',
+            shadeClose: true,
+            shade: 0.8,
+            area: [width+'px', height+'px'],
+            content: '/admin/news/info?id=' + id
+        });
+    }
+
+    function updateState(id) {
+        $.get("/admin/news/state?id=" + id, function () {
+            window.location.reload();
+        })
+    }
+</script>
+</body>
+</html>

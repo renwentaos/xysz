@@ -1,0 +1,243 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:replace="fragments/header :: managePublic('额度申请列表 - 云水滴商户后台',~{::link})">
+    <link href="/js/myPages/myPages.css" rel="stylesheet" type="text/css"/>
+    <!-- Date Range Picker -->
+    <link rel="stylesheet" type="text/css" href="/cosmo/css/daterangepicker/daterangepicker.css"/>
+</head>
+<body>
+<th:block th:replace="fragments/top :: merchantPublic('额度申请列表','',~{::#content},~{::#filter})">
+    <div id="filter" class="col controls-wrapper mt-3 mt-md-0 d-none d-md-block">
+        <div class="controls d-flex justify-content-center justify-content-md-end">
+            <form method="get">
+                <div class="row">
+                    <div class="col-md-4 col-xl-3 p-1">
+                        <input type="text" class="form-control d-inline-block" placeholder="额度申请订单号"
+                               name="orderId" th:value="${param.orderId}">
+                    </div>
+                    <div class="col-6 col-md-4 col-xl-2 p-1">
+                        <input type="text" class="form-control d-inline-block" placeholder="产品名称"
+                               name="projectName" th:value="${param.projectName}">
+                    </div>
+                    <div class="col-6 col-md-4 col-xl-2 p-1">
+                        <input type="text" class="form-control d-inline-block" placeholder="客户手机号/姓名/ID"
+                               name="memberInfo" th:value="${param.memberInfo}">
+                    </div>
+                    <div class="col-7 col-md-8 col-xl-3 p-1">
+                        <input type="text" class="form-control d-inline-block" id="dateRange" placeholder="点击选择申请时间范围"
+                               th:value="${#strings.isEmpty(param.startTime)}?'':${param.startTime}+' - '+${param.endTime}">
+                    </div>
+                    <div class="col-3 col-md-3 col-xl-1 p-1">
+                        <select class="form-control" name="state">
+                            <option value="">状态</option>
+                            <option th:selected="${param.state!=null}?${param.state[0]} eq ${sta.value}"
+                                    th:each="sta : ${application.applyState}"
+                                    th:text="${sta.key}" th:value="${sta.value}"></option>
+                        </select>
+                    </div>
+                    <div class="col-2 col-md-1 p-1">
+                        <input type="hidden" name="startTime" id="startTime" th:value="${param.startTime}">
+                        <input type="hidden" name="endTime" id="endTime" th:value="${param.endTime}">
+                        <button type="submit" class="btn btn-info py-1 px-2" data-toggle="modal"
+                                data-target="#gridFilters"><span
+                                class="material-icons align-text-bottom">search</span>
+                        </button>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+    <div class="content" id="content">
+        <div class="row align-items-center">
+            <table class="table table-bordered-sm bg-white responsive-table table-hover table-striped text-md-center align-middle-table">
+                <thead class="thead-light2">
+                <tr>
+                    <th scope="col">额度订单号</th>
+                    <th scope="col">申请客户</th>
+                    <th scope="col">产品名称</th>
+                    <th scope="col">申请额度/审批额度</th>
+                    <th scope="col">借款用途</th>
+                    <th scope="col">申请时间</th>
+                    <th scope="col">状态</th>
+                    <th scope="col">操作</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr th:each="item : ${pageInfo.list}" data-toggle="tooltip"
+                    th:id="'tr'+${item.id}"
+                    th:title="'审批意见:'+${item.opinion==null||item.opinion.length() == 0?'无':item.opinion}">
+                    <td data-label="额度订单号" th:text="${item.orderId}"></td>
+                    <td data-label="申请客户">
+                        <small class="text-muted" th:if="${item.memberIdCard != null}"
+                               th:text="${item.memberIdCard.name}"></small>
+                        <div class="text-primary" th:text="${item.member.mobile}"></div>
+                    </td>
+                    <td data-label="产品名称" th:text="${item.project.name}"></td>
+                    <td data-label="申请额度/审批额度">
+                        <span class="text-info" th:text="${#numbers.formatCurrency(item.applyAmount)}"></span>
+                        /
+                        <span class="text-success font-weight-bold" th:id="'applyED'+${item.id}"
+                              th:text="${#numbers.formatCurrency(item.amount)}"></span>
+                    </td>
+                    <td data-label="借款用途" th:text="${item.use}"></td>
+                    <td data-label="申请时间" th:text="${#dates.format(item.createDate, 'yyyy-MM-dd HH:mm:ss')}"></td>
+                    <td data-label="状态" th:switch="${item.state}" th:id="'state'+${item.id}">
+                        <strong class="text-danger" th:case="-1">已拒绝</strong>
+                        <strong class="text-warning" th:case="0">待处理</strong>
+                        <strong class="text-success" th:case="1">已通过</strong>
+                        <strong class="text-primary" th:case="2">已使用</strong>
+                        <strong class="text-secondary" th:case="3">已失效</strong>
+                    </td>
+                    <td data-label="操作" class="dropdown dropleft">
+
+                        <th:block th:if="${item.isBack == 0}">
+                            <a th:href="'javascript:addBack('+${item.memberId}+','+${item.id}+')'"
+                               th:style="${item.state != -1}?'display:none'"
+                               class="btn text-white btn-sm btn-danger mr-1 mr-lg-0" th:id="'black'+${item.id}">拉黑</a>
+                        </th:block>
+                        <th:block th:if="${item.isBack == 1}">
+                            <a href="javascript:void(0)"
+                               th:style="${item.state != -1}?'display:none'"
+                               class="btn text-white btn-sm btn-success mr-1 mr-lg-0" th:id="'black'+${item.id}">已拉黑</a>
+                        </th:block>
+
+                        <a th:href="'javascript:audit('+${item.id}+','+${item.memberId}+')'"
+                           th:id="'audit'+${item.id}"
+                           th:text="${item.state==0}?'审核':'认证详情'"
+                           class="btn text-white btn-sm btn-primary mr-1 mr-lg-0"></a>
+
+                        <a href="javascript:void(0)" name="btnGE"
+                           th:attr="data-id=${item.id},data-amount=${item.amount}"
+                           th:style="${item.state != 1}?'display:none'"
+                           th:id="'ge'+${item.id}"
+                           class="btn text-white btn-sm btn-info mr-1 mr-lg-0">改额</a>
+
+                        <a href="javascript:void(0)" class="btn btn-warning btn-sm text-white " id="actionDropdown"
+                           data-toggle="dropdown"
+                           aria-expanded="true">跳转</a>
+                        <div class="dropdown-menu dropdown-menu-right" aria-labelledby="actionDropdown"
+                             x-placement="left-start"
+                             style="position: absolute; transform: translate3d(-136px, 13px, 0px); top: 0px; left: 0px; will-change: transform;">
+
+                            <a class="dropdown-item" th:href="'/merchant/apply/1-10?memberId='+${item.memberId}">额度记录</a>
+                            <a class="dropdown-item" th:href="'/merchant/loan/1-10?applyId='+${item.id}">贷款记录</a>
+                            <a class="dropdown-item" th:href="'/merchant/repayment/1-10?applyId='+${item.id}">还款记录</a>
+                        </div>
+                    </td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+        <div class="row" th:if="${pageInfo.total > 0}">
+            <div class="col-12">
+                <div id="pages"></div>
+            </div>
+        </div>
+    </div>
+</th:block>
+<form method="post" id="upAmountForm" action="/merchant/apply/amount">
+    <input type="hidden" name="token" th:value="${token}"/>
+    <input type="hidden" id="id" name="id"/>
+    <input type="hidden" id="amount" name="amount"/>
+</form>
+<th:block th:replace="fragments/js :: managePublic(~{})"></th:block>
+<script src="/js/myPages/myPages.js" type="text/javascript"></script>
+<script src="/cosmo/js/lib/moment.min.js"></script>
+<script src="/cosmo/js/daterangepicker/daterangepicker.min.js"></script>
+<script src="/js/my-datarange.js"></script>
+<script src="/js/merchantPublic.js"></script>
+
+<script>
+    $(function () {
+        $("#pages").myPages({
+            pageNo: [[${pageInfo.pageNum}]],
+            pageSize: [[${pageInfo.pageSize}]],
+            lastPage: [[${pageInfo.pages}]],
+            preText: "上一页",
+            nextText: "下一页",
+            url: "/merchant/apply/{pageNo}-{pageSize}",
+            showPageButton: 6
+        })
+
+        //时间范围选择器
+        myRange("#dateRange", "#startTime", "#endTime");
+
+        $("a[name='btnGE']").click(function () {
+            var id = $(this).data("id");
+            var amount = $(this).data("amount");
+            layer.prompt({title: '修改审批额度', value: amount, formType: 0}, function (text, index) {
+                var reg=/^[0-9]+(.[0-9]+)?$/;
+                if (!reg.test(text)) {
+                    layer.msg("额度必须为数字")
+                }else if(parseFloat(text) <= 0){
+                    layer.msg("额度必须大于0");
+                } else {
+                    layer.confirm('确认修改审批额度？', {
+                        btn: ['确认', '取消'] //按钮
+                    }, function () {
+                        $("#id").val(id);
+                        $("#amount").val(text);
+                        $("#upAmountForm").submit();
+                    });
+                }
+            });
+        })
+    })
+
+    function addBack(memberId,id) {
+        var aId = "#black"+id;
+        layer.confirm('您将要拉黑该用户？', {
+            btn: ['确定','取消'] //按钮
+        }, function(){
+            $.post("/merchant/back/add", {
+                "memberId": memberId,
+            }, function (data) {
+                if (data == null || data.length == 0) {
+                    updateA(aId);
+                } else {
+                    if(data == '该用户已在黑名单'){
+                        updateA(aId);
+                    }else{
+                        layer.msg(data);
+                    }
+                }
+            }, 'text')
+            layer.closeAll();
+        });
+    }
+
+    /**
+     * 更改拉黑按钮css
+     * @param aId
+     */
+    function updateA(aId) {
+        $(aId).removeClass("btn-danger");
+        $(aId).addClass("btn-success");
+        $(aId).text("已拉黑");
+        $(aId).removeAttr('href');
+    }
+
+    function auditAfter(isSuccess,applyId,option,applyAmount){
+        var stateSpan = $("#state"+applyId+" strong");
+        stateSpan.removeClass("text-warning");
+        $("#audit"+applyId).text("认证详情");
+        if(isSuccess){
+            $("#ge"+applyId).show();
+            $("#ge"+applyId).data("amount",applyAmount);
+            $("#applyED"+applyId).text(applyAmount);
+            stateSpan.addClass("text-success");
+            stateSpan.text("已通过");
+        }else{
+            $("#black"+applyId).show();
+            stateSpan.addClass("text-danger");
+            stateSpan.text("已拒绝");
+        }
+        if(option != null){
+            $("#tr"+applyId).attr("data-original-title","审批意见："+option);
+        }
+        layer.closeAll();
+    }
+
+</script>
+</body>
+</html>
